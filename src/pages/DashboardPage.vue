@@ -1,0 +1,582 @@
+<template>
+  <div class="dashboard-page">
+    <div class="dashboard-container">
+      <!-- Filter Bar -->
+      <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
+        <div class="filter-group">
+          <label class="filter-label">Ordered Date</label>
+          <select v-model="orderedDate" class="filter-select">
+            <option value="">Select Date</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last-week">Last Week</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">Delivered Date</label>
+          <select v-model="deliveredDate" class="filter-select">
+            <option value="">Select Date</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="last-week">Last Week</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">City</label>
+          <select v-model="selectedCity" class="filter-select">
+            <option value="">Select City</option>
+            <option value="bangalore">Bangalore</option>
+            <option value="mumbai">Mumbai</option>
+            <option value="delhi">Delhi</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label">Point of Contact</label>
+          <select v-model="selectedPOC" class="filter-select">
+            <option value="">Select POC</option>
+            <option value="john">John Doe</option>
+            <option value="jane">Jane Smith</option>
+            <option value="mike">Mike Johnson</option>
+          </select>
+        </div>
+        
+        <AnimatedButton @click="clearAllFilters" variant="clear" size="medium">
+          Clear All Filters
+        </AnimatedButton>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="metrics-container">
+        <div class="metrics-grid">
+          <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.2s;">
+            <h3 class="metric-title">Total Orders Placed</h3>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Count</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersPlaced.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersPlaced.quantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.4s;">
+            <h3 class="metric-title">Total Orders Delivered</h3>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Count</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersDelivered.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersDelivered.quantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.6s;">
+            <h3 class="metric-title">Total Orders Rescheduled</h3>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Count</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersRescheduled.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersRescheduled.quantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.8s;">
+            <h3 class="metric-title">Total Orders Cancelled</h3>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Count</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersCancelled.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span class="metric-value">{{ dashboardData.totalOrdersCancelled.quantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-card cost-saved-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 1.0s;">
+            <h3 class="metric-title">Total Cost Saved</h3>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span class="metric-value">{{ dashboardData.totalCostSaved.quantity }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Amount</span>
+                <span class="metric-value">{{ dashboardData.totalCostSaved.amount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import AnimatedButton from '@/components/common/AnimatedButton.vue'
+
+// Animation state
+const isLoaded = ref(false)
+
+// Filter states
+const orderedDate = ref('')
+const deliveredDate = ref('')
+const selectedCity = ref('')
+const selectedPOC = ref('')
+
+// Mock data for dashboard metrics
+const dashboardData = ref({
+  totalOrdersPlaced: {
+    count: 0,
+    quantity: 0
+  },
+  totalOrdersDelivered: {
+    count: 0,
+    quantity: 0
+  },
+  totalOrdersRescheduled: {
+    count: 0,
+    quantity: 0
+  },
+  totalOrdersCancelled: {
+    count: 0,
+    quantity: 0
+  },
+  totalCostSaved: {
+    quantity: '0 Litres',
+    amount: 'Rs. 0'
+  }
+})
+
+const clearAllFilters = () => {
+  orderedDate.value = ''
+  deliveredDate.value = ''
+  selectedCity.value = ''
+  selectedPOC.value = ''
+}
+
+// Initialize animations on component mount
+onMounted(() => {
+  setTimeout(() => {
+    isLoaded.value = true
+  }, 100)
+})
+</script>
+
+<style scoped>
+.dashboard-page {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.dashboard-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(0, 200, 81, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(0, 200, 81, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.dashboard-container {
+  width: 100%;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-bar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  border: 1px solid rgba(0, 200, 81, 0.1);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-bar.animate-slide-down {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.filter-select {
+  padding: 0.6rem;
+  border: 2px solid rgba(0, 200, 81, 0.3);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  color: #333;
+  min-width: 120px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.filter-select:hover {
+  border-color: rgba(0, 200, 81, 0.6);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #00C851;
+  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  transform: translateY(-2px);
+}
+
+
+
+.metrics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 200, 81, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-card.animate-fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00C851, #00A844);
+  border-radius: 16px 16px 0 0;
+}
+
+.metric-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 12px 32px rgba(0, 200, 81, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 200, 81, 0.25);
+}
+
+.cost-saved-card {
+  /* Additional styles for cost saved card if needed */
+  max-width: 450px;
+}
+.metric-title {
+  color: #00C851;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.metric-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #00C851, #00A844);
+  border-radius: 1px;
+}
+
+.metric-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 200, 81, 0.08) 0%, rgba(0, 200, 81, 0.04) 100%);
+  transition: all 0.3s ease;
+}
+
+.metric-item:hover {
+  background: linear-gradient(135deg, rgba(0, 200, 81, 0.12) 0%, rgba(0, 200, 81, 0.08) 100%);
+  transform: translateY(-2px);
+  border-color: rgba(0, 200, 81, 0.2);
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.metric-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  transition: color 0.3s ease;
+  line-height: 1.2;
+}
+
+.metric-item:hover .metric-value {
+  color: #00C851;
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    margin-left: 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+  
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .filter-bar {
+    padding: 1rem;
+    gap: 1rem;
+    border-radius: 12px;
+  }
+  
+  .filter-group {
+    min-width: 120px;
+  }
+  
+  .filter-select {
+    min-width: 120px;
+    padding: 0.6rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .metric-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .metric-content {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .metric-item {
+    width: auto;
+    padding: 0.75rem;
+  }
+  
+  .metric-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: 0;
+  }
+  
+  .dashboard-container {
+    padding: 0.75rem;
+  }
+  
+  .filter-bar {
+    padding: 1rem;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-group {
+    min-width: auto;
+  }
+  
+  .filter-select {
+    min-width: auto;
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  .clear-filters-btn {
+    align-self: center;
+    margin-top: 1rem;
+    padding: 0.75rem 2rem;
+  }
+  
+  .metrics-container {
+    gap: 1.5rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .metric-card {
+    padding: 1.25rem;
+    border-radius: 14px;
+  }
+  
+  .metric-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.875rem;
+  }
+  
+  .metric-content {
+    gap: 0.75rem;
+  }
+  
+  .metric-item {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .metric-value {
+    font-size: 1.1rem;
+  }
+  
+  .metric-label {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .dashboard-container {
+    padding: 0.5rem;
+  }
+  
+  .filter-bar {
+    padding: 0.75rem;
+  }
+  
+  .metric-card {
+    padding: 1rem;
+  }
+  
+  .metric-title {
+    font-size: 0.9rem;
+  }
+  
+  .metric-value {
+    font-size: 1rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .filter-bar, .metric-card {
+    backdrop-filter: blur(15px);
+  }
+}
+
+/* Landscape orientation on tablets */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

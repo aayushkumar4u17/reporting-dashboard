@@ -1,0 +1,19 @@
+schema: 
+  - "${VITE_GRAPHQL_SCHEMA_PATH:http://localhost:8080/v1/graphql}":
+      headers:
+        x-hasura-admin-secret: ${VITE_GRAPHQL_ADMIN_SECRET:myadminsecretkey}
+documents: 'src/graphql/**/*.graphql'
+generates:
+  graphql.schema.json:
+    plugins:
+      - introspection
+  src/sdk.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+  src/sdk.urql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-vue-urql

@@ -1,0 +1,21 @@
+query checkUserOwnerStatus($user_id: uuid!) {
+  organization_user(
+    where: {
+      user_id: { _eq: $user_id }
+      is_owner: { _eq: true }
+      is_active: { _eq: true }
+    }
+  ) {
+    id
+    is_owner
+    organization_id
+    organization {
+      id
+      name
+    }
+    user {
+      id
+      phone_number
+    }
+  }
+}

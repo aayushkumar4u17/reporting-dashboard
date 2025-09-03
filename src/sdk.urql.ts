@@ -17827,6 +17827,197 @@ export type Day_Type_Updates = {
   where: Day_Type_Bool_Exp;
 };
 
+/** columns and relationships of "delivered_to" */
+export type Delivered_To = {
+  __typename?: 'delivered_to';
+  comment: Scalars['String'];
+  /** An array relationship */
+  fuel_deliveries: Array<Fuel_Delivery>;
+  /** An aggregate relationship */
+  fuel_deliveries_aggregate: Fuel_Delivery_Aggregate;
+  value: Scalars['String'];
+};
+
+
+/** columns and relationships of "delivered_to" */
+export type Delivered_ToFuel_DeliveriesArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+/** columns and relationships of "delivered_to" */
+export type Delivered_ToFuel_Deliveries_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+/** aggregated selection of "delivered_to" */
+export type Delivered_To_Aggregate = {
+  __typename?: 'delivered_to_aggregate';
+  aggregate?: Maybe<Delivered_To_Aggregate_Fields>;
+  nodes: Array<Delivered_To>;
+};
+
+/** aggregate fields of "delivered_to" */
+export type Delivered_To_Aggregate_Fields = {
+  __typename?: 'delivered_to_aggregate_fields';
+  count: Scalars['Int'];
+  max?: Maybe<Delivered_To_Max_Fields>;
+  min?: Maybe<Delivered_To_Min_Fields>;
+};
+
+
+/** aggregate fields of "delivered_to" */
+export type Delivered_To_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Delivered_To_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+};
+
+/** Boolean expression to filter rows from the table "delivered_to". All fields are combined with a logical 'AND'. */
+export type Delivered_To_Bool_Exp = {
+  _and?: InputMaybe<Array<Delivered_To_Bool_Exp>>;
+  _not?: InputMaybe<Delivered_To_Bool_Exp>;
+  _or?: InputMaybe<Array<Delivered_To_Bool_Exp>>;
+  comment?: InputMaybe<String_Comparison_Exp>;
+  fuel_deliveries?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  fuel_deliveries_aggregate?: InputMaybe<Fuel_Delivery_Aggregate_Bool_Exp>;
+  value?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "delivered_to" */
+export enum Delivered_To_Constraint {
+  /** unique or primary key constraint on columns "value" */
+  DeliveredToPkey = 'delivered_to_pkey'
+}
+
+export enum Delivered_To_Enum {
+  /** JERRYCAN */
+  Jerrycan = 'JERRYCAN',
+  /** OTHER */
+  Other = 'OTHER',
+  /** OWNER_TANK */
+  OwnerTank = 'OWNER_TANK',
+  /** TANK */
+  Tank = 'TANK',
+  /** TECHNICIAN */
+  Technician = 'TECHNICIAN'
+}
+
+/** Boolean expression to compare columns of type "delivered_to_enum". All fields are combined with logical 'AND'. */
+export type Delivered_To_Enum_Comparison_Exp = {
+  _eq?: InputMaybe<Delivered_To_Enum>;
+  _in?: InputMaybe<Array<Delivered_To_Enum>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _neq?: InputMaybe<Delivered_To_Enum>;
+  _nin?: InputMaybe<Array<Delivered_To_Enum>>;
+};
+
+/** input type for inserting data into table "delivered_to" */
+export type Delivered_To_Insert_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  fuel_deliveries?: InputMaybe<Fuel_Delivery_Arr_Rel_Insert_Input>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** aggregate max on columns */
+export type Delivered_To_Max_Fields = {
+  __typename?: 'delivered_to_max_fields';
+  comment?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+/** aggregate min on columns */
+export type Delivered_To_Min_Fields = {
+  __typename?: 'delivered_to_min_fields';
+  comment?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+/** response of any mutation on the table "delivered_to" */
+export type Delivered_To_Mutation_Response = {
+  __typename?: 'delivered_to_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Delivered_To>;
+};
+
+/** input type for inserting object relation for remote table "delivered_to" */
+export type Delivered_To_Obj_Rel_Insert_Input = {
+  data: Delivered_To_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Delivered_To_On_Conflict>;
+};
+
+/** on_conflict condition type for table "delivered_to" */
+export type Delivered_To_On_Conflict = {
+  constraint: Delivered_To_Constraint;
+  update_columns?: Array<Delivered_To_Update_Column>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "delivered_to". */
+export type Delivered_To_Order_By = {
+  comment?: InputMaybe<Order_By>;
+  fuel_deliveries_aggregate?: InputMaybe<Fuel_Delivery_Aggregate_Order_By>;
+  value?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: delivered_to */
+export type Delivered_To_Pk_Columns_Input = {
+  value: Scalars['String'];
+};
+
+/** select columns of table "delivered_to" */
+export enum Delivered_To_Select_Column {
+  /** column name */
+  Comment = 'comment',
+  /** column name */
+  Value = 'value'
+}
+
+/** input type for updating data in table "delivered_to" */
+export type Delivered_To_Set_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** Streaming cursor of the table "delivered_to" */
+export type Delivered_To_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Delivered_To_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Delivered_To_Stream_Cursor_Value_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** update columns of table "delivered_to" */
+export enum Delivered_To_Update_Column {
+  /** column name */
+  Comment = 'comment',
+  /** column name */
+  Value = 'value'
+}
+
+export type Delivered_To_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Delivered_To_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Delivered_To_Bool_Exp;
+};
+
 export type DeliveryFeesDriverAppInput = {
   customer_order_id: Scalars['numeric'];
   total_dispensed_qty: Scalars['numeric'];
@@ -26626,6 +26817,7 @@ export type Filtered_Orders_Dashboard = {
   is_express_delivery?: Maybe<Scalars['Boolean']>;
   is_previous_order_late_delivered?: Maybe<Scalars['Boolean']>;
   is_rescheduled?: Maybe<Scalars['Boolean']>;
+  is_sensel_enable?: Maybe<Scalars['Boolean']>;
   is_test_enabled?: Maybe<Scalars['Boolean']>;
   item_state?: Maybe<Scalars['String']>;
   last_name?: Maybe<Scalars['String']>;
@@ -26637,6 +26829,7 @@ export type Filtered_Orders_Dashboard = {
   order_id?: Maybe<Scalars['uuid']>;
   order_source_of_creation?: Maybe<Scalars['String']>;
   order_state?: Maybe<Scalars['String']>;
+  organization_address_location?: Maybe<Scalars['point']>;
   organization_id?: Maybe<Scalars['uuid']>;
   organization_name?: Maybe<Scalars['String']>;
   organization_user_id?: Maybe<Scalars['uuid']>;
@@ -26647,11 +26840,17 @@ export type Filtered_Orders_Dashboard = {
   placed_order_otp?: Maybe<Scalars['Int']>;
   previous_customer_order_code?: Maybe<Scalars['numeric']>;
   qty?: Maybe<Scalars['numeric']>;
+  registration_number?: Maybe<Scalars['String']>;
   shipping_address_id?: Maybe<Scalars['uuid']>;
   start_time?: Maybe<Scalars['timetz']>;
+  tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
+  third_party_gps?: Maybe<Scalars['String']>;
   user_id?: Maybe<Scalars['uuid']>;
+  vehicle_id?: Maybe<Scalars['uuid']>;
+  vehicle_type?: Maybe<Scalars['String']>;
 };
 
 /** aggregated selection of "filtered_orders_dashboard" */
@@ -26694,6 +26893,8 @@ export type Filtered_Orders_Dashboard_Avg_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** Boolean expression to filter rows from the table "filtered_orders_dashboard". All fields are combined with a logical 'AND'. */
@@ -26723,6 +26924,7 @@ export type Filtered_Orders_Dashboard_Bool_Exp = {
   is_express_delivery?: InputMaybe<Boolean_Comparison_Exp>;
   is_previous_order_late_delivered?: InputMaybe<Boolean_Comparison_Exp>;
   is_rescheduled?: InputMaybe<Boolean_Comparison_Exp>;
+  is_sensel_enable?: InputMaybe<Boolean_Comparison_Exp>;
   is_test_enabled?: InputMaybe<Boolean_Comparison_Exp>;
   item_state?: InputMaybe<String_Comparison_Exp>;
   last_name?: InputMaybe<String_Comparison_Exp>;
@@ -26734,6 +26936,7 @@ export type Filtered_Orders_Dashboard_Bool_Exp = {
   order_id?: InputMaybe<Uuid_Comparison_Exp>;
   order_source_of_creation?: InputMaybe<String_Comparison_Exp>;
   order_state?: InputMaybe<String_Comparison_Exp>;
+  organization_address_location?: InputMaybe<Point_Comparison_Exp>;
   organization_id?: InputMaybe<Uuid_Comparison_Exp>;
   organization_name?: InputMaybe<String_Comparison_Exp>;
   organization_user_id?: InputMaybe<Uuid_Comparison_Exp>;
@@ -26744,11 +26947,17 @@ export type Filtered_Orders_Dashboard_Bool_Exp = {
   placed_order_otp?: InputMaybe<Int_Comparison_Exp>;
   previous_customer_order_code?: InputMaybe<Numeric_Comparison_Exp>;
   qty?: InputMaybe<Numeric_Comparison_Exp>;
+  registration_number?: InputMaybe<String_Comparison_Exp>;
   shipping_address_id?: InputMaybe<Uuid_Comparison_Exp>;
   start_time?: InputMaybe<Timetz_Comparison_Exp>;
+  tanker_capacity?: InputMaybe<Int_Comparison_Exp>;
   task_id?: InputMaybe<Uuid_Comparison_Exp>;
+  task_rank_id?: InputMaybe<Int_Comparison_Exp>;
   task_state?: InputMaybe<String_Comparison_Exp>;
+  third_party_gps?: InputMaybe<String_Comparison_Exp>;
   user_id?: InputMaybe<Uuid_Comparison_Exp>;
+  vehicle_id?: InputMaybe<Uuid_Comparison_Exp>;
+  vehicle_type?: InputMaybe<String_Comparison_Exp>;
 };
 
 /** aggregate max on columns */
@@ -26793,11 +27002,17 @@ export type Filtered_Orders_Dashboard_Max_Fields = {
   placed_order_otp?: Maybe<Scalars['Int']>;
   previous_customer_order_code?: Maybe<Scalars['numeric']>;
   qty?: Maybe<Scalars['numeric']>;
+  registration_number?: Maybe<Scalars['String']>;
   shipping_address_id?: Maybe<Scalars['uuid']>;
   start_time?: Maybe<Scalars['timetz']>;
+  tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
+  third_party_gps?: Maybe<Scalars['String']>;
   user_id?: Maybe<Scalars['uuid']>;
+  vehicle_id?: Maybe<Scalars['uuid']>;
+  vehicle_type?: Maybe<Scalars['String']>;
 };
 
 /** aggregate min on columns */
@@ -26842,11 +27057,17 @@ export type Filtered_Orders_Dashboard_Min_Fields = {
   placed_order_otp?: Maybe<Scalars['Int']>;
   previous_customer_order_code?: Maybe<Scalars['numeric']>;
   qty?: Maybe<Scalars['numeric']>;
+  registration_number?: Maybe<Scalars['String']>;
   shipping_address_id?: Maybe<Scalars['uuid']>;
   start_time?: Maybe<Scalars['timetz']>;
+  tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
+  third_party_gps?: Maybe<Scalars['String']>;
   user_id?: Maybe<Scalars['uuid']>;
+  vehicle_id?: Maybe<Scalars['uuid']>;
+  vehicle_type?: Maybe<Scalars['String']>;
 };
 
 /** Ordering options when selecting data from "filtered_orders_dashboard". */
@@ -26873,6 +27094,7 @@ export type Filtered_Orders_Dashboard_Order_By = {
   is_express_delivery?: InputMaybe<Order_By>;
   is_previous_order_late_delivered?: InputMaybe<Order_By>;
   is_rescheduled?: InputMaybe<Order_By>;
+  is_sensel_enable?: InputMaybe<Order_By>;
   is_test_enabled?: InputMaybe<Order_By>;
   item_state?: InputMaybe<Order_By>;
   last_name?: InputMaybe<Order_By>;
@@ -26884,6 +27106,7 @@ export type Filtered_Orders_Dashboard_Order_By = {
   order_id?: InputMaybe<Order_By>;
   order_source_of_creation?: InputMaybe<Order_By>;
   order_state?: InputMaybe<Order_By>;
+  organization_address_location?: InputMaybe<Order_By>;
   organization_id?: InputMaybe<Order_By>;
   organization_name?: InputMaybe<Order_By>;
   organization_user_id?: InputMaybe<Order_By>;
@@ -26894,11 +27117,17 @@ export type Filtered_Orders_Dashboard_Order_By = {
   placed_order_otp?: InputMaybe<Order_By>;
   previous_customer_order_code?: InputMaybe<Order_By>;
   qty?: InputMaybe<Order_By>;
+  registration_number?: InputMaybe<Order_By>;
   shipping_address_id?: InputMaybe<Order_By>;
   start_time?: InputMaybe<Order_By>;
+  tanker_capacity?: InputMaybe<Order_By>;
   task_id?: InputMaybe<Order_By>;
+  task_rank_id?: InputMaybe<Order_By>;
   task_state?: InputMaybe<Order_By>;
+  third_party_gps?: InputMaybe<Order_By>;
   user_id?: InputMaybe<Order_By>;
+  vehicle_id?: InputMaybe<Order_By>;
+  vehicle_type?: InputMaybe<Order_By>;
 };
 
 /** select columns of table "filtered_orders_dashboard" */
@@ -26948,6 +27177,8 @@ export enum Filtered_Orders_Dashboard_Select_Column {
   /** column name */
   IsRescheduled = 'is_rescheduled',
   /** column name */
+  IsSenselEnable = 'is_sensel_enable',
+  /** column name */
   IsTestEnabled = 'is_test_enabled',
   /** column name */
   ItemState = 'item_state',
@@ -26970,6 +27201,8 @@ export enum Filtered_Orders_Dashboard_Select_Column {
   /** column name */
   OrderState = 'order_state',
   /** column name */
+  OrganizationAddressLocation = 'organization_address_location',
+  /** column name */
   OrganizationId = 'organization_id',
   /** column name */
   OrganizationName = 'organization_name',
@@ -26990,15 +27223,27 @@ export enum Filtered_Orders_Dashboard_Select_Column {
   /** column name */
   Qty = 'qty',
   /** column name */
+  RegistrationNumber = 'registration_number',
+  /** column name */
   ShippingAddressId = 'shipping_address_id',
   /** column name */
   StartTime = 'start_time',
   /** column name */
+  TankerCapacity = 'tanker_capacity',
+  /** column name */
   TaskId = 'task_id',
+  /** column name */
+  TaskRankId = 'task_rank_id',
   /** column name */
   TaskState = 'task_state',
   /** column name */
-  UserId = 'user_id'
+  ThirdPartyGps = 'third_party_gps',
+  /** column name */
+  UserId = 'user_id',
+  /** column name */
+  VehicleId = 'vehicle_id',
+  /** column name */
+  VehicleType = 'vehicle_type'
 }
 
 /** aggregate stddev on columns */
@@ -27011,6 +27256,8 @@ export type Filtered_Orders_Dashboard_Stddev_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** aggregate stddev_pop on columns */
@@ -27023,6 +27270,8 @@ export type Filtered_Orders_Dashboard_Stddev_Pop_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** aggregate stddev_samp on columns */
@@ -27035,6 +27284,8 @@ export type Filtered_Orders_Dashboard_Stddev_Samp_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** Streaming cursor of the table "filtered_orders_dashboard" */
@@ -27069,6 +27320,7 @@ export type Filtered_Orders_Dashboard_Stream_Cursor_Value_Input = {
   is_express_delivery?: InputMaybe<Scalars['Boolean']>;
   is_previous_order_late_delivered?: InputMaybe<Scalars['Boolean']>;
   is_rescheduled?: InputMaybe<Scalars['Boolean']>;
+  is_sensel_enable?: InputMaybe<Scalars['Boolean']>;
   is_test_enabled?: InputMaybe<Scalars['Boolean']>;
   item_state?: InputMaybe<Scalars['String']>;
   last_name?: InputMaybe<Scalars['String']>;
@@ -27080,6 +27332,7 @@ export type Filtered_Orders_Dashboard_Stream_Cursor_Value_Input = {
   order_id?: InputMaybe<Scalars['uuid']>;
   order_source_of_creation?: InputMaybe<Scalars['String']>;
   order_state?: InputMaybe<Scalars['String']>;
+  organization_address_location?: InputMaybe<Scalars['point']>;
   organization_id?: InputMaybe<Scalars['uuid']>;
   organization_name?: InputMaybe<Scalars['String']>;
   organization_user_id?: InputMaybe<Scalars['uuid']>;
@@ -27090,11 +27343,17 @@ export type Filtered_Orders_Dashboard_Stream_Cursor_Value_Input = {
   placed_order_otp?: InputMaybe<Scalars['Int']>;
   previous_customer_order_code?: InputMaybe<Scalars['numeric']>;
   qty?: InputMaybe<Scalars['numeric']>;
+  registration_number?: InputMaybe<Scalars['String']>;
   shipping_address_id?: InputMaybe<Scalars['uuid']>;
   start_time?: InputMaybe<Scalars['timetz']>;
+  tanker_capacity?: InputMaybe<Scalars['Int']>;
   task_id?: InputMaybe<Scalars['uuid']>;
+  task_rank_id?: InputMaybe<Scalars['Int']>;
   task_state?: InputMaybe<Scalars['String']>;
+  third_party_gps?: InputMaybe<Scalars['String']>;
   user_id?: InputMaybe<Scalars['uuid']>;
+  vehicle_id?: InputMaybe<Scalars['uuid']>;
+  vehicle_type?: InputMaybe<Scalars['String']>;
 };
 
 /** aggregate sum on columns */
@@ -27107,6 +27366,8 @@ export type Filtered_Orders_Dashboard_Sum_Fields = {
   placed_order_otp?: Maybe<Scalars['Int']>;
   previous_customer_order_code?: Maybe<Scalars['numeric']>;
   qty?: Maybe<Scalars['numeric']>;
+  tanker_capacity?: Maybe<Scalars['Int']>;
+  task_rank_id?: Maybe<Scalars['Int']>;
 };
 
 /** aggregate var_pop on columns */
@@ -27119,6 +27380,8 @@ export type Filtered_Orders_Dashboard_Var_Pop_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** aggregate var_samp on columns */
@@ -27131,6 +27394,8 @@ export type Filtered_Orders_Dashboard_Var_Samp_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** aggregate variance on columns */
@@ -27143,6 +27408,8 @@ export type Filtered_Orders_Dashboard_Variance_Fields = {
   placed_order_otp?: Maybe<Scalars['Float']>;
   previous_customer_order_code?: Maybe<Scalars['Float']>;
   qty?: Maybe<Scalars['Float']>;
+  tanker_capacity?: Maybe<Scalars['Float']>;
+  task_rank_id?: Maybe<Scalars['Float']>;
 };
 
 /** columns and relationships of "filtered_orders_live_dispensing_view" */
@@ -27912,6 +28179,418 @@ export type Float8_Comparison_Exp = {
   _lte?: InputMaybe<Scalars['float8']>;
   _neq?: InputMaybe<Scalars['float8']>;
   _nin?: InputMaybe<Array<Scalars['float8']>>;
+};
+
+/** columns and relationships of "fuel_delivery" */
+export type Fuel_Delivery = {
+  __typename?: 'fuel_delivery';
+  created_at?: Maybe<Scalars['timestamp']>;
+  /** An object relationship */
+  deliveredToByDeliveredTo: Delivered_To;
+  delivered_to: Delivered_To_Enum;
+  id: Scalars['uuid'];
+  is_active: Scalars['Boolean'];
+  last_modified?: Maybe<Scalars['timestamp']>;
+  last_modified_by?: Maybe<Scalars['uuid']>;
+  other_reason?: Maybe<Scalars['String']>;
+  quantity: Scalars['numeric'];
+  /** An object relationship */
+  task: Task;
+  task_id: Scalars['uuid'];
+};
+
+/** aggregated selection of "fuel_delivery" */
+export type Fuel_Delivery_Aggregate = {
+  __typename?: 'fuel_delivery_aggregate';
+  aggregate?: Maybe<Fuel_Delivery_Aggregate_Fields>;
+  nodes: Array<Fuel_Delivery>;
+};
+
+export type Fuel_Delivery_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<Fuel_Delivery_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<Fuel_Delivery_Aggregate_Bool_Exp_Bool_Or>;
+  count?: InputMaybe<Fuel_Delivery_Aggregate_Bool_Exp_Count>;
+};
+
+export type Fuel_Delivery_Aggregate_Bool_Exp_Bool_And = {
+  arguments: Fuel_Delivery_Select_Column_Fuel_Delivery_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Fuel_Delivery_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: Fuel_Delivery_Select_Column_Fuel_Delivery_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Fuel_Delivery_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+/** aggregate fields of "fuel_delivery" */
+export type Fuel_Delivery_Aggregate_Fields = {
+  __typename?: 'fuel_delivery_aggregate_fields';
+  avg?: Maybe<Fuel_Delivery_Avg_Fields>;
+  count: Scalars['Int'];
+  max?: Maybe<Fuel_Delivery_Max_Fields>;
+  min?: Maybe<Fuel_Delivery_Min_Fields>;
+  stddev?: Maybe<Fuel_Delivery_Stddev_Fields>;
+  stddev_pop?: Maybe<Fuel_Delivery_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Fuel_Delivery_Stddev_Samp_Fields>;
+  sum?: Maybe<Fuel_Delivery_Sum_Fields>;
+  var_pop?: Maybe<Fuel_Delivery_Var_Pop_Fields>;
+  var_samp?: Maybe<Fuel_Delivery_Var_Samp_Fields>;
+  variance?: Maybe<Fuel_Delivery_Variance_Fields>;
+};
+
+
+/** aggregate fields of "fuel_delivery" */
+export type Fuel_Delivery_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+};
+
+/** order by aggregate values of table "fuel_delivery" */
+export type Fuel_Delivery_Aggregate_Order_By = {
+  avg?: InputMaybe<Fuel_Delivery_Avg_Order_By>;
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Fuel_Delivery_Max_Order_By>;
+  min?: InputMaybe<Fuel_Delivery_Min_Order_By>;
+  stddev?: InputMaybe<Fuel_Delivery_Stddev_Order_By>;
+  stddev_pop?: InputMaybe<Fuel_Delivery_Stddev_Pop_Order_By>;
+  stddev_samp?: InputMaybe<Fuel_Delivery_Stddev_Samp_Order_By>;
+  sum?: InputMaybe<Fuel_Delivery_Sum_Order_By>;
+  var_pop?: InputMaybe<Fuel_Delivery_Var_Pop_Order_By>;
+  var_samp?: InputMaybe<Fuel_Delivery_Var_Samp_Order_By>;
+  variance?: InputMaybe<Fuel_Delivery_Variance_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "fuel_delivery" */
+export type Fuel_Delivery_Arr_Rel_Insert_Input = {
+  data: Array<Fuel_Delivery_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Fuel_Delivery_On_Conflict>;
+};
+
+/** aggregate avg on columns */
+export type Fuel_Delivery_Avg_Fields = {
+  __typename?: 'fuel_delivery_avg_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by avg() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Avg_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** Boolean expression to filter rows from the table "fuel_delivery". All fields are combined with a logical 'AND'. */
+export type Fuel_Delivery_Bool_Exp = {
+  _and?: InputMaybe<Array<Fuel_Delivery_Bool_Exp>>;
+  _not?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  _or?: InputMaybe<Array<Fuel_Delivery_Bool_Exp>>;
+  created_at?: InputMaybe<Timestamp_Comparison_Exp>;
+  deliveredToByDeliveredTo?: InputMaybe<Delivered_To_Bool_Exp>;
+  delivered_to?: InputMaybe<Delivered_To_Enum_Comparison_Exp>;
+  id?: InputMaybe<Uuid_Comparison_Exp>;
+  is_active?: InputMaybe<Boolean_Comparison_Exp>;
+  last_modified?: InputMaybe<Timestamp_Comparison_Exp>;
+  last_modified_by?: InputMaybe<Uuid_Comparison_Exp>;
+  other_reason?: InputMaybe<String_Comparison_Exp>;
+  quantity?: InputMaybe<Numeric_Comparison_Exp>;
+  task?: InputMaybe<Task_Bool_Exp>;
+  task_id?: InputMaybe<Uuid_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "fuel_delivery" */
+export enum Fuel_Delivery_Constraint {
+  /** unique or primary key constraint on columns "task_id", "delivered_to" */
+  FuelDeliveryDeliveredToTaskIdKey = 'fuel_delivery_delivered_to_task_id_key',
+  /** unique or primary key constraint on columns "id" */
+  FuelDeliveryPkey = 'fuel_delivery_pkey'
+}
+
+/** input type for incrementing numeric columns in table "fuel_delivery" */
+export type Fuel_Delivery_Inc_Input = {
+  quantity?: InputMaybe<Scalars['numeric']>;
+};
+
+/** input type for inserting data into table "fuel_delivery" */
+export type Fuel_Delivery_Insert_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']>;
+  deliveredToByDeliveredTo?: InputMaybe<Delivered_To_Obj_Rel_Insert_Input>;
+  delivered_to?: InputMaybe<Delivered_To_Enum>;
+  id?: InputMaybe<Scalars['uuid']>;
+  is_active?: InputMaybe<Scalars['Boolean']>;
+  last_modified?: InputMaybe<Scalars['timestamp']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']>;
+  other_reason?: InputMaybe<Scalars['String']>;
+  quantity?: InputMaybe<Scalars['numeric']>;
+  task?: InputMaybe<Task_Obj_Rel_Insert_Input>;
+  task_id?: InputMaybe<Scalars['uuid']>;
+};
+
+/** aggregate max on columns */
+export type Fuel_Delivery_Max_Fields = {
+  __typename?: 'fuel_delivery_max_fields';
+  created_at?: Maybe<Scalars['timestamp']>;
+  id?: Maybe<Scalars['uuid']>;
+  last_modified?: Maybe<Scalars['timestamp']>;
+  last_modified_by?: Maybe<Scalars['uuid']>;
+  other_reason?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['numeric']>;
+  task_id?: Maybe<Scalars['uuid']>;
+};
+
+/** order by max() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Max_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  other_reason?: InputMaybe<Order_By>;
+  quantity?: InputMaybe<Order_By>;
+  task_id?: InputMaybe<Order_By>;
+};
+
+/** aggregate min on columns */
+export type Fuel_Delivery_Min_Fields = {
+  __typename?: 'fuel_delivery_min_fields';
+  created_at?: Maybe<Scalars['timestamp']>;
+  id?: Maybe<Scalars['uuid']>;
+  last_modified?: Maybe<Scalars['timestamp']>;
+  last_modified_by?: Maybe<Scalars['uuid']>;
+  other_reason?: Maybe<Scalars['String']>;
+  quantity?: Maybe<Scalars['numeric']>;
+  task_id?: Maybe<Scalars['uuid']>;
+};
+
+/** order by min() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Min_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  other_reason?: InputMaybe<Order_By>;
+  quantity?: InputMaybe<Order_By>;
+  task_id?: InputMaybe<Order_By>;
+};
+
+/** response of any mutation on the table "fuel_delivery" */
+export type Fuel_Delivery_Mutation_Response = {
+  __typename?: 'fuel_delivery_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Fuel_Delivery>;
+};
+
+/** on_conflict condition type for table "fuel_delivery" */
+export type Fuel_Delivery_On_Conflict = {
+  constraint: Fuel_Delivery_Constraint;
+  update_columns?: Array<Fuel_Delivery_Update_Column>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "fuel_delivery". */
+export type Fuel_Delivery_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  deliveredToByDeliveredTo?: InputMaybe<Delivered_To_Order_By>;
+  delivered_to?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  is_active?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  other_reason?: InputMaybe<Order_By>;
+  quantity?: InputMaybe<Order_By>;
+  task?: InputMaybe<Task_Order_By>;
+  task_id?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: fuel_delivery */
+export type Fuel_Delivery_Pk_Columns_Input = {
+  id: Scalars['uuid'];
+};
+
+/** select columns of table "fuel_delivery" */
+export enum Fuel_Delivery_Select_Column {
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  DeliveredTo = 'delivered_to',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsActive = 'is_active',
+  /** column name */
+  LastModified = 'last_modified',
+  /** column name */
+  LastModifiedBy = 'last_modified_by',
+  /** column name */
+  OtherReason = 'other_reason',
+  /** column name */
+  Quantity = 'quantity',
+  /** column name */
+  TaskId = 'task_id'
+}
+
+/** select "fuel_delivery_aggregate_bool_exp_bool_and_arguments_columns" columns of table "fuel_delivery" */
+export enum Fuel_Delivery_Select_Column_Fuel_Delivery_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  IsActive = 'is_active'
+}
+
+/** select "fuel_delivery_aggregate_bool_exp_bool_or_arguments_columns" columns of table "fuel_delivery" */
+export enum Fuel_Delivery_Select_Column_Fuel_Delivery_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  IsActive = 'is_active'
+}
+
+/** input type for updating data in table "fuel_delivery" */
+export type Fuel_Delivery_Set_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']>;
+  delivered_to?: InputMaybe<Delivered_To_Enum>;
+  id?: InputMaybe<Scalars['uuid']>;
+  is_active?: InputMaybe<Scalars['Boolean']>;
+  last_modified?: InputMaybe<Scalars['timestamp']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']>;
+  other_reason?: InputMaybe<Scalars['String']>;
+  quantity?: InputMaybe<Scalars['numeric']>;
+  task_id?: InputMaybe<Scalars['uuid']>;
+};
+
+/** aggregate stddev on columns */
+export type Fuel_Delivery_Stddev_Fields = {
+  __typename?: 'fuel_delivery_stddev_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by stddev() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Stddev_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Fuel_Delivery_Stddev_Pop_Fields = {
+  __typename?: 'fuel_delivery_stddev_pop_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by stddev_pop() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Stddev_Pop_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Fuel_Delivery_Stddev_Samp_Fields = {
+  __typename?: 'fuel_delivery_stddev_samp_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by stddev_samp() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Stddev_Samp_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** Streaming cursor of the table "fuel_delivery" */
+export type Fuel_Delivery_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Fuel_Delivery_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Fuel_Delivery_Stream_Cursor_Value_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']>;
+  delivered_to?: InputMaybe<Delivered_To_Enum>;
+  id?: InputMaybe<Scalars['uuid']>;
+  is_active?: InputMaybe<Scalars['Boolean']>;
+  last_modified?: InputMaybe<Scalars['timestamp']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']>;
+  other_reason?: InputMaybe<Scalars['String']>;
+  quantity?: InputMaybe<Scalars['numeric']>;
+  task_id?: InputMaybe<Scalars['uuid']>;
+};
+
+/** aggregate sum on columns */
+export type Fuel_Delivery_Sum_Fields = {
+  __typename?: 'fuel_delivery_sum_fields';
+  quantity?: Maybe<Scalars['numeric']>;
+};
+
+/** order by sum() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Sum_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** update columns of table "fuel_delivery" */
+export enum Fuel_Delivery_Update_Column {
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  DeliveredTo = 'delivered_to',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsActive = 'is_active',
+  /** column name */
+  LastModified = 'last_modified',
+  /** column name */
+  LastModifiedBy = 'last_modified_by',
+  /** column name */
+  OtherReason = 'other_reason',
+  /** column name */
+  Quantity = 'quantity',
+  /** column name */
+  TaskId = 'task_id'
+}
+
+export type Fuel_Delivery_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Fuel_Delivery_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Fuel_Delivery_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Fuel_Delivery_Bool_Exp;
+};
+
+/** aggregate var_pop on columns */
+export type Fuel_Delivery_Var_Pop_Fields = {
+  __typename?: 'fuel_delivery_var_pop_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by var_pop() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Var_Pop_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** aggregate var_samp on columns */
+export type Fuel_Delivery_Var_Samp_Fields = {
+  __typename?: 'fuel_delivery_var_samp_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by var_samp() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Var_Samp_Order_By = {
+  quantity?: InputMaybe<Order_By>;
+};
+
+/** aggregate variance on columns */
+export type Fuel_Delivery_Variance_Fields = {
+  __typename?: 'fuel_delivery_variance_fields';
+  quantity?: Maybe<Scalars['Float']>;
+};
+
+/** order by variance() on columns of table "fuel_delivery" */
+export type Fuel_Delivery_Variance_Order_By = {
+  quantity?: InputMaybe<Order_By>;
 };
 
 /** columns and relationships of "fuel_request_type" */
@@ -36758,6 +37437,10 @@ export type Mutation_Root = {
   delete_day_type?: Maybe<Day_Type_Mutation_Response>;
   /** delete single row from the table: "day_type" */
   delete_day_type_by_pk?: Maybe<Day_Type>;
+  /** delete data from the table: "delivered_to" */
+  delete_delivered_to?: Maybe<Delivered_To_Mutation_Response>;
+  /** delete single row from the table: "delivered_to" */
+  delete_delivered_to_by_pk?: Maybe<Delivered_To>;
   /** delete data from the table: "delivery_preferences" */
   delete_delivery_preferences?: Maybe<Delivery_Preferences_Mutation_Response>;
   /** delete single row from the table: "delivery_preferences" */
@@ -36854,6 +37537,10 @@ export type Mutation_Root = {
   delete_fillup_request_status?: Maybe<Fillup_Request_Status_Mutation_Response>;
   /** delete single row from the table: "fillup_request_status" */
   delete_fillup_request_status_by_pk?: Maybe<Fillup_Request_Status>;
+  /** delete data from the table: "fuel_delivery" */
+  delete_fuel_delivery?: Maybe<Fuel_Delivery_Mutation_Response>;
+  /** delete single row from the table: "fuel_delivery" */
+  delete_fuel_delivery_by_pk?: Maybe<Fuel_Delivery>;
   /** delete data from the table: "fuel_request_type" */
   delete_fuel_request_type?: Maybe<Fuel_Request_Type_Mutation_Response>;
   /** delete single row from the table: "fuel_request_type" */
@@ -37754,6 +38441,10 @@ export type Mutation_Root = {
   insert_day_type?: Maybe<Day_Type_Mutation_Response>;
   /** insert a single row into the table: "day_type" */
   insert_day_type_one?: Maybe<Day_Type>;
+  /** insert data into the table: "delivered_to" */
+  insert_delivered_to?: Maybe<Delivered_To_Mutation_Response>;
+  /** insert a single row into the table: "delivered_to" */
+  insert_delivered_to_one?: Maybe<Delivered_To>;
   /** insert data into the table: "delivery_preferences" */
   insert_delivery_preferences?: Maybe<Delivery_Preferences_Mutation_Response>;
   /** insert a single row into the table: "delivery_preferences" */
@@ -37850,6 +38541,10 @@ export type Mutation_Root = {
   insert_fillup_request_status?: Maybe<Fillup_Request_Status_Mutation_Response>;
   /** insert a single row into the table: "fillup_request_status" */
   insert_fillup_request_status_one?: Maybe<Fillup_Request_Status>;
+  /** insert data into the table: "fuel_delivery" */
+  insert_fuel_delivery?: Maybe<Fuel_Delivery_Mutation_Response>;
+  /** insert a single row into the table: "fuel_delivery" */
+  insert_fuel_delivery_one?: Maybe<Fuel_Delivery>;
   /** insert data into the table: "fuel_request_type" */
   insert_fuel_request_type?: Maybe<Fuel_Request_Type_Mutation_Response>;
   /** insert a single row into the table: "fuel_request_type" */
@@ -38853,6 +39548,12 @@ export type Mutation_Root = {
   update_day_type_by_pk?: Maybe<Day_Type>;
   /** update multiples rows of table: "day_type" */
   update_day_type_many?: Maybe<Array<Maybe<Day_Type_Mutation_Response>>>;
+  /** update data of the table: "delivered_to" */
+  update_delivered_to?: Maybe<Delivered_To_Mutation_Response>;
+  /** update single row of the table: "delivered_to" */
+  update_delivered_to_by_pk?: Maybe<Delivered_To>;
+  /** update multiples rows of table: "delivered_to" */
+  update_delivered_to_many?: Maybe<Array<Maybe<Delivered_To_Mutation_Response>>>;
   /** update data of the table: "delivery_preferences" */
   update_delivery_preferences?: Maybe<Delivery_Preferences_Mutation_Response>;
   /** update single row of the table: "delivery_preferences" */
@@ -38997,6 +39698,12 @@ export type Mutation_Root = {
   update_fillup_request_status_by_pk?: Maybe<Fillup_Request_Status>;
   /** update multiples rows of table: "fillup_request_status" */
   update_fillup_request_status_many?: Maybe<Array<Maybe<Fillup_Request_Status_Mutation_Response>>>;
+  /** update data of the table: "fuel_delivery" */
+  update_fuel_delivery?: Maybe<Fuel_Delivery_Mutation_Response>;
+  /** update single row of the table: "fuel_delivery" */
+  update_fuel_delivery_by_pk?: Maybe<Fuel_Delivery>;
+  /** update multiples rows of table: "fuel_delivery" */
+  update_fuel_delivery_many?: Maybe<Array<Maybe<Fuel_Delivery_Mutation_Response>>>;
   /** update data of the table: "fuel_request_type" */
   update_fuel_request_type?: Maybe<Fuel_Request_Type_Mutation_Response>;
   /** update single row of the table: "fuel_request_type" */
@@ -40777,6 +41484,18 @@ export type Mutation_RootDelete_Day_Type_By_PkArgs = {
 
 
 /** mutation root */
+export type Mutation_RootDelete_Delivered_ToArgs = {
+  where: Delivered_To_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Delivered_To_By_PkArgs = {
+  value: Scalars['String'];
+};
+
+
+/** mutation root */
 export type Mutation_RootDelete_Delivery_PreferencesArgs = {
   where: Delivery_Preferences_Bool_Exp;
 };
@@ -41061,6 +41780,18 @@ export type Mutation_RootDelete_Fillup_Request_StatusArgs = {
 /** mutation root */
 export type Mutation_RootDelete_Fillup_Request_Status_By_PkArgs = {
   value: Scalars['String'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Fuel_DeliveryArgs = {
+  where: Fuel_Delivery_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Fuel_Delivery_By_PkArgs = {
+  id: Scalars['uuid'];
 };
 
 
@@ -43913,6 +44644,20 @@ export type Mutation_RootInsert_Day_Type_OneArgs = {
 
 
 /** mutation root */
+export type Mutation_RootInsert_Delivered_ToArgs = {
+  objects: Array<Delivered_To_Insert_Input>;
+  on_conflict?: InputMaybe<Delivered_To_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Delivered_To_OneArgs = {
+  object: Delivered_To_Insert_Input;
+  on_conflict?: InputMaybe<Delivered_To_On_Conflict>;
+};
+
+
+/** mutation root */
 export type Mutation_RootInsert_Delivery_PreferencesArgs = {
   objects: Array<Delivery_Preferences_Insert_Input>;
   on_conflict?: InputMaybe<Delivery_Preferences_On_Conflict>;
@@ -44245,6 +44990,20 @@ export type Mutation_RootInsert_Fillup_Request_StatusArgs = {
 export type Mutation_RootInsert_Fillup_Request_Status_OneArgs = {
   object: Fillup_Request_Status_Insert_Input;
   on_conflict?: InputMaybe<Fillup_Request_Status_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Fuel_DeliveryArgs = {
+  objects: Array<Fuel_Delivery_Insert_Input>;
+  on_conflict?: InputMaybe<Fuel_Delivery_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Fuel_Delivery_OneArgs = {
+  object: Fuel_Delivery_Insert_Input;
+  on_conflict?: InputMaybe<Fuel_Delivery_On_Conflict>;
 };
 
 
@@ -47820,6 +48579,26 @@ export type Mutation_RootUpdate_Day_Type_ManyArgs = {
 
 
 /** mutation root */
+export type Mutation_RootUpdate_Delivered_ToArgs = {
+  _set?: InputMaybe<Delivered_To_Set_Input>;
+  where: Delivered_To_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Delivered_To_By_PkArgs = {
+  _set?: InputMaybe<Delivered_To_Set_Input>;
+  pk_columns: Delivered_To_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Delivered_To_ManyArgs = {
+  updates: Array<Delivered_To_Updates>;
+};
+
+
+/** mutation root */
 export type Mutation_RootUpdate_Delivery_PreferencesArgs = {
   _set?: InputMaybe<Delivery_Preferences_Set_Input>;
   where: Delivery_Preferences_Bool_Exp;
@@ -48298,6 +49077,28 @@ export type Mutation_RootUpdate_Fillup_Request_Status_By_PkArgs = {
 /** mutation root */
 export type Mutation_RootUpdate_Fillup_Request_Status_ManyArgs = {
   updates: Array<Fillup_Request_Status_Updates>;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Fuel_DeliveryArgs = {
+  _inc?: InputMaybe<Fuel_Delivery_Inc_Input>;
+  _set?: InputMaybe<Fuel_Delivery_Set_Input>;
+  where: Fuel_Delivery_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Fuel_Delivery_By_PkArgs = {
+  _inc?: InputMaybe<Fuel_Delivery_Inc_Input>;
+  _set?: InputMaybe<Fuel_Delivery_Set_Input>;
+  pk_columns: Fuel_Delivery_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Fuel_Delivery_ManyArgs = {
+  updates: Array<Fuel_Delivery_Updates>;
 };
 
 
@@ -88354,6 +89155,12 @@ export type Query_Root = {
   day_type_aggregate: Day_Type_Aggregate;
   /** fetch data from the table: "day_type" using primary key columns */
   day_type_by_pk?: Maybe<Day_Type>;
+  /** fetch data from the table: "delivered_to" */
+  delivered_to: Array<Delivered_To>;
+  /** fetch aggregated fields from the table: "delivered_to" */
+  delivered_to_aggregate: Delivered_To_Aggregate;
+  /** fetch data from the table: "delivered_to" using primary key columns */
+  delivered_to_by_pk?: Maybe<Delivered_To>;
   /** fetch data from the table: "delivery_preferences" */
   delivery_preferences: Array<Delivery_Preferences>;
   /** fetch aggregated fields from the table: "delivery_preferences" */
@@ -88605,6 +89412,12 @@ export type Query_Root = {
   filtered_orders_live_streaming_view: Array<Filtered_Orders_Live_Streaming_View>;
   /** fetch aggregated fields from the table: "filtered_orders_live_streaming_view" */
   filtered_orders_live_streaming_view_aggregate: Filtered_Orders_Live_Streaming_View_Aggregate;
+  /** fetch data from the table: "fuel_delivery" */
+  fuel_delivery: Array<Fuel_Delivery>;
+  /** fetch aggregated fields from the table: "fuel_delivery" */
+  fuel_delivery_aggregate: Fuel_Delivery_Aggregate;
+  /** fetch data from the table: "fuel_delivery" using primary key columns */
+  fuel_delivery_by_pk?: Maybe<Fuel_Delivery>;
   /** fetch data from the table: "fuel_request_type" */
   fuel_request_type: Array<Fuel_Request_Type>;
   /** fetch aggregated fields from the table: "fuel_request_type" */
@@ -90877,6 +91690,29 @@ export type Query_RootDay_Type_By_PkArgs = {
 };
 
 
+export type Query_RootDelivered_ToArgs = {
+  distinct_on?: InputMaybe<Array<Delivered_To_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Delivered_To_Order_By>>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+
+export type Query_RootDelivered_To_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Delivered_To_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Delivered_To_Order_By>>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+
+export type Query_RootDelivered_To_By_PkArgs = {
+  value: Scalars['String'];
+};
+
+
 export type Query_RootDelivery_PreferencesArgs = {
   distinct_on?: InputMaybe<Array<Delivery_Preferences_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -91868,6 +92704,29 @@ export type Query_RootFiltered_Orders_Live_Streaming_View_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']>;
   order_by?: InputMaybe<Array<Filtered_Orders_Live_Streaming_View_Order_By>>;
   where?: InputMaybe<Filtered_Orders_Live_Streaming_View_Bool_Exp>;
+};
+
+
+export type Query_RootFuel_DeliveryArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+export type Query_RootFuel_Delivery_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+export type Query_RootFuel_Delivery_By_PkArgs = {
+  id: Scalars['uuid'];
 };
 
 
@@ -102024,6 +102883,14 @@ export type Subscription_Root = {
   day_type_by_pk?: Maybe<Day_Type>;
   /** fetch data from the table in a streaming manner: "day_type" */
   day_type_stream: Array<Day_Type>;
+  /** fetch data from the table: "delivered_to" */
+  delivered_to: Array<Delivered_To>;
+  /** fetch aggregated fields from the table: "delivered_to" */
+  delivered_to_aggregate: Delivered_To_Aggregate;
+  /** fetch data from the table: "delivered_to" using primary key columns */
+  delivered_to_by_pk?: Maybe<Delivered_To>;
+  /** fetch data from the table in a streaming manner: "delivered_to" */
+  delivered_to_stream: Array<Delivered_To>;
   /** fetch data from the table: "delivery_preferences" */
   delivery_preferences: Array<Delivery_Preferences>;
   /** fetch aggregated fields from the table: "delivery_preferences" */
@@ -102240,6 +103107,14 @@ export type Subscription_Root = {
   filtered_orders_live_streaming_view_aggregate: Filtered_Orders_Live_Streaming_View_Aggregate;
   /** fetch data from the table in a streaming manner: "filtered_orders_live_streaming_view" */
   filtered_orders_live_streaming_view_stream: Array<Filtered_Orders_Live_Streaming_View>;
+  /** fetch data from the table: "fuel_delivery" */
+  fuel_delivery: Array<Fuel_Delivery>;
+  /** fetch aggregated fields from the table: "fuel_delivery" */
+  fuel_delivery_aggregate: Fuel_Delivery_Aggregate;
+  /** fetch data from the table: "fuel_delivery" using primary key columns */
+  fuel_delivery_by_pk?: Maybe<Fuel_Delivery>;
+  /** fetch data from the table in a streaming manner: "fuel_delivery" */
+  fuel_delivery_stream: Array<Fuel_Delivery>;
   /** fetch data from the table: "fuel_request_type" */
   fuel_request_type: Array<Fuel_Request_Type>;
   /** fetch aggregated fields from the table: "fuel_request_type" */
@@ -105011,6 +105886,36 @@ export type Subscription_RootDay_Type_StreamArgs = {
 };
 
 
+export type Subscription_RootDelivered_ToArgs = {
+  distinct_on?: InputMaybe<Array<Delivered_To_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Delivered_To_Order_By>>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+
+export type Subscription_RootDelivered_To_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Delivered_To_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Delivered_To_Order_By>>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+
+export type Subscription_RootDelivered_To_By_PkArgs = {
+  value: Scalars['String'];
+};
+
+
+export type Subscription_RootDelivered_To_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Delivered_To_Stream_Cursor_Input>>;
+  where?: InputMaybe<Delivered_To_Bool_Exp>;
+};
+
+
 export type Subscription_RootDelivery_PreferencesArgs = {
   distinct_on?: InputMaybe<Array<Delivery_Preferences_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -105828,6 +106733,36 @@ export type Subscription_RootFiltered_Orders_Live_Streaming_View_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Filtered_Orders_Live_Streaming_View_Stream_Cursor_Input>>;
   where?: InputMaybe<Filtered_Orders_Live_Streaming_View_Bool_Exp>;
+};
+
+
+export type Subscription_RootFuel_DeliveryArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+export type Subscription_RootFuel_Delivery_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+export type Subscription_RootFuel_Delivery_By_PkArgs = {
+  id: Scalars['uuid'];
+};
+
+
+export type Subscription_RootFuel_Delivery_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Fuel_Delivery_Stream_Cursor_Input>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
 };
 
 
@@ -112870,6 +113805,10 @@ export type Task = {
   fillup_requests: Array<Fillup_Request>;
   /** An aggregate relationship */
   fillup_requests_aggregate: Fillup_Request_Aggregate;
+  /** An array relationship */
+  fuel_deliveries: Array<Fuel_Delivery>;
+  /** An aggregate relationship */
+  fuel_deliveries_aggregate: Fuel_Delivery_Aggregate;
   id: Scalars['uuid'];
   is_active: Scalars['Boolean'];
   is_done_locally?: Maybe<Scalars['Boolean']>;
@@ -112957,6 +113896,26 @@ export type TaskFillup_Requests_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']>;
   order_by?: InputMaybe<Array<Fillup_Request_Order_By>>;
   where?: InputMaybe<Fillup_Request_Bool_Exp>;
+};
+
+
+/** columns and relationships of "task" */
+export type TaskFuel_DeliveriesArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+};
+
+
+/** columns and relationships of "task" */
+export type TaskFuel_Deliveries_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Fuel_Delivery_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Fuel_Delivery_Order_By>>;
+  where?: InputMaybe<Fuel_Delivery_Bool_Exp>;
 };
 
 
@@ -113795,6 +114754,8 @@ export type Task_Bool_Exp = {
   estimate_delivery_date?: InputMaybe<Timestamp_Comparison_Exp>;
   fillup_requests?: InputMaybe<Fillup_Request_Bool_Exp>;
   fillup_requests_aggregate?: InputMaybe<Fillup_Request_Aggregate_Bool_Exp>;
+  fuel_deliveries?: InputMaybe<Fuel_Delivery_Bool_Exp>;
+  fuel_deliveries_aggregate?: InputMaybe<Fuel_Delivery_Aggregate_Bool_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
   is_active?: InputMaybe<Boolean_Comparison_Exp>;
   is_done_locally?: InputMaybe<Boolean_Comparison_Exp>;
@@ -114142,6 +115103,7 @@ export type Task_Insert_Input = {
   driver_vehicle_id?: InputMaybe<Scalars['uuid']>;
   estimate_delivery_date?: InputMaybe<Scalars['timestamp']>;
   fillup_requests?: InputMaybe<Fillup_Request_Arr_Rel_Insert_Input>;
+  fuel_deliveries?: InputMaybe<Fuel_Delivery_Arr_Rel_Insert_Input>;
   id?: InputMaybe<Scalars['uuid']>;
   is_active?: InputMaybe<Scalars['Boolean']>;
   is_done_locally?: InputMaybe<Scalars['Boolean']>;
@@ -114282,6 +115244,7 @@ export type Task_Order_By = {
   driver_vehicle_id?: InputMaybe<Order_By>;
   estimate_delivery_date?: InputMaybe<Order_By>;
   fillup_requests_aggregate?: InputMaybe<Fillup_Request_Aggregate_Order_By>;
+  fuel_deliveries_aggregate?: InputMaybe<Fuel_Delivery_Aggregate_Order_By>;
   id?: InputMaybe<Order_By>;
   is_active?: InputMaybe<Order_By>;
   is_done_locally?: InputMaybe<Order_By>;
@@ -128430,23 +129393,34 @@ export type Wallet_Variance_Order_By = {
   van_number?: InputMaybe<Order_By>;
 };
 
-export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
+export type CheckUserOwnerStatusQueryVariables = Exact<{
+  user_id: Scalars['uuid'];
+}>;
 
 
-export type GetUsersQuery = { __typename?: 'query_root', user: Array<{ __typename?: 'user', id: any, email?: string | null, first_name?: string | null, last_name?: string | null }> };
+export type CheckUserOwnerStatusQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, is_owner: boolean, organization_id: any, organization: { __typename?: 'organization', id: any, name?: string | null }, user: { __typename?: 'user', id: any, phone_number?: string | null } }> };
 
 
-export const GetUsersDocument = gql`
-    query GetUsers {
-  user {
+export const CheckUserOwnerStatusDocument = gql`
+    query checkUserOwnerStatus($user_id: uuid!) {
+  organization_user(
+    where: {user_id: {_eq: $user_id}, is_owner: {_eq: true}, is_active: {_eq: true}}
+  ) {
     id
-    email
-    first_name
-    last_name
+    is_owner
+    organization_id
+    organization {
+      id
+      name
+    }
+    user {
+      id
+      phone_number
+    }
   }
 }
     `;
 
-export function useGetUsersQuery(options: Omit<Urql.UseQueryArgs<never, GetUsersQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<GetUsersQuery>({ query: GetUsersDocument, ...options });
+export function useCheckUserOwnerStatusQuery(options: Omit<Urql.UseQueryArgs<never, CheckUserOwnerStatusQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<CheckUserOwnerStatusQuery>({ query: CheckUserOwnerStatusDocument, ...options });
 };

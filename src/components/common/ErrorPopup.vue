@@ -95,8 +95,12 @@ watch(() => props.show, async (newValue) => {
     
     // Focus management
     await nextTick()
-    if (primaryButton.value) {
-      primaryButton.value.focus()
+    if (primaryButton.value && typeof primaryButton.value.focus === 'function') {
+      try {
+        primaryButton.value.focus()
+      } catch (error) {
+        console.warn('Could not focus primary button:', error)
+      }
     }
     
     // Auto close timer

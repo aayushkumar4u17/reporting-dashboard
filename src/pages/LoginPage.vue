@@ -148,7 +148,8 @@ import TermsPopup from '@/components/common/TermsPopup.vue'
 
 // Import Firebase Auth actions
 import { useAuthStore } from '@/store'
-import { sendOTP as sendOTPAction, startTimer, verifyOTP as verifyOTPAction, formatTime } from '@/actions/auth'
+import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/actions/GraphQLAuth'
+import { startTimer, formatTime } from '@/actions/auth'
 import { validatePhoneNumber, getCurrentUser } from '@/actions/general'
 
 const router = useRouter()
@@ -277,15 +278,45 @@ const verifyOTPHandler = async () => {
         // Redirect to user selection on successful verification
         router.push('/select-user')
       } else {
-        // Clear OTP on failure
+        // Clear OTP on failure and show error
         otpCode.value = ''
         isVerifying.value = false
+        
+        // Show error message if not already shown by error handler
+        if (result.error && !result.error.includes('owner') && !result.error.includes('authorization')) {
+          authStore.showErrorPopup({
+            title: 'Verification Failed',
+            message: result.error || 'OTP verification failed. Please try again.',
+            showRetry: true
+          })
+        }
       }
     } catch (error) {
       console.error('Error verifying OTP:', error)
       // Clear OTP on error
       otpCode.value = ''
       isVerifying.value = false
+      
+      // Show appropriate error message
+      if (error.code === 'auth/invalid-verification-code') {
+        authStore.showErrorPopup({
+          title: 'Invalid OTP',
+          message: 'The OTP you entered is incorrect. Please try again.',
+          showRetry: true
+        })
+      } else if (error.code === 'auth/code-expired') {
+        authStore.showErrorPopup({
+          title: 'OTP Expired',
+          message: 'The OTP has expired. Please request a new one.',
+          showRetry: true
+        })
+      } else {
+        authStore.showErrorPopup({
+          title: 'Verification Error',
+          message: 'An error occurred during verification. Please try again.',
+          showRetry: true
+        })
+      }
     }
   }
 }

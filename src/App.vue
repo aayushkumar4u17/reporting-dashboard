@@ -1,10 +1,14 @@
 <script setup>
 //imports
 import { useRouter } from "vue-router";
+import { useErrorHandler } from "@/composables/useErrorHandler";
 
-//imports
+//components
 import Navbar from "@/components/common/Navbar.vue";
+import ErrorNotification from "@/components/ErrorNotification.vue";
+
 const router = useRouter();
+const { errorState, hideError, handleRetry } = useErrorHandler();
 
 const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"];
 </script>
@@ -34,6 +38,17 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 			">
 			<router-view></router-view>
 		</div>
+		
+		<!-- Global Error Notification -->
+		<ErrorNotification
+			:show="errorState.show"
+			:title="errorState.title"
+			:message="errorState.message"
+			:details="errorState.details"
+			:show-retry="errorState.showRetry"
+			@close="hideError"
+			@retry="handleRetry"
+		/>
 	</main>
 </template>
 

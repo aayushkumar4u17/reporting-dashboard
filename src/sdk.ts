@@ -1,6 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
-import { GraphQLClientRequestHeaders } from 'graphql-request/build/cjs/types';
-import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -67,6 +64,15 @@ export type CancleInvoiceAndDeliveryNoteOutput = {
   code?: Maybe<Scalars['String']>;
   error?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+};
+
+export type CheckUserAccessInput = {
+  user_id: Scalars['String'];
+};
+
+export type CheckUserAccessOutput = {
+  __typename?: 'CheckUserAccessOutput';
+  has_access: Scalars['Boolean'];
 };
 
 export type CreateAppCustomerOrderCustomerAssetInput = {
@@ -5381,6 +5387,7 @@ export type Customer_Asset = {
   customer_order_customer_assets_aggregate: Customer_Order_Customer_Asset_Aggregate;
   description?: Maybe<Scalars['String']>;
   erp_code?: Maybe<Scalars['String']>;
+  flespi_channel_code?: Maybe<Scalars['String']>;
   id: Scalars['uuid'];
   /** An array relationship */
   invoiced_items: Array<Invoiced_Item>;
@@ -5417,6 +5424,7 @@ export type Customer_Asset = {
   product?: Maybe<Product>;
   product_id?: Maybe<Scalars['uuid']>;
   registration_number?: Maybe<Scalars['String']>;
+  sensor_type?: Maybe<Sensor_Type_Enum>;
   slug?: Maybe<Scalars['String']>;
   /** An object relationship */
   state?: Maybe<State>;
@@ -5759,6 +5767,7 @@ export type Customer_Asset_Bool_Exp = {
   customer_order_customer_assets_aggregate?: InputMaybe<Customer_Order_Customer_Asset_Aggregate_Bool_Exp>;
   description?: InputMaybe<String_Comparison_Exp>;
   erp_code?: InputMaybe<String_Comparison_Exp>;
+  flespi_channel_code?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
   invoiced_items?: InputMaybe<Invoiced_Item_Bool_Exp>;
   invoiced_items_aggregate?: InputMaybe<Invoiced_Item_Aggregate_Bool_Exp>;
@@ -5783,6 +5792,7 @@ export type Customer_Asset_Bool_Exp = {
   product?: InputMaybe<Product_Bool_Exp>;
   product_id?: InputMaybe<Uuid_Comparison_Exp>;
   registration_number?: InputMaybe<String_Comparison_Exp>;
+  sensor_type?: InputMaybe<Sensor_Type_Enum_Comparison_Exp>;
   slug?: InputMaybe<String_Comparison_Exp>;
   state?: InputMaybe<State_Bool_Exp>;
   state_id?: InputMaybe<Uuid_Comparison_Exp>;
@@ -6586,6 +6596,7 @@ export type Customer_Asset_Insert_Input = {
   customer_order_customer_assets?: InputMaybe<Customer_Order_Customer_Asset_Arr_Rel_Insert_Input>;
   description?: InputMaybe<Scalars['String']>;
   erp_code?: InputMaybe<Scalars['String']>;
+  flespi_channel_code?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
   invoiced_items?: InputMaybe<Invoiced_Item_Arr_Rel_Insert_Input>;
   is_active?: InputMaybe<Scalars['Boolean']>;
@@ -6605,6 +6616,7 @@ export type Customer_Asset_Insert_Input = {
   product?: InputMaybe<Product_Obj_Rel_Insert_Input>;
   product_id?: InputMaybe<Scalars['uuid']>;
   registration_number?: InputMaybe<Scalars['String']>;
+  sensor_type?: InputMaybe<Sensor_Type_Enum>;
   slug?: InputMaybe<Scalars['String']>;
   state?: InputMaybe<State_Obj_Rel_Insert_Input>;
   state_id?: InputMaybe<Scalars['uuid']>;
@@ -7094,6 +7106,7 @@ export type Customer_Asset_Max_Fields = {
   created_at?: Maybe<Scalars['timestamp']>;
   description?: Maybe<Scalars['String']>;
   erp_code?: Maybe<Scalars['String']>;
+  flespi_channel_code?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['uuid']>;
   last_modified?: Maybe<Scalars['timestamp']>;
   last_modified_by?: Maybe<Scalars['uuid']>;
@@ -7117,6 +7130,7 @@ export type Customer_Asset_Max_Order_By = {
   created_at?: InputMaybe<Order_By>;
   description?: InputMaybe<Order_By>;
   erp_code?: InputMaybe<Order_By>;
+  flespi_channel_code?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   last_modified?: InputMaybe<Order_By>;
   last_modified_by?: InputMaybe<Order_By>;
@@ -7141,6 +7155,7 @@ export type Customer_Asset_Min_Fields = {
   created_at?: Maybe<Scalars['timestamp']>;
   description?: Maybe<Scalars['String']>;
   erp_code?: Maybe<Scalars['String']>;
+  flespi_channel_code?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['uuid']>;
   last_modified?: Maybe<Scalars['timestamp']>;
   last_modified_by?: Maybe<Scalars['uuid']>;
@@ -7164,6 +7179,7 @@ export type Customer_Asset_Min_Order_By = {
   created_at?: InputMaybe<Order_By>;
   description?: InputMaybe<Order_By>;
   erp_code?: InputMaybe<Order_By>;
+  flespi_channel_code?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   last_modified?: InputMaybe<Order_By>;
   last_modified_by?: InputMaybe<Order_By>;
@@ -7217,6 +7233,7 @@ export type Customer_Asset_Order_By = {
   customer_order_customer_assets_aggregate?: InputMaybe<Customer_Order_Customer_Asset_Aggregate_Order_By>;
   description?: InputMaybe<Order_By>;
   erp_code?: InputMaybe<Order_By>;
+  flespi_channel_code?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   invoiced_items_aggregate?: InputMaybe<Invoiced_Item_Aggregate_Order_By>;
   is_active?: InputMaybe<Order_By>;
@@ -7236,6 +7253,7 @@ export type Customer_Asset_Order_By = {
   product?: InputMaybe<Product_Order_By>;
   product_id?: InputMaybe<Order_By>;
   registration_number?: InputMaybe<Order_By>;
+  sensor_type?: InputMaybe<Order_By>;
   slug?: InputMaybe<Order_By>;
   state?: InputMaybe<State_Order_By>;
   state_id?: InputMaybe<Order_By>;
@@ -7266,6 +7284,8 @@ export enum Customer_Asset_Select_Column {
   /** column name */
   ErpCode = 'erp_code',
   /** column name */
+  FlespiChannelCode = 'flespi_channel_code',
+  /** column name */
   Id = 'id',
   /** column name */
   IsActive = 'is_active',
@@ -7289,6 +7309,8 @@ export enum Customer_Asset_Select_Column {
   ProductId = 'product_id',
   /** column name */
   RegistrationNumber = 'registration_number',
+  /** column name */
+  SensorType = 'sensor_type',
   /** column name */
   Slug = 'slug',
   /** column name */
@@ -7326,6 +7348,7 @@ export type Customer_Asset_Set_Input = {
   created_at?: InputMaybe<Scalars['timestamp']>;
   description?: InputMaybe<Scalars['String']>;
   erp_code?: InputMaybe<Scalars['String']>;
+  flespi_channel_code?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
   is_active?: InputMaybe<Scalars['Boolean']>;
   is_collect_odometer_reading?: InputMaybe<Scalars['Boolean']>;
@@ -7338,6 +7361,7 @@ export type Customer_Asset_Set_Input = {
   organization_user_id?: InputMaybe<Scalars['uuid']>;
   product_id?: InputMaybe<Scalars['uuid']>;
   registration_number?: InputMaybe<Scalars['String']>;
+  sensor_type?: InputMaybe<Sensor_Type_Enum>;
   slug?: InputMaybe<Scalars['String']>;
   state_id?: InputMaybe<Scalars['uuid']>;
   tag_id?: InputMaybe<Scalars['String']>;
@@ -7360,6 +7384,7 @@ export type Customer_Asset_Stream_Cursor_Value_Input = {
   created_at?: InputMaybe<Scalars['timestamp']>;
   description?: InputMaybe<Scalars['String']>;
   erp_code?: InputMaybe<Scalars['String']>;
+  flespi_channel_code?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
   is_active?: InputMaybe<Scalars['Boolean']>;
   is_collect_odometer_reading?: InputMaybe<Scalars['Boolean']>;
@@ -7372,6 +7397,7 @@ export type Customer_Asset_Stream_Cursor_Value_Input = {
   organization_user_id?: InputMaybe<Scalars['uuid']>;
   product_id?: InputMaybe<Scalars['uuid']>;
   registration_number?: InputMaybe<Scalars['String']>;
+  sensor_type?: InputMaybe<Sensor_Type_Enum>;
   slug?: InputMaybe<Scalars['String']>;
   state_id?: InputMaybe<Scalars['uuid']>;
   tag_id?: InputMaybe<Scalars['String']>;
@@ -7671,6 +7697,8 @@ export enum Customer_Asset_Update_Column {
   /** column name */
   ErpCode = 'erp_code',
   /** column name */
+  FlespiChannelCode = 'flespi_channel_code',
+  /** column name */
   Id = 'id',
   /** column name */
   IsActive = 'is_active',
@@ -7694,6 +7722,8 @@ export enum Customer_Asset_Update_Column {
   ProductId = 'product_id',
   /** column name */
   RegistrationNumber = 'registration_number',
+  /** column name */
+  SensorType = 'sensor_type',
   /** column name */
   Slug = 'slug',
   /** column name */
@@ -8196,6 +8226,8 @@ export type Customer_Order = {
   erp_cancellation_log?: Maybe<Scalars['String']>;
   erp_code?: Maybe<Scalars['String']>;
   id: Scalars['uuid'];
+  /** An object relationship */
+  indus_customer_order_scheduler_log?: Maybe<Indus_Customer_Order_Scheduler_Logs>;
   /** An array relationship */
   indus_customer_order_scheduler_logs: Array<Indus_Customer_Order_Scheduler_Logs>;
   /** An aggregate relationship */
@@ -8710,6 +8742,7 @@ export type Customer_Order_Bool_Exp = {
   erp_cancellation_log?: InputMaybe<String_Comparison_Exp>;
   erp_code?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
+  indus_customer_order_scheduler_log?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Bool_Exp>;
   indus_customer_order_scheduler_logs?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Bool_Exp>;
   indus_customer_order_scheduler_logs_aggregate?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Aggregate_Bool_Exp>;
   instruction?: InputMaybe<String_Comparison_Exp>;
@@ -9252,6 +9285,7 @@ export type Customer_Order_Insert_Input = {
   erp_cancellation_log?: InputMaybe<Scalars['String']>;
   erp_code?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
+  indus_customer_order_scheduler_log?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Obj_Rel_Insert_Input>;
   indus_customer_order_scheduler_logs?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Arr_Rel_Insert_Input>;
   instruction?: InputMaybe<Scalars['String']>;
   inventories?: InputMaybe<Inventory_Arr_Rel_Insert_Input>;
@@ -14409,6 +14443,7 @@ export type Customer_Order_Order_By = {
   erp_cancellation_log?: InputMaybe<Order_By>;
   erp_code?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
+  indus_customer_order_scheduler_log?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Order_By>;
   indus_customer_order_scheduler_logs_aggregate?: InputMaybe<Indus_Customer_Order_Scheduler_Logs_Aggregate_Order_By>;
   instruction?: InputMaybe<Order_By>;
   inventories_aggregate?: InputMaybe<Inventory_Aggregate_Order_By>;
@@ -38023,6 +38058,10 @@ export type Mutation_Root = {
   delete_scripts?: Maybe<Scripts_Mutation_Response>;
   /** delete single row from the table: "scripts" */
   delete_scripts_by_pk?: Maybe<Scripts>;
+  /** delete data from the table: "sensor_type" */
+  delete_sensor_type?: Maybe<Sensor_Type_Mutation_Response>;
+  /** delete single row from the table: "sensor_type" */
+  delete_sensor_type_by_pk?: Maybe<Sensor_Type>;
   /** delete data from the table: "services" */
   delete_services?: Maybe<Services_Mutation_Response>;
   /** delete single row from the table: "services" */
@@ -39033,6 +39072,10 @@ export type Mutation_Root = {
   insert_scripts?: Maybe<Scripts_Mutation_Response>;
   /** insert a single row into the table: "scripts" */
   insert_scripts_one?: Maybe<Scripts>;
+  /** insert data into the table: "sensor_type" */
+  insert_sensor_type?: Maybe<Sensor_Type_Mutation_Response>;
+  /** insert a single row into the table: "sensor_type" */
+  insert_sensor_type_one?: Maybe<Sensor_Type>;
   /** insert data into the table: "services" */
   insert_services?: Maybe<Services_Mutation_Response>;
   /** insert data into the table: "services_category" */
@@ -40430,6 +40473,12 @@ export type Mutation_Root = {
   update_scripts_by_pk?: Maybe<Scripts>;
   /** update multiples rows of table: "scripts" */
   update_scripts_many?: Maybe<Array<Maybe<Scripts_Mutation_Response>>>;
+  /** update data of the table: "sensor_type" */
+  update_sensor_type?: Maybe<Sensor_Type_Mutation_Response>;
+  /** update single row of the table: "sensor_type" */
+  update_sensor_type_by_pk?: Maybe<Sensor_Type>;
+  /** update multiples rows of table: "sensor_type" */
+  update_sensor_type_many?: Maybe<Array<Maybe<Sensor_Type_Mutation_Response>>>;
   /** update data of the table: "services" */
   update_services?: Maybe<Services_Mutation_Response>;
   /** update single row of the table: "services" */
@@ -43238,6 +43287,18 @@ export type Mutation_RootDelete_ScriptsArgs = {
 /** mutation root */
 export type Mutation_RootDelete_Scripts_By_PkArgs = {
   id: Scalars['uuid'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Sensor_TypeArgs = {
+  where: Sensor_Type_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Sensor_Type_By_PkArgs = {
+  value: Scalars['String'];
 };
 
 
@@ -46706,6 +46767,20 @@ export type Mutation_RootInsert_ScriptsArgs = {
 export type Mutation_RootInsert_Scripts_OneArgs = {
   object: Scripts_Insert_Input;
   on_conflict?: InputMaybe<Scripts_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Sensor_TypeArgs = {
+  objects: Array<Sensor_Type_Insert_Input>;
+  on_conflict?: InputMaybe<Sensor_Type_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Sensor_Type_OneArgs = {
+  object: Sensor_Type_Insert_Input;
+  on_conflict?: InputMaybe<Sensor_Type_On_Conflict>;
 };
 
 
@@ -51591,6 +51666,26 @@ export type Mutation_RootUpdate_Scripts_By_PkArgs = {
 /** mutation root */
 export type Mutation_RootUpdate_Scripts_ManyArgs = {
   updates: Array<Scripts_Updates>;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Sensor_TypeArgs = {
+  _set?: InputMaybe<Sensor_Type_Set_Input>;
+  where: Sensor_Type_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Sensor_Type_By_PkArgs = {
+  _set?: InputMaybe<Sensor_Type_Set_Input>;
+  pk_columns: Sensor_Type_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Sensor_Type_ManyArgs = {
+  updates: Array<Sensor_Type_Updates>;
 };
 
 
@@ -88913,6 +89008,7 @@ export type Query_Root = {
   centralizedPurchaseControlForTowerBussinessReport?: Maybe<CentralizedPurchaseControlForTowerBussinessReportOutput>;
   checkForDeliveryWithPurchaseInvoice?: Maybe<CheckForDeliveryWithPurchaseInvoiceOutput>;
   checkIfPanExists?: Maybe<CheckIfPanExistsOutput>;
+  checkUserAccess?: Maybe<CheckUserAccessOutput>;
   checkWalletBalance?: Maybe<CheckWalletBalanceOutput>;
   circleLevelAndCustomerNameWiseDeliveryOtdPercentageReport?: Maybe<CircleLevelAndCustomerNameWiseDeliveryOtdPercentageReporttOutput>;
   circleLevelAndCustomerNameWiseDeliveryOtdPercentageReportv1?: Maybe<CircleLevelAndCustomerNameWiseDeliveryOtdPercentageReportv1tOutput>;
@@ -90176,6 +90272,12 @@ export type Query_Root = {
   scripts_aggregate: Scripts_Aggregate;
   /** fetch data from the table: "scripts" using primary key columns */
   scripts_by_pk?: Maybe<Scripts>;
+  /** fetch data from the table: "sensor_type" */
+  sensor_type: Array<Sensor_Type>;
+  /** fetch aggregated fields from the table: "sensor_type" */
+  sensor_type_aggregate: Sensor_Type_Aggregate;
+  /** fetch data from the table: "sensor_type" using primary key columns */
+  sensor_type_by_pk?: Maybe<Sensor_Type>;
   /** fetch data from the table: "services" */
   services: Array<Services>;
   /** fetch aggregated fields from the table: "services" */
@@ -90729,6 +90831,11 @@ export type Query_RootCheckForDeliveryWithPurchaseInvoiceArgs = {
 
 export type Query_RootCheckIfPanExistsArgs = {
   object: CheckIfPanExistsInput;
+};
+
+
+export type Query_RootCheckUserAccessArgs = {
+  arg1: CheckUserAccessInput;
 };
 
 
@@ -95668,6 +95775,29 @@ export type Query_RootScripts_By_PkArgs = {
 };
 
 
+export type Query_RootSensor_TypeArgs = {
+  distinct_on?: InputMaybe<Array<Sensor_Type_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Sensor_Type_Order_By>>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
+};
+
+
+export type Query_RootSensor_Type_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Sensor_Type_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Sensor_Type_Order_By>>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
+};
+
+
+export type Query_RootSensor_Type_By_PkArgs = {
+  value: Scalars['String'];
+};
+
+
 export type Query_RootServicesArgs = {
   distinct_on?: InputMaybe<Array<Services_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -99831,6 +99961,162 @@ export type Scripts_Updates = {
   _set?: InputMaybe<Scripts_Set_Input>;
   /** filter the rows which have to be updated */
   where: Scripts_Bool_Exp;
+};
+
+/** columns and relationships of "sensor_type" */
+export type Sensor_Type = {
+  __typename?: 'sensor_type';
+  comment?: Maybe<Scalars['String']>;
+  value: Scalars['String'];
+};
+
+/** aggregated selection of "sensor_type" */
+export type Sensor_Type_Aggregate = {
+  __typename?: 'sensor_type_aggregate';
+  aggregate?: Maybe<Sensor_Type_Aggregate_Fields>;
+  nodes: Array<Sensor_Type>;
+};
+
+/** aggregate fields of "sensor_type" */
+export type Sensor_Type_Aggregate_Fields = {
+  __typename?: 'sensor_type_aggregate_fields';
+  count: Scalars['Int'];
+  max?: Maybe<Sensor_Type_Max_Fields>;
+  min?: Maybe<Sensor_Type_Min_Fields>;
+};
+
+
+/** aggregate fields of "sensor_type" */
+export type Sensor_Type_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Sensor_Type_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+};
+
+/** Boolean expression to filter rows from the table "sensor_type". All fields are combined with a logical 'AND'. */
+export type Sensor_Type_Bool_Exp = {
+  _and?: InputMaybe<Array<Sensor_Type_Bool_Exp>>;
+  _not?: InputMaybe<Sensor_Type_Bool_Exp>;
+  _or?: InputMaybe<Array<Sensor_Type_Bool_Exp>>;
+  comment?: InputMaybe<String_Comparison_Exp>;
+  value?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "sensor_type" */
+export enum Sensor_Type_Constraint {
+  /** unique or primary key constraint on columns "value" */
+  SensorTypePkey = 'sensor_type_pkey'
+}
+
+export enum Sensor_Type_Enum {
+  /** Active-Control  - Analog */
+  ActiveControlAnalog = 'ACTIVE_CONTROL_ANALOG',
+  /** Blazon Labs - Analog */
+  BlazonLabsAnalog = 'BLAZON_LABS_ANALOG',
+  /** Escorts 150 BLE */
+  Escorts_150Ble = 'ESCORTS_150_BLE',
+  /** Escorts BLE - Digital */
+  EscortsBleDigital = 'ESCORTS_BLE_DIGITAL',
+  /** Truman - Analog */
+  TrumanAnalog = 'TRUMAN_ANALOG'
+}
+
+/** Boolean expression to compare columns of type "sensor_type_enum". All fields are combined with logical 'AND'. */
+export type Sensor_Type_Enum_Comparison_Exp = {
+  _eq?: InputMaybe<Sensor_Type_Enum>;
+  _in?: InputMaybe<Array<Sensor_Type_Enum>>;
+  _is_null?: InputMaybe<Scalars['Boolean']>;
+  _neq?: InputMaybe<Sensor_Type_Enum>;
+  _nin?: InputMaybe<Array<Sensor_Type_Enum>>;
+};
+
+/** input type for inserting data into table "sensor_type" */
+export type Sensor_Type_Insert_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** aggregate max on columns */
+export type Sensor_Type_Max_Fields = {
+  __typename?: 'sensor_type_max_fields';
+  comment?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+/** aggregate min on columns */
+export type Sensor_Type_Min_Fields = {
+  __typename?: 'sensor_type_min_fields';
+  comment?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+/** response of any mutation on the table "sensor_type" */
+export type Sensor_Type_Mutation_Response = {
+  __typename?: 'sensor_type_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Sensor_Type>;
+};
+
+/** on_conflict condition type for table "sensor_type" */
+export type Sensor_Type_On_Conflict = {
+  constraint: Sensor_Type_Constraint;
+  update_columns?: Array<Sensor_Type_Update_Column>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "sensor_type". */
+export type Sensor_Type_Order_By = {
+  comment?: InputMaybe<Order_By>;
+  value?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: sensor_type */
+export type Sensor_Type_Pk_Columns_Input = {
+  value: Scalars['String'];
+};
+
+/** select columns of table "sensor_type" */
+export enum Sensor_Type_Select_Column {
+  /** column name */
+  Comment = 'comment',
+  /** column name */
+  Value = 'value'
+}
+
+/** input type for updating data in table "sensor_type" */
+export type Sensor_Type_Set_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** Streaming cursor of the table "sensor_type" */
+export type Sensor_Type_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Sensor_Type_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Sensor_Type_Stream_Cursor_Value_Input = {
+  comment?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
+};
+
+/** update columns of table "sensor_type" */
+export enum Sensor_Type_Update_Column {
+  /** column name */
+  Comment = 'comment',
+  /** column name */
+  Value = 'value'
+}
+
+export type Sensor_Type_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Sensor_Type_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Sensor_Type_Bool_Exp;
 };
 
 /** columns and relationships of "services" */
@@ -104113,6 +104399,14 @@ export type Subscription_Root = {
   scripts_by_pk?: Maybe<Scripts>;
   /** fetch data from the table in a streaming manner: "scripts" */
   scripts_stream: Array<Scripts>;
+  /** fetch data from the table: "sensor_type" */
+  sensor_type: Array<Sensor_Type>;
+  /** fetch aggregated fields from the table: "sensor_type" */
+  sensor_type_aggregate: Sensor_Type_Aggregate;
+  /** fetch data from the table: "sensor_type" using primary key columns */
+  sensor_type_by_pk?: Maybe<Sensor_Type>;
+  /** fetch data from the table in a streaming manner: "sensor_type" */
+  sensor_type_stream: Array<Sensor_Type>;
   /** fetch data from the table: "services" */
   services: Array<Services>;
   /** fetch aggregated fields from the table: "services" */
@@ -110528,6 +110822,36 @@ export type Subscription_RootScripts_StreamArgs = {
   batch_size: Scalars['Int'];
   cursor: Array<InputMaybe<Scripts_Stream_Cursor_Input>>;
   where?: InputMaybe<Scripts_Bool_Exp>;
+};
+
+
+export type Subscription_RootSensor_TypeArgs = {
+  distinct_on?: InputMaybe<Array<Sensor_Type_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Sensor_Type_Order_By>>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
+};
+
+
+export type Subscription_RootSensor_Type_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Sensor_Type_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Sensor_Type_Order_By>>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
+};
+
+
+export type Subscription_RootSensor_Type_By_PkArgs = {
+  value: Scalars['String'];
+};
+
+
+export type Subscription_RootSensor_Type_StreamArgs = {
+  batch_size: Scalars['Int'];
+  cursor: Array<InputMaybe<Sensor_Type_Stream_Cursor_Input>>;
+  where?: InputMaybe<Sensor_Type_Bool_Exp>;
 };
 
 
@@ -129393,44 +129717,16 @@ export type Wallet_Variance_Order_By = {
   van_number?: InputMaybe<Order_By>;
 };
 
+export type CheckUserAccessQueryVariables = Exact<{
+  user_id: Scalars['uuid'];
+}>;
+
+
+export type CheckUserAccessQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_owner: boolean, organization_id: any, organization: { __typename?: 'organization', id: any, name?: string | null }, user: { __typename?: 'user', id: any, phone_number?: string | null } }> };
+
 export type CheckUserOwnerStatusQueryVariables = Exact<{
   user_id: Scalars['uuid'];
 }>;
 
 
 export type CheckUserOwnerStatusQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, is_owner: boolean, organization_id: any, organization: { __typename?: 'organization', id: any, name?: string | null }, user: { __typename?: 'user', id: any, phone_number?: string | null } }> };
-
-
-export const CheckUserOwnerStatusDocument = gql`
-    query checkUserOwnerStatus($user_id: uuid!) {
-  organization_user(
-    where: {user_id: {_eq: $user_id}, is_owner: {_eq: true}, is_active: {_eq: true}}
-  ) {
-    id
-    is_owner
-    organization_id
-    organization {
-      id
-      name
-    }
-    user {
-      id
-      phone_number
-    }
-  }
-}
-    `;
-
-export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
-
-
-const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationType) => action();
-
-export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
-  return {
-    checkUserOwnerStatus(variables: CheckUserOwnerStatusQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckUserOwnerStatusQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CheckUserOwnerStatusQuery>(CheckUserOwnerStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'checkUserOwnerStatus', 'query');
-    }
-  };
-}
-export type Sdk = ReturnType<typeof getSdk>;

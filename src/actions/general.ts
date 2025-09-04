@@ -1,7 +1,7 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { app } from '@/firebase';
 
-import { signOutUser, checkUserOwnerStatus } from './GraphQLAuth';
+import { signOutUser } from './GraphQLAuth';
 import { useUserStore } from '@/store';
 
 export const handleClick = () => {
@@ -37,17 +37,7 @@ export const getCurrentUser = () => {
 						return;
 					}
 					
-					// Check if user is an owner
-					const ownerCheckResult = await checkUserOwnerStatus(xHasuraUserId);
-					
-					if (ownerCheckResult.success && ownerCheckResult.is_owner) {
-						resolve(user);
-						return;
-					} else {
-						// User is not an owner
-						resolve(null);
-						return;
-					}
+					resolve(user);
 				} catch (error) {
 					console.error('Error checking user owner status:', error);
 					resolve(null);

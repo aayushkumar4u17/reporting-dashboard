@@ -4,13 +4,11 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import router from "../router";
 
 //actions
-import { signOutUser, checkUserOwnerStatus } from "../actions/GraphQLAuth";
-import { getCurrentUser } from "../actions/general";
+import { signOutUser } from "../actions/auth";
 import { useUserStore } from "../store";
 
 //utils
 import { setReportingLoginState, clearLoginState } from "../utils/auth";
-import { useErrorHandler } from "../composables/useErrorHandler";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -27,51 +25,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// redirect after logout
-// redirect after logout - following customer dashboard pattern
+// Handle auth state changes
 onAuthStateChanged(auth, async (user) => {
 	const userStore = useUserStore();
 	
 	if (user) {
 		try {
-			// Get user claims and store Hasura user ID
-			const tokenResult = await user.getIdTokenResult(true);
-			const hasuraClaims = tokenResult.claims["https://hasura.io/jwt/claims"];
-			
-			if (!hasuraClaims) {
-				console.log("User has no authorization claims");
-				clearLoginState();
-				await signOutUser(() => null);
-				router.push("/login");
-				return;
-			}
-			
-			const xHasuraUserId = hasuraClaims["x-hasura-user-id"];
-			
-			if (!xHasuraUserId) {
-				console.log("User ID not found in token");
-				clearLoginState();
-				await signOutUser(() => null);
-				router.push("/login");
-				return;
-			}
-			
-			// Store user ID and set user in store
-			localStorage.setItem("xHasuraUserId", xHasuraUserId);
+			// Store Firebase user ID
+			localStorage.setItem("firebaseUserId", user.uid);
 			userStore.setUser(user);
 			
-			// Check if user is an owner and set login state accordingly
-			console.log('Checking owner status for user:', xHasuraUserId);
-			const ownerCheckResult = await checkUserOwnerStatus(xHasuraUserId);
-			
-			if (ownerCheckResult.success && ownerCheckResult.is_owner) {
-				setReportingLoginState();
-				console.log('User verified as owner, access granted');
-			} else {
-				console.log("User is not an owner or check failed");
-				localStorage.setItem("isLoggedInReportingDashboard", "false");
-				// Error handling will be done in the auth actions during login flow
-			}
+			// Set login state
+			setReportingLoginState();
 			
 		} catch (error) {
 			console.error('Error during auth state change:', error);

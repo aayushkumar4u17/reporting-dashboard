@@ -69,46 +69,26 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { signOutUser, completeLogoutReset, forceLogoutReset } from '@/actions/auth'
+import { signOutUser } from '@/actions/auth'
 
 const router = useRouter()
 const isMobileMenuOpen = ref(false)
 const isLoggingOut = ref(false)
 
 const handleLogout = async () => {
-  if (isLoggingOut.value) return // Prevent multiple clicks
+  if (isLoggingOut.value) return
   
   isLoggingOut.value = true
   
   try {
-    // Use enhanced logout with comprehensive reset
-    console.log('Starting enhanced logout with complete reset...')
-    
     await signOutUser(() => {
-      console.log('Enhanced logout successful, redirecting to login...')
       router.push('/login')
-    }, { completeReset: false, forceReload: false })
-    
+    })
   } catch (error) {
-    console.error('Error during enhanced logout:', error)
-    
-    // Fallback: Try force reset if normal logout fails
-    try {
-      console.log('Attempting force reset as fallback...')
-      await forceLogoutReset(() => {
-        router.push('/login')
-      })
-    } catch (fallbackError) {
-      console.error('Force reset also failed:', fallbackError)
-      // Even if everything fails, redirect to login
-      router.push('/login')
-    }
-    
+    console.error('Error during logout:', error)
+    router.push('/login')
   } finally {
-    // Reset loading state (may not execute if page reloads)
-    setTimeout(() => {
-      isLoggingOut.value = false
-    }, 100)
+    isLoggingOut.value = false
   }
 }
 

@@ -1,8 +1,4 @@
-import { getAuth } from 'firebase/auth'
 import { createRouter, createWebHistory } from 'vue-router'
-import { app } from '../firebase'
-import { useUserStore } from '../store'
-import { canAccessReportingDashboard, clearLoginState } from '@/utils/auth'
 import DashboardPage from '../pages/DashboardPage.vue'
 import LoginPage from '../pages/LoginPage.vue'
 import UserSelectionPage from '../pages/UserSelectionPage.vue'
@@ -62,35 +58,18 @@ const router = createRouter({
   ]
 })
 
-// Navigation guard to protect routes - following customer dashboard pattern
-router.beforeEach(async (to, from) => {
-  getAuth(app)
-  const userStore = useUserStore()
+router.beforeEach((to, from) => {
+  const isLoggedIn = localStorage.getItem('isLoggedInReportingDashboard') === 'true'
   
-  // Check if the route is the login page
   if (to.path === '/login') {
-    return true // Allow access to login page
+    return isLoggedIn ? '/select-user' : true
   }
   
-  // Check login state from localStorage
-  if (!canAccessReportingDashboard()) {
+  if (to.meta?.requiresAuth && !isLoggedIn) {
     return '/login'
   }
   
-  // User is logged in as owner, allow navigation
-  try {
-    // Additional checks can be added here if needed
-    return true // Allow navigation
-  } catch (error) {
-    console.error('Error during navigation guard:', error)
-    // If there's a critical error, redirect to login
-    if (error instanceof Error && error.message.includes('unauthorized')) {
-      clearLoginState()
-      return '/login'
-    }
-    // For other errors, allow navigation but log the error
-    return true
-  }
+  return true
 })
 
 export default router

@@ -6,6 +6,7 @@ import { useErrorHandler } from "@/composables/useErrorHandler";
 //components
 import Navbar from "@/components/common/Navbar.vue";
 import ErrorNotification from "@/components/ErrorNotification.vue";
+import AuthGuard from "@/components/AuthGuard.vue";
 
 const router = useRouter();
 const { errorState, hideError, handleRetry } = useErrorHandler();
@@ -15,29 +16,37 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 
 <template>
 	<main>
-		<Navbar
-			v-if="
-				router.currentRoute.value.fullPath !== '/login' &&
-				router.currentRoute.value.fullPath !== '/' &&
-				router.currentRoute.value.fullPath !== '/select-user'
-			" />
-		<div
-			v-if="router.currentRoute.value.fullPath === '/select-user'"
-			class="fullscreen-content">
+		<!-- Wrap entire app with AuthGuard except login page -->
+		<template v-if="router.currentRoute.value.fullPath === '/login'">
+			<!-- Login page - no authentication required -->
 			<router-view></router-view>
-		</div>
-		<div
-			v-else
-			class="content-wrapper"
-			:class="
-				routesWithoutXPadding.includes(
-					router.currentRoute.value.fullPath,
-				)
-					? 'with-sidebar'
-					: 'without-sidebar'
-			">
-			<router-view></router-view>
-		</div>
+		</template>
+		<AuthGuard v-else>
+			<!-- Protected content - requires authentication -->
+			<Navbar
+				v-if="
+					router.currentRoute.value.fullPath !== '/login' &&
+					router.currentRoute.value.fullPath !== '/' &&
+					router.currentRoute.value.fullPath !== '/select-user'
+				" />
+			<div
+				v-if="router.currentRoute.value.fullPath === '/select-user'"
+				class="fullscreen-content">
+				<router-view></router-view>
+			</div>
+			<div
+				v-else
+				class="content-wrapper"
+				:class="
+					routesWithoutXPadding.includes(
+						router.currentRoute.value.fullPath,
+					)
+						? 'with-sidebar'
+						: 'without-sidebar'
+				">
+				<router-view></router-view>
+			</div>
+		</AuthGuard>
 		
 		<!-- Global Error Notification -->
 		<ErrorNotification

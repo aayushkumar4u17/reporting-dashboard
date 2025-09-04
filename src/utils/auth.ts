@@ -28,7 +28,7 @@ export const canAccessReportingDashboard = (): boolean => {
  */
 export const clearLoginState = (): void => {
 	localStorage.setItem('isLoggedInReportingDashboard', 'false');
-	localStorage.removeItem('xHasuraUserId');
+	localStorage.removeItem('firebaseUserId');
 	console.log('Login state cleared');
 };
 
@@ -196,7 +196,7 @@ export const clearAllLocalStorage = () => {
 		'firebase:heartbeat:',
 		'firebase:installations:',
 		'isLoggedInReportingDashboard',
-		'xHasuraUserId',
+		'firebaseUserId',
 		'firebase-analytics-storage',
 		'firebase-messaging-storage'
 	];
@@ -329,7 +329,7 @@ export const quickCacheClear = () => {
 	try {
 		// Clear login states
 		localStorage.removeItem('isLoggedInReportingDashboard');
-		localStorage.removeItem('xHasuraUserId');
+		localStorage.removeItem('firebaseUserId');
 		
 		// Clear Firebase auth persistence
 		const authKeys = Object.keys(localStorage).filter(key => 

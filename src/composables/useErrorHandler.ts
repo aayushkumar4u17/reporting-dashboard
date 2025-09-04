@@ -60,9 +60,9 @@ export const useErrorHandler = () => {
   // Predefined error messages for common scenarios
   const showOwnerAccessError = () => {
     showError({
-      title: 'Access Restricted',
-      message: 'Only organization owners can access the reporting dashboard.',
-      details: 'Please contact your system administrator if you believe you should have access to this dashboard.',
+      title: 'Access Restricted - Owner Only',
+      message: 'This reporting dashboard is only accessible to organization owners.',
+      details: 'You need to be marked as an owner in the organization_user table with is_owner=true. Please contact your system administrator if you believe you should have access to this dashboard.',
       showRetry: true,
       retryCallback: () => {
         // Clear authentication and redirect to login

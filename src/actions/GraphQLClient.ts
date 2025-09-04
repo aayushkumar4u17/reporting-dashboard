@@ -74,28 +74,42 @@ const graphQLClient = new GraphQLClient(
 );
 
 const createClient = async (): Promise<{
-	request: (query: any, variables?: any) => Promise<any>;
+	request: (query: any, variables?: any, userId?: string) => Promise<any>;
 }> => {
 	try {
 		// Try to get token, but don't fail if Firebase isn't ready
 		const token = await getToken();
 		graphQLClient.setHeader('Authorization', `Bearer ${token}`);
 		return {
-			request: (query, variables) => withJWTRefresh(() => graphQLClient.request(query, variables))
+			request: (query, variables, userId) => {
+				// Set Hasura session variables if userId is provided
+				if (userId) {
+					graphQLClient.setHeader('x-hasura-user-id', userId);
+				}
+				return withJWTRefresh(() => graphQLClient.request(query, variables));
+			}
 		};
 	} catch (error) {
 		console.warn('GraphQL client created without authentication:', error.message);
 		// Return client without auth header - will be set later when Firebase is ready
 		return {
-			request: async (query, variables) => {
+			request: async (query, variables, userId) => {
 				try {
 					// Try to get token on each request
 					const token = await getToken();
 					graphQLClient.setHeader('Authorization', `Bearer ${token}`);
+					// Set Hasura session variables if userId is provided
+					if (userId) {
+						graphQLClient.setHeader('x-hasura-user-id', userId);
+					}
 					return await withJWTRefresh(() => graphQLClient.request(query, variables));
 				} catch (authError) {
 					// If still no auth, make request without token
 					console.warn('Making GraphQL request without authentication:', authError.message);
+					// Set Hasura session variables if userId is provided
+					if (userId) {
+						graphQLClient.setHeader('x-hasura-user-id', userId);
+					}
 					return await graphQLClient.request(query, variables);
 				}
 			}

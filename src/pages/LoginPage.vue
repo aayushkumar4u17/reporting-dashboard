@@ -148,7 +148,7 @@ import TermsPopup from '@/components/common/TermsPopup.vue'
 
 // Import Firebase Auth actions
 import { useAuthStore } from '@/store'
-import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/actions/GraphQLAuth'
+import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/actions/auth'
 import { startTimer, formatTime } from '@/actions/auth'
 import { validatePhoneNumber, getCurrentUser } from '@/actions/general'
 
@@ -231,36 +231,43 @@ watch(
 )
 
 const sendOTPHandler = async () => {
+  console.log('Send OTP button clicked');
+  console.log('Phone valid:', isPhoneNumberValid.value);
+  console.log('Agreed:', isAgreed.value);
+  
   if (isPhoneNumberValid.value && isAgreed.value) {
-    // Phone number is already cleaned (only digits)
-    const numberToValidate = phoneNumber.value
-    
-    // Additional validation using the existing function
-    if (!validatePhoneNumber(numberToValidate)) {
-      authStore.showErrorPopup({
-        title: 'Invalid Phone Number',
-        message: 'Please enter a valid 10-digit phone number',
-        showRetry: true
-      })
-      return
-    }
-
+    console.log('Starting OTP send process...');
     isLoading.value = true
-    authStore.setPhoneNumber(phoneNumber.value)
-    
-    // Setup recaptcha container for Firebase
     setupRecaptcha()
     
     try {
-      await sendOTPAction(`+91${numberToValidate}`, (confirmationResult) => {
+      console.log('Calling sendOTPAction with:', `+91${phoneNumber.value}`);
+      await sendOTPAction(`+91${phoneNumber.value}`, (confirmationResult) => {
+        console.log('Got confirmation result:', confirmationResult);
         authStore.setLoginConfirmationResult(confirmationResult)
       })
+      console.log('OTP sent successfully');
       startTimer()
     } catch (error) {
       console.error('Error sending OTP:', error)
       isLoading.value = false
-      // Error popup is handled in the sendOTPAction function
+      
+      if (error.message === 'Unauthorized user') {
+        authStore.showErrorPopup({
+          title: 'Unauthorized Access',
+          message: 'Only organization owners can access the reporting dashboard',
+          showRetry: false
+        })
+      } else {
+        authStore.showErrorPopup({
+          title: 'Error Sending OTP',
+          message: 'Unable to send OTP. Please try again.',
+          showRetry: true
+        })
+      }
     }
+  } else {
+    console.log('Validation failed - phone valid:', isPhoneNumberValid.value, 'agreed:', isAgreed.value);
   }
 }
 
@@ -275,15 +282,21 @@ const verifyOTPHandler = async () => {
       })
       
       if (result.success) {
-        // Redirect to user selection on successful verification
+        // Redirect to dashboard on successful verification
         router.push('/select-user')
       } else {
         // Clear OTP on failure and show error
         otpCode.value = ''
         isVerifying.value = false
         
-        // Show error message if not already shown by error handler
-        if (result.error && !result.error.includes('owner') && !result.error.includes('authorization')) {
+        // Show access denied popup if user doesn't have access
+        if (result.error && result.error.includes('Access denied')) {
+          authStore.showErrorPopup({
+            title: 'Access Denied',
+            message: result.error,
+            showRetry: false
+          })
+        } else {
           authStore.showErrorPopup({
             title: 'Verification Failed',
             message: result.error || 'OTP verification failed. Please try again.',

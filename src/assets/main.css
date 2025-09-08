@@ -13,6 +13,8 @@ html, body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* zoom: 0.95; */
+  transform-origin: top left;
 }
 
 #app {

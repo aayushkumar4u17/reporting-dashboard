@@ -81,15 +81,15 @@ main {
 
 /* With sidebar (dashboard, point-of-contact, my-orders, my-invoices, payments) */
 .content-wrapper.with-sidebar {
-  margin-left: 180px; /* Account for sidebar width */
-  padding-top: 56px; /* Account for navbar height */
+  margin-left: 200px; /* Account for sidebar width */
+  padding-top: 64px; /* Account for navbar height */
   padding-left: 0;
   padding-right: 0;
 }
 
 /* Without sidebar (other pages) */
 .content-wrapper.without-sidebar {
-  padding-top: 72px; /* 56px navbar + 16px extra */
+  padding-top: 80px; /* 64px navbar + 16px extra */
   padding-left: 3rem;
   padding-right: 3rem;
   margin-left: auto;
@@ -110,7 +110,7 @@ main {
 @media (max-width: 768px) {
   .content-wrapper.with-sidebar {
     margin-left: 0;
-    padding-top: 100px; /* Account for mobile navbar + sidebar */
+    padding-top: 64px; /* Account for navbar height only on mobile */
   }
   
   .content-wrapper.without-sidebar {

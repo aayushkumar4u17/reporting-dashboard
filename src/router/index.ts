@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DashboardPage from '../pages/DashboardPage.vue'
-import LoginPage from '../pages/LoginPage.vue'
-import UserSelectionPage from '../pages/UserSelectionPage.vue'
-import MyInvoicesPage from '../pages/MyInvoicesPage.vue'
-import MyOrdersPage from '../pages/MyOrdersPage.vue'
-import PaymentsPage from '../pages/PaymentsPage.vue'
-import PointOfContactPage from '../pages/PointOfContactPage.vue'
+import DashboardPage from '../pages/DashboardPage/DashboardPage.vue'
+import LoginPage from '../pages/LoginPage/LoginPage.vue'
+import UserSelectionPage from '../pages/UserSelectionPage/UserSelectionPage.vue'
+import MyInvoicesPage from '../pages/MyInvoicesPage/MyInvoicesPage.vue'
+import MyOrdersPage from '../pages/MyOrdersPage/MyOrdersPage.vue'
+import PaymentsPage from '../pages/PaymentsPage/PaymentsPage.vue'
+import PointOfContactPage from '../pages/PointOfContactPage/PointOfContactPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

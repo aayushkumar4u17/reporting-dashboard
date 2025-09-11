@@ -69,15 +69,6 @@ export type CancleInvoiceAndDeliveryNoteOutput = {
   message: Scalars['String'];
 };
 
-export type CheckUserAccessInput = {
-  user_id: Scalars['String'];
-};
-
-export type CheckUserAccessOutput = {
-  __typename?: 'CheckUserAccessOutput';
-  has_access: Scalars['Boolean'];
-};
-
 export type CreateAppCustomerOrderCustomerAssetInput = {
   customer_asset_id: Scalars['uuid'];
 };
@@ -400,6 +391,119 @@ export type PayThroughWalletOutput = {
   order_id: Scalars['uuid'];
   payment_id?: Maybe<Scalars['uuid']>;
   status?: Maybe<Scalars['String']>;
+};
+
+export type PointOfContactDashboardData = {
+  __typename?: 'PointOfContactDashboardData';
+  cancelled_count?: Maybe<Scalars['Int']>;
+  cancelled_qty?: Maybe<Scalars['Float']>;
+  delivered_orders?: Maybe<Scalars['Int']>;
+  delivered_qty?: Maybe<Scalars['Float']>;
+  order_count?: Maybe<Scalars['Int']>;
+  ordered_qty?: Maybe<Scalars['Float']>;
+  planned_orders?: Maybe<Scalars['Int']>;
+  planned_qty?: Maybe<Scalars['Float']>;
+  rescheduled_count?: Maybe<Scalars['Int']>;
+  rescheduled_qty?: Maybe<Scalars['Float']>;
+};
+
+export type PointOfContactDashboardInput = {
+  cities?: InputMaybe<Array<Scalars['String']>>;
+  delivered_date?: InputMaybe<Scalars['String']>;
+  ordered_date?: InputMaybe<Scalars['String']>;
+  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type PointOfContactDashboardOutput = {
+  __typename?: 'PointOfContactDashboardOutput';
+  data: Array<PointOfContactDashboardData>;
+};
+
+export type PointOfContactDetailedReportData = {
+  __typename?: 'PointOfContactDetailedReportData';
+  actual_delivery_date?: Maybe<Scalars['String']>;
+  app_order_code?: Maybe<Scalars['String']>;
+  backend_order_status?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  customer_name?: Maybe<Scalars['String']>;
+  delivery_slot?: Maybe<Scalars['String']>;
+  erp_order_code?: Maybe<Scalars['String']>;
+  erp_order_status?: Maybe<Scalars['String']>;
+  first_name?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
+  order_amount?: Maybe<Scalars['Float']>;
+  order_date?: Maybe<Scalars['String']>;
+  order_delivered_qty?: Maybe<Scalars['Float']>;
+  order_qty?: Maybe<Scalars['Float']>;
+  phone_number?: Maybe<Scalars['String']>;
+  shipping_address?: Maybe<Scalars['String']>;
+};
+
+export type PointOfContactDetailedReportInput = {
+  cities?: InputMaybe<Array<Scalars['String']>>;
+  delivered_date?: InputMaybe<Scalars['String']>;
+  ordered_date?: InputMaybe<Scalars['String']>;
+  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type PointOfContactDetailedReportOutput = {
+  __typename?: 'PointOfContactDetailedReportOutput';
+  data: Array<PointOfContactDetailedReportData>;
+};
+
+export type PointOfContactInvoiceReportData = {
+  __typename?: 'PointOfContactInvoiceReportData';
+  app_order_code?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  delivered_date?: Maybe<Scalars['String']>;
+  erp_order_code?: Maybe<Scalars['String']>;
+  first_name?: Maybe<Scalars['String']>;
+  invoice?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
+  order_amount?: Maybe<Scalars['Float']>;
+  order_date?: Maybe<Scalars['String']>;
+  order_delivered_qty?: Maybe<Scalars['Float']>;
+  order_qty?: Maybe<Scalars['Float']>;
+  phone_number?: Maybe<Scalars['String']>;
+  shipping_address?: Maybe<Scalars['String']>;
+};
+
+export type PointOfContactInvoiceReportInput = {
+  cities?: InputMaybe<Array<Scalars['String']>>;
+  delivered_date?: InputMaybe<Scalars['String']>;
+  ordered_date?: InputMaybe<Scalars['String']>;
+  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type PointOfContactInvoiceReportOutput = {
+  __typename?: 'PointOfContactInvoiceReportOutput';
+  data: Array<PointOfContactInvoiceReportData>;
+};
+
+export type PointOfContactPaymentReportData = {
+  __typename?: 'PointOfContactPaymentReportData';
+  allowed_credit_breach?: Maybe<Scalars['String']>;
+  credit_limit?: Maybe<Scalars['Float']>;
+  customer_id?: Maybe<Scalars['String']>;
+  customer_name?: Maybe<Scalars['String']>;
+  first_name?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
+  outstanding_amount?: Maybe<Scalars['Float']>;
+  overdue_amount?: Maybe<Scalars['Float']>;
+  payment_terms?: Maybe<Scalars['Int']>;
+  phone_number?: Maybe<Scalars['String']>;
+};
+
+export type PointOfContactPaymentReportInput = {
+  cities?: InputMaybe<Array<Scalars['String']>>;
+  delivered_date?: InputMaybe<Scalars['String']>;
+  ordered_date?: InputMaybe<Scalars['String']>;
+  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+};
+
+export type PointOfContactPaymentReportOutput = {
+  __typename?: 'PointOfContactPaymentReportOutput';
+  data: Array<PointOfContactPaymentReportData>;
 };
 
 export type RescheduleTaskInput = {
@@ -5427,6 +5531,8 @@ export type Customer_Asset = {
   product?: Maybe<Product>;
   product_id?: Maybe<Scalars['uuid']>;
   registration_number?: Maybe<Scalars['String']>;
+  /** An object relationship */
+  sensorTypeBySensorType?: Maybe<Sensor_Type>;
   sensor_type?: Maybe<Sensor_Type_Enum>;
   slug?: Maybe<Scalars['String']>;
   /** An object relationship */
@@ -5795,6 +5901,7 @@ export type Customer_Asset_Bool_Exp = {
   product?: InputMaybe<Product_Bool_Exp>;
   product_id?: InputMaybe<Uuid_Comparison_Exp>;
   registration_number?: InputMaybe<String_Comparison_Exp>;
+  sensorTypeBySensorType?: InputMaybe<Sensor_Type_Bool_Exp>;
   sensor_type?: InputMaybe<Sensor_Type_Enum_Comparison_Exp>;
   slug?: InputMaybe<String_Comparison_Exp>;
   state?: InputMaybe<State_Bool_Exp>;
@@ -6619,6 +6726,7 @@ export type Customer_Asset_Insert_Input = {
   product?: InputMaybe<Product_Obj_Rel_Insert_Input>;
   product_id?: InputMaybe<Scalars['uuid']>;
   registration_number?: InputMaybe<Scalars['String']>;
+  sensorTypeBySensorType?: InputMaybe<Sensor_Type_Obj_Rel_Insert_Input>;
   sensor_type?: InputMaybe<Sensor_Type_Enum>;
   slug?: InputMaybe<Scalars['String']>;
   state?: InputMaybe<State_Obj_Rel_Insert_Input>;
@@ -7256,6 +7364,7 @@ export type Customer_Asset_Order_By = {
   product?: InputMaybe<Product_Order_By>;
   product_id?: InputMaybe<Order_By>;
   registration_number?: InputMaybe<Order_By>;
+  sensorTypeBySensorType?: InputMaybe<Sensor_Type_Order_By>;
   sensor_type?: InputMaybe<Order_By>;
   slug?: InputMaybe<Order_By>;
   state?: InputMaybe<State_Order_By>;
@@ -24767,9 +24876,18 @@ export type FetchSenselDataForPartnerV1Output = {
   data?: Maybe<Scalars['jsonb']>;
 };
 
+export type FetchSiteCircleAggregatedDataInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
 export type FetchSiteCircleAggregatedDataOutput = {
   __typename?: 'fetchSiteCircleAggregatedDataOutput';
   data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchSiteCityAggregatedDataInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
 export type FetchSiteCityAggregatedDataOutput = {
@@ -89011,7 +89129,6 @@ export type Query_Root = {
   centralizedPurchaseControlForTowerBussinessReport?: Maybe<CentralizedPurchaseControlForTowerBussinessReportOutput>;
   checkForDeliveryWithPurchaseInvoice?: Maybe<CheckForDeliveryWithPurchaseInvoiceOutput>;
   checkIfPanExists?: Maybe<CheckIfPanExistsOutput>;
-  checkUserAccess?: Maybe<CheckUserAccessOutput>;
   checkWalletBalance?: Maybe<CheckWalletBalanceOutput>;
   circleLevelAndCustomerNameWiseDeliveryOtdPercentageReport?: Maybe<CircleLevelAndCustomerNameWiseDeliveryOtdPercentageReporttOutput>;
   circleLevelAndCustomerNameWiseDeliveryOtdPercentageReportv1?: Maybe<CircleLevelAndCustomerNameWiseDeliveryOtdPercentageReportv1tOutput>;
@@ -90143,6 +90260,10 @@ export type Query_Root = {
   poc_to_add_aggregate: Poc_To_Add_Aggregate;
   /** fetch data from the table: "poc_to_add" using primary key columns */
   poc_to_add_by_pk?: Maybe<Poc_To_Add>;
+  pointOfContactDashboard?: Maybe<PointOfContactDashboardOutput>;
+  pointOfContactDetailedReport?: Maybe<PointOfContactDetailedReportOutput>;
+  pointOfContactInvoiceReport?: Maybe<PointOfContactInvoiceReportOutput>;
+  pointOfContactPaymentReport?: Maybe<PointOfContactPaymentReportOutput>;
   /** fetch data from the table: "product" */
   product: Array<Product>;
   /** fetch aggregated fields from the table: "product" */
@@ -90834,11 +90955,6 @@ export type Query_RootCheckForDeliveryWithPurchaseInvoiceArgs = {
 
 export type Query_RootCheckIfPanExistsArgs = {
   object: CheckIfPanExistsInput;
-};
-
-
-export type Query_RootCheckUserAccessArgs = {
-  arg1: CheckUserAccessInput;
 };
 
 
@@ -92595,6 +92711,16 @@ export type Query_RootFetchSalesInvoicePdfArgs = {
 
 export type Query_RootFetchSenselDataByVehicleArgs = {
   object: FetchSenselDataByVehicleInput;
+};
+
+
+export type Query_RootFetchSiteCircleAggregatedDataArgs = {
+  object: FetchSiteCircleAggregatedDataInput;
+};
+
+
+export type Query_RootFetchSiteCityAggregatedDataArgs = {
+  object: FetchSiteCityAggregatedDataInput;
 };
 
 
@@ -95269,6 +95395,26 @@ export type Query_RootPoc_To_Add_AggregateArgs = {
 
 export type Query_RootPoc_To_Add_By_PkArgs = {
   id: Scalars['uuid'];
+};
+
+
+export type Query_RootPointOfContactDashboardArgs = {
+  object: PointOfContactDashboardInput;
+};
+
+
+export type Query_RootPointOfContactDetailedReportArgs = {
+  object: PointOfContactDetailedReportInput;
+};
+
+
+export type Query_RootPointOfContactInvoiceReportArgs = {
+  object: PointOfContactInvoiceReportInput;
+};
+
+
+export type Query_RootPointOfContactPaymentReportArgs = {
+  object: PointOfContactPaymentReportInput;
 };
 
 
@@ -99970,7 +100116,31 @@ export type Scripts_Updates = {
 export type Sensor_Type = {
   __typename?: 'sensor_type';
   comment?: Maybe<Scalars['String']>;
+  /** An array relationship */
+  customer_assets: Array<Customer_Asset>;
+  /** An aggregate relationship */
+  customer_assets_aggregate: Customer_Asset_Aggregate;
   value: Scalars['String'];
+};
+
+
+/** columns and relationships of "sensor_type" */
+export type Sensor_TypeCustomer_AssetsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Asset_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Customer_Asset_Order_By>>;
+  where?: InputMaybe<Customer_Asset_Bool_Exp>;
+};
+
+
+/** columns and relationships of "sensor_type" */
+export type Sensor_TypeCustomer_Assets_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Asset_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  order_by?: InputMaybe<Array<Customer_Asset_Order_By>>;
+  where?: InputMaybe<Customer_Asset_Bool_Exp>;
 };
 
 /** aggregated selection of "sensor_type" */
@@ -100001,6 +100171,8 @@ export type Sensor_Type_Bool_Exp = {
   _not?: InputMaybe<Sensor_Type_Bool_Exp>;
   _or?: InputMaybe<Array<Sensor_Type_Bool_Exp>>;
   comment?: InputMaybe<String_Comparison_Exp>;
+  customer_assets?: InputMaybe<Customer_Asset_Bool_Exp>;
+  customer_assets_aggregate?: InputMaybe<Customer_Asset_Aggregate_Bool_Exp>;
   value?: InputMaybe<String_Comparison_Exp>;
 };
 
@@ -100035,6 +100207,7 @@ export type Sensor_Type_Enum_Comparison_Exp = {
 /** input type for inserting data into table "sensor_type" */
 export type Sensor_Type_Insert_Input = {
   comment?: InputMaybe<Scalars['String']>;
+  customer_assets?: InputMaybe<Customer_Asset_Arr_Rel_Insert_Input>;
   value?: InputMaybe<Scalars['String']>;
 };
 
@@ -100061,6 +100234,13 @@ export type Sensor_Type_Mutation_Response = {
   returning: Array<Sensor_Type>;
 };
 
+/** input type for inserting object relation for remote table "sensor_type" */
+export type Sensor_Type_Obj_Rel_Insert_Input = {
+  data: Sensor_Type_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Sensor_Type_On_Conflict>;
+};
+
 /** on_conflict condition type for table "sensor_type" */
 export type Sensor_Type_On_Conflict = {
   constraint: Sensor_Type_Constraint;
@@ -100071,6 +100251,7 @@ export type Sensor_Type_On_Conflict = {
 /** Ordering options when selecting data from "sensor_type". */
 export type Sensor_Type_Order_By = {
   comment?: InputMaybe<Order_By>;
+  customer_assets_aggregate?: InputMaybe<Customer_Asset_Aggregate_Order_By>;
   value?: InputMaybe<Order_By>;
 };
 
@@ -129720,63 +129901,72 @@ export type Wallet_Variance_Order_By = {
   van_number?: InputMaybe<Order_By>;
 };
 
-export type CheckUserAccessQueryVariables = Exact<{
+export type PointOfContactDashboardQueryVariables = Exact<{
+  object: PointOfContactDashboardInput;
+}>;
+
+
+export type PointOfContactDashboardQuery = { __typename?: 'query_root', pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, delivered_qty?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null, rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null };
+
+export type ValidateIndusDashboardUserQueryVariables = Exact<{
   user_id: Scalars['uuid'];
 }>;
 
 
-export type CheckUserAccessQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_owner: boolean, organization_id: any, organization: { __typename?: 'organization', id: any, name?: string | null }, user: { __typename?: 'user', id: any, phone_number?: string | null } }> };
-
-export type CheckUserOwnerStatusQueryVariables = Exact<{
-  user_id: Scalars['uuid'];
-}>;
+export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 
-export type CheckUserOwnerStatusQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, is_owner: boolean, organization_id: any, organization: { __typename?: 'organization', id: any, name?: string | null }, user: { __typename?: 'user', id: any, phone_number?: string | null } }> };
-
-
-export const CheckUserAccessDocument = gql`
-    query checkUserAccess($user_id: uuid!) {
-  organization_user(where: {user_id: {_eq: $user_id}, is_owner: {_eq: true}}) {
-    id
-    user_id
-    is_owner
-    organization_id
-    organization {
-      id
-      name
-    }
-    user {
-      id
-      phone_number
+export const PointOfContactDashboardDocument = gql`
+    query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
+  pointOfContactDashboard(object: $object) {
+    data {
+      cancelled_count
+      cancelled_qty
+      delivered_orders
+      delivered_qty
+      order_count
+      ordered_qty
+      planned_orders
+      planned_qty
+      rescheduled_count
+      rescheduled_qty
     }
   }
 }
     `;
 
-export function useCheckUserAccessQuery(options: Omit<Urql.UseQueryArgs<never, CheckUserAccessQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<CheckUserAccessQuery>({ query: CheckUserAccessDocument, ...options });
+export function usePointOfContactDashboardQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactDashboardQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactDashboardQuery>({ query: PointOfContactDashboardDocument, ...options });
 };
-export const CheckUserOwnerStatusDocument = gql`
-    query checkUserOwnerStatus($user_id: uuid!) {
+export const ValidateIndusDashboardUserDocument = gql`
+    query validateIndusDashboardUser($user_id: uuid!) {
   organization_user(
-    where: {user_id: {_eq: $user_id}, is_owner: {_eq: true}, is_active: {_eq: true}}
+    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, is_owner: {_eq: true}}
   ) {
     id
+    user_id
+    is_active
     is_owner
     organization_id
     organization {
       id
       name
+      is_active
+      created_at
     }
     user {
       id
+      first_name
+      last_name
       phone_number
+      email
+      created_at
     }
+    created_at
   }
 }
     `;
 
-export function useCheckUserOwnerStatusQuery(options: Omit<Urql.UseQueryArgs<never, CheckUserOwnerStatusQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<CheckUserOwnerStatusQuery>({ query: CheckUserOwnerStatusDocument, ...options });
+export function useValidateIndusDashboardUserQuery(options: Omit<Urql.UseQueryArgs<never, ValidateIndusDashboardUserQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<ValidateIndusDashboardUserQuery>({ query: ValidateIndusDashboardUserDocument, ...options });
 };

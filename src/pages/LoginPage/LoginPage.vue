@@ -3,7 +3,6 @@
     <div class="welcome-container" :class="{ 'fade-in': isLoaded }">
       <div class="welcome-logo" :class="{ 'animate-bounce': isLoaded }">
         <img src="/fuelbuddy-logo.svg" alt="FuelBuddy Logo" class="logo-image" />
-        <!-- <p class="welcome-tagline">Doorstep Fuel Delivery</p> -->
       </div>
       
       <h1 class="welcome-title" :class="{ 'slide-in-left': isLoaded }">
@@ -183,23 +182,17 @@ const setupRecaptcha = () => {
 }
 
 onMounted(async () => {
-  console.log('LoginPage mounted - starting initialization...');
-  
   // Set loaded immediately to show the page
   isLoaded.value = true;
   
   try {
     // Check if user is already logged in
-    console.log('Checking current user...');
     const user = await getCurrentUser();
     if (user) {
-      console.log('User already authenticated, redirecting to user selection');
       router.replace('/select-user');
       return;
     }
-    console.log('No authenticated user found, staying on login page');
   } catch (error) {
-    console.error('Error checking current user:', error);
     // Continue to show login page even if there's an error
   }
   
@@ -231,25 +224,16 @@ watch(
 )
 
 const sendOTPHandler = async () => {
-  console.log('Send OTP button clicked');
-  console.log('Phone valid:', isPhoneNumberValid.value);
-  console.log('Agreed:', isAgreed.value);
-  
   if (isPhoneNumberValid.value && isAgreed.value) {
-    console.log('Starting OTP send process...');
     isLoading.value = true
     setupRecaptcha()
     
     try {
-      console.log('Calling sendOTPAction with:', `+91${phoneNumber.value}`);
       await sendOTPAction(`+91${phoneNumber.value}`, (confirmationResult) => {
-        console.log('Got confirmation result:', confirmationResult);
         authStore.setLoginConfirmationResult(confirmationResult)
       })
-      console.log('OTP sent successfully');
       startTimer()
     } catch (error) {
-      console.error('Error sending OTP:', error)
       isLoading.value = false
       
       if (error.message === 'Unauthorized user') {
@@ -266,8 +250,6 @@ const sendOTPHandler = async () => {
         })
       }
     }
-  } else {
-    console.log('Validation failed - phone valid:', isPhoneNumberValid.value, 'agreed:', isAgreed.value);
   }
 }
 
@@ -305,7 +287,6 @@ const verifyOTPHandler = async () => {
         }
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error)
       // Clear OTP on error
       otpCode.value = ''
       isVerifying.value = false
@@ -347,9 +328,7 @@ const resendOTPHandler = async () => {
       otpCode.value = ''
       startResendTimer()
       startTimer() // Restart the main OTP timer
-      console.log('OTP resent successfully')
     } catch (error) {
-      console.error('Error resending OTP:', error)
       // Use error popup instead of alert
       authStore.showErrorPopup({
         title: 'Resend Failed',

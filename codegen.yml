@@ -1,7 +1,8 @@
 schema: 
   - "${VITE_GRAPHQL_SCHEMA_PATH:http://localhost:8080/v1/graphql}":
       headers:
-        x-hasura-admin-secret: ${VITE_GRAPHQL_ADMIN_SECRET:myadminsecretkey}
+        # Admin secret for build-time code generation only (not used at runtime)
+        x-hasura-admin-secret: ${HASURA_GRAPHQL_ADMIN_SECRET:myadminsecretkey}
 documents: 'src/graphql/**/*.graphql'
 generates:
   graphql.schema.json:

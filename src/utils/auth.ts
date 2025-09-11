@@ -2,16 +2,69 @@
  * Authentication utility functions for checking login state
  */
 
+// Import Firebase auth functions - Move to top to prevent initialization issues
+import { getAuth, signOut } from 'firebase/auth';
+import { app } from '../firebase/index';
+
+// Cache authentication state to avoid repeated localStorage reads
+let authStateCache: { 
+  isReportingLoggedIn: boolean | null,
+  isIndusDashboardLoggedIn: boolean | null,
+  lastChecked: number 
+} = {
+  isReportingLoggedIn: null,
+  isIndusDashboardLoggedIn: null,
+  lastChecked: 0
+};
+
+// Cache expiration time (5 seconds)
+const CACHE_EXPIRATION = 5000;
+
 /**
  * Check if user is logged in as reporting dashboard user
  * @returns boolean indicating if user is logged in as owner
  */
 export const isReportingLoggedIn = (): boolean => {
-	return localStorage.getItem('isLoggedInReportingDashboard') === 'true';
+  const now = Date.now();
+  
+  // Return cached value if still valid
+  if (authStateCache.isReportingLoggedIn !== null && 
+      (now - authStateCache.lastChecked) < CACHE_EXPIRATION) {
+    return authStateCache.isReportingLoggedIn;
+  }
+  
+  // Check and cache the value
+  const isLoggedIn = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
+  authStateCache.isReportingLoggedIn = isLoggedIn;
+  authStateCache.lastChecked = now;
+  
+  return isLoggedIn;
+};
+
+/**
+ * Check if user is logged in to Indus Dashboard specifically
+ * @returns boolean indicating if user has Indus Dashboard access
+ */
+export const isIndusDashboardLoggedIn = (): boolean => {
+  const now = Date.now();
+  
+  // Return cached value if still valid
+  if (authStateCache.isIndusDashboardLoggedIn !== null && 
+      (now - authStateCache.lastChecked) < CACHE_EXPIRATION) {
+    return authStateCache.isIndusDashboardLoggedIn;
+  }
+  
+  // Check and cache the value
+  const isLoggedIn = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+  authStateCache.isIndusDashboardLoggedIn = isLoggedIn;
+  authStateCache.lastChecked = now;
+  
+  return isLoggedIn;
 };
 
 /**
  * Check if user has valid login state for reporting dashboard
+ * @deprecated Use canAccessIndusDashboard() instead
  * @returns boolean indicating if user can access reporting dashboard
  */
 export const canAccessReportingDashboard = (): boolean => {
@@ -24,11 +77,83 @@ export const canAccessReportingDashboard = (): boolean => {
 };
 
 /**
+ * Check if user has valid Indus Dashboard access with improved error handling
+ * @returns boolean indicating if user can access Indus Dashboard
+ */
+export const canAccessIndusDashboard = (): boolean => {
+	try {
+		const isIndusLoggedIn = isIndusDashboardLoggedIn();
+		const isReportingLoggedInVar = isReportingLoggedIn();
+		
+		// Removed verbose logging that was causing performance issues
+		// console.log('Auth state check:', { isIndusLoggedIn, isReportingLoggedIn: isReportingLoggedInVar });
+		
+		return isIndusLoggedIn && isReportingLoggedInVar;
+	} catch (error) {
+		console.error('Error checking Indus Dashboard access:', error);
+		return false;
+	}
+};
+
+/**
+ * Invalidate the authentication state cache
+ * Call this when login state changes
+ */
+export const invalidateAuthCache = (): void => {
+  authStateCache = {
+    isReportingLoggedIn: null,
+    isIndusDashboardLoggedIn: null,
+    lastChecked: 0
+  };
+};
+
+/**
+ * Get user's organization details from localStorage
+ * @returns object with organization data or null
+ */
+export const getUserOrganizationData = (): { id: string; name: string } | null => {
+	try {
+		const orgId = localStorage.getItem('userOrganizationId');
+		const orgName = localStorage.getItem('userOrganizationName');
+		
+		if (orgId && orgName) {
+			return { id: orgId, name: orgName };
+		}
+		return null;
+	} catch (error) {
+		console.error('Error getting organization data:', error);
+		return null;
+	}
+};
+
+/**
+ * Check if user has owner privileges for current organization
+ * @returns boolean indicating if user is an owner
+ */
+export const isOrganizationOwner = (): boolean => {
+	try {
+		// For now, if user has Indus Dashboard access, they are an owner
+		// This could be expanded to check specific owner permissions
+		return canAccessIndusDashboard();
+	} catch (error) {
+		console.error('Error checking owner status:', error);
+		return false;
+	}
+};
+
+/**
  * Clear all login state flags
  */
 export const clearLoginState = (): void => {
 	localStorage.setItem('isLoggedInReportingDashboard', 'false');
+	localStorage.setItem('isLoggedInIndusDashboard', 'false');
 	localStorage.removeItem('firebaseUserId');
+	localStorage.removeItem('userOrganizationId');
+	localStorage.removeItem('userOrganizationName');
+	
+  // Invalidate cache when clearing login state
+  invalidateAuthCache();
+  
 	console.log('Login state cleared');
 };
 
@@ -37,12 +162,24 @@ export const clearLoginState = (): void => {
  */
 export const setReportingLoginState = (): void => {
 	localStorage.setItem('isLoggedInReportingDashboard', 'true');
+	
+  // Invalidate cache when setting login state
+  invalidateAuthCache();
+  
 	console.log('Reporting dashboard login state set');
 };
 
-// Import Firebase auth functions
-import { getAuth, signOut } from 'firebase/auth';
-import { app } from '../firebase/index';
+/**
+ * Set login state for Indus Dashboard
+ */
+export const setIndusDashboardLoginState = (): void => {
+	localStorage.setItem('isLoggedInIndusDashboard', 'true');
+	
+  // Invalidate cache when setting login state
+  invalidateAuthCache();
+  
+	console.log('Indus Dashboard login state set');
+};
 
 /**
  * Rate limiting utility functions
@@ -196,7 +333,10 @@ export const clearAllLocalStorage = () => {
 		'firebase:heartbeat:',
 		'firebase:installations:',
 		'isLoggedInReportingDashboard',
+		'isLoggedInIndusDashboard',
 		'firebaseUserId',
+		'userOrganizationId',
+		'userOrganizationName',
 		'firebase-analytics-storage',
 		'firebase-messaging-storage'
 	];
@@ -243,9 +383,9 @@ export const clearFirebaseAuth = async () => {
 		}
 		
 		// Force clear auth state
-		if (auth._delegate) {
-			auth._delegate._currentUser = null;
-			auth._delegate._isInitialized = false;
+		if ((auth as any)._delegate) {
+			(auth as any)._delegate._currentUser = null;
+			(auth as any)._delegate._isInitialized = false;
 		}
 		
 	} catch (error) {
@@ -272,7 +412,7 @@ export const clearFirebaseIndexedDB = async () => {
 			
 			for (const dbName of firebaseDBNames) {
 				try {
-					await new Promise((resolve, reject) => {
+					await new Promise<void>((resolve, reject) => {
 						const deleteReq = indexedDB.deleteDatabase(dbName);
 						deleteReq.onsuccess = () => {
 							console.log(`Deleted IndexedDB: ${dbName}`);
@@ -329,7 +469,10 @@ export const quickCacheClear = () => {
 	try {
 		// Clear login states
 		localStorage.removeItem('isLoggedInReportingDashboard');
+		localStorage.removeItem('isLoggedInIndusDashboard');
 		localStorage.removeItem('firebaseUserId');
+		localStorage.removeItem('userOrganizationId');
+		localStorage.removeItem('userOrganizationName');
 		
 		// Clear Firebase auth persistence
 		const authKeys = Object.keys(localStorage).filter(key => 
@@ -362,12 +505,12 @@ export const resetFirebaseApp = async () => {
 		
 		// Force page reload to reset everything
 		console.log('Reloading page to complete reset...');
-		window.location.reload(true);
+		window.location.reload();
 		
 	} catch (error) {
 		console.error('Error resetting Firebase app:', error);
 		// Force reload even on error
-		window.location.reload(true);
+		window.location.reload();
 	}
 };
 
@@ -385,7 +528,7 @@ export const performCompleteLogout = async () => {
 		const { signOutUser } = await import('../actions/auth.js');
 		
 		// Perform enhanced logout with complete reset
-		await signOutUser(null, { completeReset: true, forceReload: false });
+		await signOutUser(null);
 		
 		return { success: true, message: 'Complete logout successful' };
 		

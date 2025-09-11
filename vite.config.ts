@@ -45,6 +45,14 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       host: true,
       open: true,
+      // Proxy configuration to handle CORS issues with Firebase functions
+      proxy: {
+        '/api/refreshToken': {
+          target: 'https://us-central1-fuelbuddy-india.cloudfunctions.net',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
     },
     // Preview server configuration
     preview: {

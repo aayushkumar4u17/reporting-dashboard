@@ -1,0 +1,30 @@
+query validateIndusDashboardUser($user_id: uuid!) {
+  organization_user(
+    where: {
+      user_id: { _eq: $user_id }
+      is_active: { _eq: true }
+      is_owner: { _eq: true }
+    }
+  ) {
+    id
+    user_id
+    is_active
+    is_owner
+    organization_id
+    organization {
+      id
+      name
+      is_active
+      created_at
+    }
+    user {
+      id
+      first_name
+      last_name
+      phone_number
+      email
+      created_at
+    }
+    created_at
+  }
+}

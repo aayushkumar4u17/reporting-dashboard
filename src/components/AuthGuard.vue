@@ -50,8 +50,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { signOutUser } from '../actions/GraphQLAuth'
-import { canAccessReportingDashboard, clearLoginState } from '../utils/auth'
+import { signOutUser } from '../actions/auth'
+import { canAccessIndusDashboard, clearLoginState } from '../utils/auth'
 import { useErrorHandler } from '../composables/useErrorHandler'
 
 const router = useRouter()
@@ -64,11 +64,24 @@ const errorTitle = ref('')
 const errorMessage = ref('')
 const errorDetails = ref('')
 
+// Debounce flag to prevent multiple simultaneous auth checks
+let isCheckingAuth = false
+
 const checkAuthentication = async () => {
+  // Prevent multiple simultaneous auth checks
+  if (isCheckingAuth) {
+    return
+  }
+  
+  isCheckingAuth = true
+  
   try {
+    // Add a small delay to prevent blocking the UI
+    await new Promise(resolve => setTimeout(resolve, 10))
+    
     // Check basic login state
-    if (!canAccessReportingDashboard()) {
-      console.log('AuthGuard: No valid login state found')
+    if (!canAccessIndusDashboard()) {
+      console.log('AuthGuard: No valid Indus Dashboard access found')
       redirectToLogin()
       return
     }
@@ -81,6 +94,7 @@ const checkAuthentication = async () => {
     redirectToLogin()
   } finally {
     isChecking.value = false
+    isCheckingAuth = false
   }
 }
 
@@ -106,5 +120,9 @@ onMounted(() => {
   checkAuthentication()
 })
 
-
+// Optimize unmounted cleanup
+onUnmounted(() => {
+  // Clean up any pending operations if needed
+  isCheckingAuth = false
+})
 </script>

@@ -1,12 +1,14 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { app } from '@/firebase';
 
-import { signOutUser } from './GraphQLAuth';
-import { useUserStore } from '@/store';
+// Import the Firebase app to ensure it's initialized before using auth
+import '../firebase';
+
+import { signOutUser } from './auth';
+import { useUserStore } from '../store';
 
 export const handleClick = () => {
-	const button = document.activeElement;
-	(button)?.blur();
+	const button = document.activeElement as HTMLElement;
+	button?.blur();
 };
 
 /**
@@ -16,37 +18,41 @@ export const getCurrentUser = () => {
 	const userStore = useUserStore();
 	
 	return new Promise((resolve) => {
-		const auth = getAuth(app);
-		const unsubscribe = onAuthStateChanged(auth, async (user) => {
-			unsubscribe();
-			
-			if (user) {
-				try {
-					const claims = (await user.getIdTokenResult(true))?.claims;
-					const hasuraClaims = claims?.["https://hasura.io/jwt/claims"];
+		try {
+			// Try to get Firebase auth instance
+			const auth = getAuth();
+			const unsubscribe = onAuthStateChanged(auth, async (user) => {
+				unsubscribe();
+				
+				if (user) {
+					try {
+						const claims = (await user.getIdTokenResult(true))?.claims;
+						const hasuraClaims = claims?.["https://hasura.io/jwt/claims"];
 
-					if (!hasuraClaims) {
+						if (!hasuraClaims) {
+							resolve(null);
+							return;
+						}
+
+						const xHasuraUserId = hasuraClaims["x-hasura-user-id"];
+						
+						if (!xHasuraUserId) {
+							resolve(null);
+							return;
+						}
+						
+						resolve(user);
+					} catch (error) {
 						resolve(null);
 						return;
 					}
-
-					const xHasuraUserId = hasuraClaims["x-hasura-user-id"];
-					
-					if (!xHasuraUserId) {
-						resolve(null);
-						return;
-					}
-					
-					resolve(user);
-				} catch (error) {
-					console.error('Error checking user owner status:', error);
+				} else {
 					resolve(null);
-					return;
 				}
-			} else {
-				resolve(null);
-			}
-		});
+			});
+		} catch (error) {
+			resolve(null);
+		}
 	});
 };
 
@@ -55,29 +61,33 @@ export const getCurrentUser = () => {
  */
 export const checkHasuraUserId = async () => {
 	return new Promise((resolve) => {
-		const auth = getAuth(app);
-		const unsubscribe = onAuthStateChanged(auth, async (user) => {
-			unsubscribe();
-			
-			if (user) {
-				try {
-					const claims = (await user.getIdTokenResult(true))?.claims;
-					const hasuraClaims = claims?.["https://hasura.io/jwt/claims"];
-					const xHasuraUserId = hasuraClaims?.["x-hasura-user-id"];
-					
-					if (xHasuraUserId) {
-						resolve(xHasuraUserId);
-					} else {
+		try {
+			// Try to get Firebase auth instance
+			const auth = getAuth();
+			const unsubscribe = onAuthStateChanged(auth, async (user) => {
+				unsubscribe();
+				
+				if (user) {
+					try {
+						const claims = (await user.getIdTokenResult(true))?.claims;
+						const hasuraClaims = claims?.["https://hasura.io/jwt/claims"];
+						const xHasuraUserId = hasuraClaims?.["x-hasura-user-id"];
+						
+						if (xHasuraUserId) {
+							resolve(xHasuraUserId);
+						} else {
+							resolve(null);
+						}
+					} catch (error) {
 						resolve(null);
 					}
-				} catch (error) {
-					console.error('Error getting Hasura user ID:', error);
+				} else {
 					resolve(null);
 				}
-			} else {
-				resolve(null);
-			}
-		});
+			});
+		} catch (error) {
+			resolve(null);
+		}
 	});
 };
 

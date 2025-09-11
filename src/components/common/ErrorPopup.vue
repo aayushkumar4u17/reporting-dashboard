@@ -99,7 +99,6 @@ watch(() => props.show, async (newValue) => {
       try {
         primaryButton.value.focus()
       } catch (error) {
-        console.warn('Could not focus primary button:', error)
       }
     }
     
@@ -284,12 +283,6 @@ onUnmounted(() => {
   
   .error-actions {
     flex-direction: column;
-  }
-  
-  .error-btn-primary,
-  .error-btn-secondary {
-    width: 100%;
-    padding: 0.875rem;
   }
 }
 </style>

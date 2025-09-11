@@ -149,6 +149,21 @@
   max-width: 450px;
 }
 
+.user-metrics-card {
+  /* Additional styles for user metrics card */
+  max-width: 450px;
+}
+
+.status-active {
+  color: #00C851;
+  font-weight: 700;
+}
+
+.status-inactive {
+  color: #e53e3e;
+  font-weight: 700;
+}
+
 .metric-title {
   color: #00C851;
   font-size: 1rem;
@@ -213,6 +228,45 @@
 
 .metric-item:hover .metric-value {
   color: #00C851;
+}
+
+/* Loading and error states */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 200, 81, 0.1);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 200, 81, 0.3);
+  border-top: 4px solid #00C851;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+}
+
+.error-message p {
+  color: #e53e3e;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 /* Animation Keyframes */

@@ -1,6 +1,9 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { GraphQLClient } from 'graphql-request';
 
+// Import the Firebase app to ensure it's initialized before using auth
+import '../firebase';
+
 // Use existing Firebase auth instance to avoid multiple app initializations
 let auth: any = null;
 
@@ -18,6 +21,7 @@ const getFirebaseAuth = (): any => {
 	}
 	return auth;
 };
+
 let currentToken: string | null = null;
 
 const getToken = (): Promise<string> => {
@@ -30,6 +34,20 @@ const getToken = (): Promise<string> => {
 				reject(new Error('Firebase not initialized yet'));
 				return;
 			}
+			
+			// Check if user is already available
+			const user = firebaseAuth.currentUser;
+			if (user) {
+				user.getIdToken(true)
+					.then(token => {
+						currentToken = token;
+						resolve(token);
+					})
+					.catch(reject);
+				return;
+			}
+			
+			// Listen for auth state changes
 			const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
 				unsubscribe();
 				if (user) {
@@ -54,15 +72,33 @@ const withJWTRefresh = async <T>(action: () => Promise<T>): Promise<T> => {
 		return result;
 	} catch (error) {
 		const errorExtensionsCode = error?.response?.errors[0]?.extensions?.code;
-		if (errorExtensionsCode === 'invalid-jwt') {
-			currentToken = null;
-			const newToken = await getToken();
-			currentToken = newToken;
+		
+		// Handle both invalid JWT and JWT claims errors
+		if (errorExtensionsCode === 'invalid-jwt' || errorExtensionsCode === 'jwt-invalid-claims') {
+			console.log('JWT error detected, refreshing token:', errorExtensionsCode);
 			
-			graphQLClient.setHeader('Authorization', `Bearer ${newToken}`);
-			
-			const result = await action();
-			return result;
+			try {
+				// Clear current token to force refresh
+				currentToken = null;
+				
+				// Get fresh token with force refresh
+				const newToken = await getToken();
+				currentToken = newToken;
+				
+				// Update the GraphQL client with new token
+				graphQLClient.setHeader('Authorization', `Bearer ${newToken}`);
+				
+				// Retry the action with refreshed token
+				const result = await action();
+				return result;
+			} catch (retryError) {
+				// If retry also fails, check if it's still a claims issue
+				if (retryError?.response?.errors?.[0]?.extensions?.code === 'jwt-invalid-claims') {
+					console.error('Token refresh failed - Hasura claims still missing after refresh');
+					throw new Error('Authentication failed: Token does not contain required Hasura claims. Please contact support.');
+				}
+				throw retryError;
+			}
 		} else {
 			throw error;
 		}

@@ -12,29 +12,10 @@ import { useAuthStore, useUserStore } from "../store";
 import { auth } from "../firebase";
 import router from "../router";
 import client from "./GraphQLClient";
+import { validateIndusDashboardUser } from "./IndusDashboardAuthService";
 
 //utils
-import { setReportingLoginState, clearLoginState } from "../utils/auth";
-
-// GraphQL query - simplified to check any user access
-const CHECK_USER_ACCESS_QUERY = `
-  query checkUserAccess($user_id: uuid!) {
-    organization_user(where: {user_id: {_eq: $user_id}}) {
-      id
-      user_id
-      organization_id
-      organization {
-        id
-        name
-      }
-      user {
-        id
-        first_name
-        last_name
-      }
-    }
-  }
-`;
+import { setReportingLoginState, clearLoginState, setIndusDashboardLoginState } from "../utils/auth";
 
 export const startTimer = () => {
   const authStore = useAuthStore();
@@ -81,8 +62,8 @@ export const sendOTP = async (phoneNumber, setConfirmationResult) => {
       "recaptcha-container",
       {
         size: "invisible",
-        callback: () => console.log("reCAPTCHA solved"),
-        "error-callback": (error) => console.error("reCAPTCHA error:", error),
+        callback: () => {},
+        "error-callback": (error) => {},
       }
     );
 
@@ -101,9 +82,7 @@ export const sendOTP = async (phoneNumber, setConfirmationResult) => {
     const recaptchaDiv = document.getElementById("recaptcha-container");
     recaptchaDiv?.remove();
 
-    console.log("OTP sent successfully to:", phoneNumber);
   } catch (err) {
-    console.error("Error sending OTP:", err);
     authStore.toggleOTPVerificationModal &&
       authStore.toggleOTPVerificationModal(false);
 
@@ -146,26 +125,56 @@ export const verifyOTP = async ({ otp, confirmationResult }) => {
       // Get Firebase user ID
       const userId = user.uid;
 
-      // Skip user access check - allow any authenticated user
-      console.log("User authenticated successfully, granting access");
+      // Validate user against Indus Dashboard requirements
+      const validation = await validateIndusDashboardUser(userId);
+
+      if (!validation.success) {
+        // Handle different error types appropriately
+        if (validation.errorCode === 'AUTH_ERROR') {
+          // Authentication errors - user should try logging in again
+          authStore.showErrorPopup({
+            title: "Authentication Required",
+            message: validation.error,
+            showRetry: true,
+          });
+        } else {
+          // Other access errors - user doesn't have permission
+          authStore.showErrorPopup({
+            title: "Access Denied",
+            message: validation.error,
+            showRetry: false,
+          });
+        }
+
+        // Sign out user since they don't have access
+        await signOut(auth);
+        clearLoginState();
+        
+        return { success: false, error: validation.error, errorCode: validation.errorCode };
+      }
 
       // Store user ID for backend communication
       localStorage.setItem("firebaseUserId", userId);
 
-      // Set login state
-      setReportingLoginState();
+      // Store organization details if available
+      if (validation.data) {
+        localStorage.setItem("userOrganizationId", validation.data.organization_id);
+        localStorage.setItem("userOrganizationName", validation.data.organization.name);
+      }
+
+      // Set login state for Indus Dashboard
+      setIndusDashboardLoginState();
+      setReportingLoginState(); // Keep existing reporting state for compatibility
+      
       authStore.setIsOTPVerified && authStore.setIsOTPVerified(true);
       authStore.toggleOTPVerificationModal &&
         authStore.toggleOTPVerificationModal(false);
 
-      console.log("OTP verified and access granted. User ID:", userId);
-      return { success: true, user, userId };
+      return { success: true, user, userId, organizationData: validation.data };
     }
 
     return { success: false, error: "No user found" };
   } catch (error) {
-    console.error("Error verifying OTP:", error);
-
     if (error.code === "auth/invalid-verification-code") {
       authStore.showErrorPopup({
         title: "Invalid OTP",
@@ -197,32 +206,11 @@ export const verifyOTP = async ({ otp, confirmationResult }) => {
   }
 };
 
-/**
- * Check user access with GraphQL query
- */
-export const checkUserAccess = async (userId) => {
-  try {
-    const graphqlClient = await client;
-    const result = await graphqlClient.request(CHECK_USER_ACCESS_QUERY, {
-      user_id: userId,
-    }, userId);
-
-    // Check if user exists in organization_user table
-    const userAccess = result.organization_user;
-    return userAccess && userAccess.length > 0;
-  } catch (error) {
-    console.error("Error checking user access:", error);
-    return false;
-  }
-};
-
 export const signOutUser = async (callback) => {
   const userStore = useUserStore();
   const authStore = useAuthStore();
 
   try {
-    console.log("Signing out user...");
-
     // Sign out from Firebase
     await signOut(auth);
 
@@ -238,21 +226,21 @@ export const signOutUser = async (callback) => {
 
     // Clear localStorage
     localStorage.removeItem("firebaseUserId");
+    localStorage.removeItem("userOrganizationId");
+    localStorage.removeItem("userOrganizationName");
     clearLoginState();
-
-    console.log("Logout completed successfully");
 
     // Execute callback if provided
     if (callback && typeof callback === "function") {
       callback();
     }
   } catch (error) {
-    console.error("Error during logout:", error);
-
     // Basic cleanup on error
     clearLoginState();
     userStore.clearUser();
     localStorage.removeItem("firebaseUserId");
+    localStorage.removeItem("userOrganizationId");
+    localStorage.removeItem("userOrganizationName");
 
     if (callback && typeof callback === "function") {
       callback();

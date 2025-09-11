@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:prod": "vite build --mode production",
+    "build:prod": "vite build",
     "codegen": "graphql-codegen"
   },
   "dependencies": {

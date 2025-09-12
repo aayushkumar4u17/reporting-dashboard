@@ -215,6 +215,15 @@
   accent-color: #00C851;
 }
 
+/* Skeleton Loader Styles */
+.skeleton-row .table-cell {
+  padding: 0.6rem 0.4rem;
+}
+
+.skeleton-row .skeleton-loader {
+  border-radius: 4px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .my-invoices-page {

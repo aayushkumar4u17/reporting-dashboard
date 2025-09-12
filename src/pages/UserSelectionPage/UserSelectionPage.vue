@@ -10,19 +10,23 @@
       <h1 class="title">Select Organization</h1>
       <p class="subtitle">Choose an organization to access the dashboard</p>
       
-      <div v-if="loading" class="loading">
-        <p>Loading organizations...</p>
+      <div v-if="loading" class="users-grid">
+        <div v-for="i in 4" :key="i" class="user-card skeleton-card">
+          <SkeletonLoader width="60px" height="60px" class="skeleton-avatar" />
+          <SkeletonLoader width="70%" height="20px" class="skeleton-name" />
+          <SkeletonLoader width="40%" height="16px" class="skeleton-role" />
+        </div>
       </div>
       
       <div v-else-if="error" class="error-message">
         <p>{{ error }}</p>
-        <button @click="retryFetch" class="retry-btn">Retry</button>
+        <button v-if="!error.includes('being set up') && !error.includes('associated with any organizations')" @click="retryFetch" class="retry-btn">Retry</button>
       </div>
       
       <div v-else class="users-grid">
         <div 
           v-for="org in organizations" 
-          :key="org.id"
+          :key="org.uniqueKey || `${org.id}-${org.name}`"
           class="user-card"
           @click="selectOrganization(org)"
         >
@@ -177,6 +181,20 @@ const fetchOrganizations = async () => {
     const userId = await getHasuraUserIdFromToken()
     
     if (!userId) {
+      // Check if this is a new user without Hasura claims yet
+      const { getAuth } = await import('firebase/auth')
+      const auth = getAuth()
+      const user = auth.currentUser
+      
+      if (user) {
+        // This is likely a new user whose account is being provisioned
+        error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
+        organizations.value = []
+        localStorage.removeItem('cachedOrganizations')
+        loading.value = false
+        return
+      }
+      
       router.replace('/login')
       return
     }
@@ -185,19 +203,37 @@ const fetchOrganizations = async () => {
     const graphqlClient = await client
     const sdk = getSdk(graphqlClient)
     
-    // Execute the validateIndusDashboardUser query to get organizations
-    const result = await sdk.validateIndusDashboardUser({ user_id: userId })
+    // Import and use the new fetchUserOrganizations function
+    const { fetchUserOrganizations } = await import('@/actions/IndusDashboardAuthService')
+    const organizationUsers = await fetchUserOrganizations(userId)
     
     // Transform the data for display
-    if (result.organization_user && result.organization_user.length > 0) {
-      const orgs = result.organization_user.map(orgUser => ({
+    if (organizationUsers && organizationUsers.length > 0) {
+      // Handle duplicate entries by creating a unique set based on organization ID
+      const uniqueOrgs = new Map();
+      
+      organizationUsers.forEach(orgUser => {
+        const orgId = orgUser.organization.id;
+        const existing = uniqueOrgs.get(orgId);
+        
+        // Prefer active owners, then any owners, then active users
+        if (!existing || 
+            (orgUser.is_active && orgUser.is_owner && (!existing.is_active || !existing.is_owner)) ||
+            (orgUser.is_owner && !existing.is_owner) ||
+            (orgUser.is_active && !existing.is_active)) {
+          uniqueOrgs.set(orgId, orgUser);
+        }
+      });
+      
+      const orgs = Array.from(uniqueOrgs.values()).map((orgUser, index) => ({
         id: orgUser.organization.id,
         name: orgUser.organization.name || 'Unnamed Organization',
         user_id: orgUser.user_id,
         is_active: orgUser.is_active,
         is_owner: orgUser.is_owner,
         created_at: orgUser.created_at,
-        color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization')
+        color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization'),
+        uniqueKey: `${orgUser.organization.id}-${index}-${Date.now()}` // Ensure uniqueness
       }))
       
       organizations.value = orgs
@@ -207,10 +243,17 @@ const fetchOrganizations = async () => {
     } else {
       organizations.value = []
       localStorage.removeItem('cachedOrganizations')
+      // Show message for users with no organizations
+      error.value = 'You are not associated with any organizations yet. Please contact your administrator.'
     }
   } catch (err) {
     console.error('Error fetching organizations:', err)
-    error.value = 'Failed to load organizations. Please try again.'
+    // Check if this is a JWT claims error
+    if (err.message && err.message.includes('Hasura user ID not found')) {
+      error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
+    } else {
+      error.value = 'Failed to load organizations. Please try again.'
+    }
     organizations.value = []
     // Try to load cached organizations if available
     const cached = localStorage.getItem('cachedOrganizations')

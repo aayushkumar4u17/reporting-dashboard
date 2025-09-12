@@ -192,6 +192,15 @@
   border: 1px solid #f5c6cb;
 }
 
+/* Skeleton Loader Styles */
+.skeleton-row .table-cell {
+  padding: 0.6rem 0.4rem;
+}
+
+.skeleton-row .skeleton-loader {
+  border-radius: 4px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .my-orders-page {

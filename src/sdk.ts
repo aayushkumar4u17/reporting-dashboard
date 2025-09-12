@@ -129901,6 +129901,13 @@ export type Wallet_Variance_Order_By = {
   van_number?: InputMaybe<Order_By>;
 };
 
+export type FetchUserOrganizationsQueryVariables = Exact<{
+  user_id: Scalars['uuid'];
+}>;
+
+
+export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
+
 export type PointOfContactDashboardQueryVariables = Exact<{
   object: PointOfContactDashboardInput;
 }>;
@@ -129916,6 +129923,32 @@ export type ValidateIndusDashboardUserQueryVariables = Exact<{
 export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 
+export const FetchUserOrganizationsDocument = gql`
+    query fetchUserOrganizations($user_id: uuid!) {
+  organization_user(where: {user_id: {_eq: $user_id}, is_active: {_eq: true}}) {
+    id
+    user_id
+    is_active
+    is_owner
+    organization_id
+    organization {
+      id
+      name
+      is_active
+      created_at
+    }
+    user {
+      id
+      first_name
+      last_name
+      phone_number
+      email
+      created_at
+    }
+    created_at
+  }
+}
+    `;
 export const PointOfContactDashboardDocument = gql`
     query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
   pointOfContactDashboard(object: $object) {
@@ -129970,6 +130003,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    fetchUserOrganizations(variables: FetchUserOrganizationsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<FetchUserOrganizationsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<FetchUserOrganizationsQuery>(FetchUserOrganizationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'fetchUserOrganizations', 'query');
+    },
     PointOfContactDashboard(variables: PointOfContactDashboardQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactDashboardQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactDashboardQuery>(PointOfContactDashboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactDashboard', 'query');
     },

@@ -61,72 +61,87 @@
       <!-- Metrics Cards -->
       <div v-if="!error" class="metrics-container">
         <div class="metrics-grid">
+          <!-- Total Orders Placed Card -->
           <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.2s;">
             <h3 class="metric-title">Total Orders Placed</h3>
             <div class="metric-content">
               <div class="metric-item">
                 <span class="metric-label">Count</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersPlaced.count }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersPlaced.count }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
               <div class="metric-item">
                 <span class="metric-label">Quantity</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersPlaced.quantity }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersPlaced.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
             </div>
           </div>
 
+          <!-- Total Orders Delivered Card -->
           <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.4s;">
             <h3 class="metric-title">Total Orders Delivered</h3>
             <div class="metric-content">
               <div class="metric-item">
                 <span class="metric-label">Count</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersDelivered.count }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersDelivered.count }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
               <div class="metric-item">
                 <span class="metric-label">Quantity</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersDelivered.quantity }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersDelivered.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
             </div>
           </div>
 
+          <!-- Total Orders Rescheduled Card -->
           <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.6s;">
             <h3 class="metric-title">Total Orders Rescheduled</h3>
             <div class="metric-content">
               <div class="metric-item">
                 <span class="metric-label">Count</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersRescheduled.count }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersRescheduled.count }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
               <div class="metric-item">
                 <span class="metric-label">Quantity</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersRescheduled.quantity }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersRescheduled.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
             </div>
           </div>
 
+          <!-- Total Orders Cancelled Card -->
           <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 0.8s;">
             <h3 class="metric-title">Total Orders Cancelled</h3>
             <div class="metric-content">
               <div class="metric-item">
                 <span class="metric-label">Count</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersCancelled.count }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersCancelled.count }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
               <div class="metric-item">
                 <span class="metric-label">Quantity</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalOrdersCancelled.quantity }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalOrdersCancelled.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
               </div>
             </div>
           </div>
 
+          <!-- Total Cost Saved Card -->
           <div class="metric-card cost-saved-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 1.0s;">
             <h3 class="metric-title">Total Cost Saved</h3>
             <div class="metric-content">
               <div class="metric-item">
                 <span class="metric-label">Quantity</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalCostSaved.quantity }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalCostSaved.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="5rem" />
               </div>
               <div class="metric-item">
                 <span class="metric-label">Amount</span>
-                <span class="metric-value">{{ loading ? '...' : dashboardData.totalCostSaved.amount }}</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalCostSaved.amount }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="5rem" />
               </div>
             </div>
           </div>
@@ -286,7 +301,7 @@ const fetchDashboardData = async () => {
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
-  }, 100)
+  }, 1000)
   
   // Fetch dashboard data when component mounts
   fetchDashboardData()

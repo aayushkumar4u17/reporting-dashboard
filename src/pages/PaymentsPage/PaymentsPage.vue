@@ -98,6 +98,28 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Skeleton loading rows -->
+          <tr v-if="loading" v-for="i in 5" :key="i" class="skeleton-row">
+            <td>
+              <SkeletonLoader width="16px" height="16px" />
+            </td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td><SkeletonLoader width="80%" height="16px" /></td>
+            <td>
+              <SkeletonLoader width="80%" height="24px" />
+            </td>
+          </tr>
+          
+          <!-- Actual data rows -->
           <tr v-for="payment in payments" :key="payment.id" :class="{ 'selected': payment.selected }">
             <td>
               <input type="checkbox" v-model="payment.selected">
@@ -128,22 +150,26 @@
       <div class="summary-cards">
         <div class="summary-card">
           <div class="card-header">Credit Limit</div>
-          <div class="card-value green">--</div>
+          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.creditLimit }}</div>
+          <SkeletonLoader v-else width="60%" height="24px" />
         </div>
         
         <div class="summary-card">
           <div class="card-header">Available Balance</div>
-          <div class="card-value green">--</div>
+          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.availableBalance }}</div>
+          <SkeletonLoader v-else width="60%" height="24px" />
         </div>
         
         <div class="summary-card">
           <div class="card-header">Total Outstanding</div>
-          <div class="card-value green">--</div>
+          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.totalOutstanding }}</div>
+          <SkeletonLoader v-else width="60%" height="24px" />
         </div>
         
         <div class="summary-card">
           <div class="card-header">Total Overdue</div>
-          <div class="card-value red">--</div>
+          <div v-if="!summaryLoading" class="card-value red">{{ summaryData.totalOverdue }}</div>
+          <SkeletonLoader v-else width="60%" height="24px" />
         </div>
         
         <div class="summary-card action-card">
@@ -169,12 +195,91 @@ import AnimatedButton from '@/components/common/AnimatedButton.vue'
 
 // Animation state
 const isLoaded = ref(false)
+const loading = ref(true)
+const summaryLoading = ref(true)
 
 // Reactive data
 const selectAll = ref(false)
 const payments = ref([])
 
-// Initialize animations on component mount
+// Summary data with initial values set to 0
+const summaryData = ref({
+  creditLimit: '₹ 0',
+  availableBalance: '₹ 0',
+  totalOutstanding: '₹ 0',
+  totalOverdue: '₹ 0'
+})
+
+// Simulate data loading
+const loadData = () => {
+  // In a real implementation, this would fetch data from an API
+  setTimeout(() => {
+    // Mock data would be replaced with actual API call
+    payments.value = [
+      {
+        id: 1,
+        aspOrderCode: 'ASP001',
+        salesInvoiceNumber: 'SIN001',
+        orderedDate: '2023-06-15',
+        deliveredDate: '2023-06-16',
+        paymentDueDate: '2023-06-20',
+        orderedQuantity: '1000 Ltr',
+        deliveredQuantity: '1000 Ltr',
+        amount: 50000,
+        deliveryLocation: 'Bangalore, Karnataka',
+        pocName: 'Student',
+        pocContact: '9876543210',
+        invoiceStatus: 'Paid',
+        selected: false
+      },
+      {
+        id: 2,
+        aspOrderCode: 'ASP002',
+        salesInvoiceNumber: 'SIN002',
+        orderedDate: '2023-06-14',
+        deliveredDate: '2023-06-15',
+        paymentDueDate: '2023-06-19',
+        orderedQuantity: '500 Ltr',
+        deliveredQuantity: '500 Ltr',
+        amount: 25000,
+        deliveryLocation: 'Mumbai, Maharashtra',
+        pocName: 'Chetan',
+        pocContact: '9876543211',
+        invoiceStatus: 'Unpaid',
+        selected: false
+      },
+      {
+        id: 3,
+        aspOrderCode: 'ASP003',
+        salesInvoiceNumber: 'SIN003',
+        orderedDate: '2023-06-13',
+        deliveredDate: '2023-06-14',
+        paymentDueDate: '2023-06-18',
+        orderedQuantity: '750 Ltr',
+        deliveredQuantity: '750 Ltr',
+        amount: 37500,
+        deliveryLocation: 'Delhi',
+        pocName: 'Gaurav',
+        pocContact: '9876543212',
+        invoiceStatus: 'Overdue',
+        selected: false
+      }
+    ]
+    loading.value = false
+  }, 1000)
+  
+  // Simulate summary data loading
+  setTimeout(() => {
+    summaryData.value = {
+      creditLimit: '₹ 5,00,000',
+      availableBalance: '₹ 3,50,000',
+      totalOutstanding: '₹ 1,25,000',
+      totalOverdue: '₹ 25,000'
+    }
+    summaryLoading.value = false
+  }, 1500)
+}
+
 // Methods
 const toggleAllSelection = () => {
   payments.value.forEach(payment => {
@@ -208,6 +313,9 @@ onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
+  
+  // Simulate data loading
+  loadData()
 })
 </script>
 

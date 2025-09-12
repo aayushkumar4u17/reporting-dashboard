@@ -74,6 +74,25 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Skeleton loading rows -->
+            <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
+              <td class="table-cell checkbox-col">
+                <SkeletonLoader width="16px" height="16px" />
+              </td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+            </tr>
+            
+            <!-- Actual data rows -->
             <tr v-for="order in filteredOrders" :key="order.id" class="table-row">
               <td class="table-cell checkbox-col">
                 <input type="checkbox" v-model="order.selected" class="row-checkbox" />
@@ -107,6 +126,7 @@ import AnimatedButton from '@/components/common/AnimatedButton.vue'
 
 // Animation state
 const isLoaded = ref(false)
+const loading = ref(true)
 
 // Filter states
 const orderedDate = ref('')
@@ -115,7 +135,7 @@ const selectedCity = ref('')
 const selectedPOC = ref('')
 const selectAll = ref(false)
 
-// Mock orders data based on the image
+// Orders data
 const orders = ref([])
 
 // Computed property for filtered orders
@@ -154,11 +174,76 @@ const getStatusClass = (status) => {
   }
 }
 
+// Simulate data loading
+const loadData = () => {
+  // In a real implementation, this would fetch data from an API
+  setTimeout(() => {
+    // Mock data would be replaced with actual API call
+    orders.value = [
+      {
+        id: 1,
+        checkBN: 'BN2023001',
+        aspOrderNo: 'ASP001',
+        salesOrderCode: 'SOC001',
+        orderedDate: '2023-06-15',
+        deliveryDate: '2023-06-16',
+        deliveryTimeSlot: '9:00 AM - 11:00 AM',
+        orderedQuantity: '1000 Ltr',
+        deliveryLocation: 'Bangalore, Karnataka',
+        pocName: 'Student',
+        pocContact: '9876543210',
+        deliveryStatus: 'Delivered',
+        city: 'bangalore',
+        poc: 'student',
+        selected: false
+      },
+      {
+        id: 2,
+        checkBN: 'BN2023002',
+        aspOrderNo: 'ASP002',
+        salesOrderCode: 'SOC002',
+        orderedDate: '2023-06-14',
+        deliveryDate: '2023-06-15',
+        deliveryTimeSlot: '2:00 PM - 4:00 PM',
+        orderedQuantity: '500 Ltr',
+        deliveryLocation: 'Mumbai, Maharashtra',
+        pocName: 'Chetan',
+        pocContact: '9876543211',
+        deliveryStatus: 'In Transit',
+        city: 'mumbai',
+        poc: 'chetan',
+        selected: false
+      },
+      {
+        id: 3,
+        checkBN: 'BN2023003',
+        aspOrderNo: 'ASP003',
+        salesOrderCode: 'SOC003',
+        orderedDate: '2023-06-13',
+        deliveryDate: '2023-06-14',
+        deliveryTimeSlot: '10:00 AM - 12:00 PM',
+        orderedQuantity: '750 Ltr',
+        deliveryLocation: 'Delhi',
+        pocName: 'Gaurav',
+        pocContact: '9876543212',
+        deliveryStatus: 'To be assigned',
+        city: 'delhi',
+        poc: 'gaurav',
+        selected: false
+      }
+    ]
+    loading.value = false
+  }, 1000)
+}
+
 // Initialize animations on component mount
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
+  
+  // Simulate data loading
+  loadData()
 })
 </script>
 

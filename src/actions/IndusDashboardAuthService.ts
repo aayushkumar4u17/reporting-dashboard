@@ -163,6 +163,40 @@ const waitForHasuraClaims = async (userId: string, maxAttempts: number = 5): Pro
   return null;
 };
 
+// GraphQL query for fetching user organizations (for organization selection) - ONLY ACTIVE OWNERS
+const FETCH_USER_ORGANIZATIONS_QUERY = `
+  query fetchUserOrganizations($user_id: uuid!) {
+    organization_user(
+      where: {
+        user_id: { _eq: $user_id }
+        is_active: { _eq: true }
+        is_owner: { _eq: true }
+      }
+    ) {
+      id
+      user_id
+      is_active
+      is_owner
+      organization_id
+      organization {
+        id
+        name
+        is_active
+        created_at
+      }
+      user {
+        id
+        first_name
+        last_name
+        phone_number
+        email
+        created_at
+      }
+      created_at
+    }
+  }
+`;
+
 // GraphQL query for validating Indus Dashboard user
 const VALIDATE_INDUS_DASHBOARD_USER_QUERY = `
   query validateIndusDashboardUser($user_id: uuid!) {
@@ -219,7 +253,7 @@ export const validateIndusDashboardUser = async (userId: string): Promise<Valida
       if (!hasuraUserIdString) {
         return {
           success: false,
-          error: 'Account permissions not yet configured. Please contact administrator.',
+          error: 'Account permissions are being configured. Please try again in a few moments.',
           errorCode: 'AUTH_ERROR'
         };
       }
@@ -241,13 +275,23 @@ export const validateIndusDashboardUser = async (userId: string): Promise<Valida
       if (!organizationUsers || organizationUsers.length === 0) {
         return {
           success: false,
-          error: 'You are not authorized to access the Indus Dashboard. Please contact your administrator.',
+          error: 'Access denied. You are not authorized to access the Indus Dashboard. Please contact your administrator.',
           errorCode: 'USER_NOT_FOUND'
         };
       }
 
-      // Get the first (and should be only) organization user record
-      const organizationUser = organizationUsers[0];
+      // Handle case where there are multiple organization user entries
+      // Get the first active organization user record
+      let organizationUser = organizationUsers[0];
+      
+      // Prefer an active owner record if available
+      const activeOwner = organizationUsers.find(
+        user => user.is_active && user.is_owner
+      );
+      
+      if (activeOwner) {
+        organizationUser = activeOwner;
+      }
 
       // Validate user is active
       if (!organizationUser.is_active) {
@@ -381,8 +425,51 @@ export const hasIndusDashboardAccess = async (userId: string): Promise<boolean> 
   }
 };
 
+/**
+ * Fetch organizations for ACTIVE OWNERS only (for organization selection page)
+ * This dashboard is restricted to users who are both is_active=true AND is_owner=true
+ * @param userId - Firebase/Hasura user ID
+ * @returns Array of organizations where the user is an active owner
+ */
+export const fetchUserOrganizations = async (userId: string) => {
+  try {
+    // Step 1: Check if user currently has Hasura claims
+    let hasuraUserId = await checkHasuraUserId();
+    let hasuraUserIdString: string | null = null;
+    
+    if (hasuraUserId && typeof hasuraUserId === 'string') {
+      hasuraUserIdString = hasuraUserId;
+    }
+    
+    // Step 2: If no claims, wait for them to be added
+    if (!hasuraUserIdString) {
+      hasuraUserIdString = await waitForHasuraClaims(userId);
+      
+      if (!hasuraUserIdString) {
+        throw new Error('Account permissions are being configured. Please try again in a few moments.');
+      }
+    }
+
+    // Step 3: Use JWT-authenticated GraphQL client to fetch organizations
+    const graphqlClient = await client;
+    
+    const result: ValidationResponse = await graphqlClient.request(
+      FETCH_USER_ORGANIZATIONS_QUERY,
+      { user_id: hasuraUserIdString },
+      hasuraUserIdString // Pass userId for session variables
+    );
+
+    return result.organization_user || [];
+    
+  } catch (error) {
+    console.error('Error fetching user organizations:', error);
+    throw error;
+  }
+};
+
 export default {
   validateIndusDashboardUser,
+  fetchUserOrganizations,
   getUserOrganizationDetails,
   hasIndusDashboardAccess
 };

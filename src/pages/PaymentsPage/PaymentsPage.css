@@ -261,3 +261,32 @@
 .card-value.red {
   color: #dc3545;
 }
+
+/* Skeleton Loader Styles */
+.skeleton-row td {
+  padding: 0.6rem 0.4rem;
+}
+
+.skeleton-row .skeleton-loader {
+  border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .download-section {
+    margin-top: 1rem;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}

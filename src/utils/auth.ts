@@ -82,13 +82,25 @@ export const canAccessReportingDashboard = (): boolean => {
  */
 export const canAccessIndusDashboard = (): boolean => {
 	try {
+		// Check localStorage flags
 		const isIndusLoggedIn = isIndusDashboardLoggedIn();
 		const isReportingLoggedInVar = isReportingLoggedIn();
 		
-		// Removed verbose logging that was causing performance issues
-		// console.log('Auth state check:', { isIndusLoggedIn, isReportingLoggedIn: isReportingLoggedInVar });
+		// Also check if Firebase user exists
+		let hasFirebaseUser = false;
+		try {
+			const auth = getAuth(app);
+			hasFirebaseUser = !!auth.currentUser;
+		} catch (firebaseError) {
+			// Firebase might not be initialized yet, don't fail authentication
+			console.warn('Firebase auth check failed:', firebaseError.message);
+		}
 		
-		return isIndusLoggedIn && isReportingLoggedInVar;
+		// For now, allow access if either localStorage flags are set OR Firebase user exists
+		// This handles cases where Firebase is ready but localStorage isn't set yet
+		const hasAccess = (isIndusLoggedIn && isReportingLoggedInVar) || hasFirebaseUser;
+		
+		return hasAccess;
 	} catch (error) {
 		console.error('Error checking Indus Dashboard access:', error);
 		return false;

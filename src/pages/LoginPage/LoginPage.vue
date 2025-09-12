@@ -271,14 +271,8 @@ const verifyOTPHandler = async () => {
         otpCode.value = ''
         isVerifying.value = false
         
-        // Show access denied popup if user doesn't have access
-        if (result.error && result.error.includes('Access denied')) {
-          authStore.showErrorPopup({
-            title: 'Access Denied',
-            message: result.error,
-            showRetry: false
-          })
-        } else {
+        // For access denied errors, the verifyOTPAction will handle the redirect
+        if (result.errorCode !== 'USER_NOT_FOUND' && result.errorCode !== 'AUTH_ERROR') {
           authStore.showErrorPopup({
             title: 'Verification Failed',
             message: result.error || 'OTP verification failed. Please try again.',

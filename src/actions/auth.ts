@@ -131,10 +131,10 @@ export const verifyOTP = async ({ otp, confirmationResult }) => {
       if (!validation.success) {
         // Handle different error types appropriately
         if (validation.errorCode === 'AUTH_ERROR') {
-          // Authentication errors - user should try logging in again
+          // Authentication errors - this might be a new user being provisioned
           authStore.showErrorPopup({
-            title: "Authentication Required",
-            message: validation.error,
+            title: "Account Setup in Progress",
+            message: validation.error + " This process may take a few moments. Please try again shortly.",
             showRetry: true,
           });
         } else {
@@ -144,6 +144,11 @@ export const verifyOTP = async ({ otp, confirmationResult }) => {
             message: validation.error,
             showRetry: false,
           });
+          
+          // After showing the error, redirect to login page
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000); // Show error for 3 seconds before redirecting
         }
 
         // Sign out user since they don't have access

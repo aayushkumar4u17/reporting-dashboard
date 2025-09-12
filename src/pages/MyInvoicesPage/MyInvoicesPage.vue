@@ -94,6 +94,29 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Skeleton loading rows -->
+            <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
+              <td class="table-cell checkbox-col">
+                <SkeletonLoader width="16px" height="16px" />
+              </td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell amount"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
+              <td class="table-cell download-col">
+                <SkeletonLoader width="24px" height="24px" />
+              </td>
+            </tr>
+            
+            <!-- Actual data rows -->
             <tr v-for="invoice in filteredInvoices" :key="invoice.id" class="table-row">
               <td class="table-cell checkbox-col">
                 <input type="checkbox" v-model="invoice.selected" class="row-checkbox" />
@@ -129,6 +152,7 @@ import AnimatedButton from '@/components/common/AnimatedButton.vue'
 
 // Animation state
 const isLoaded = ref(false)
+const loading = ref(true)
 
 // Filter states
 const orderedDate = ref('')
@@ -137,7 +161,7 @@ const selectedCity = ref('')
 const selectedPOC = ref('')
 const selectAll = ref(false)
 
-// Mock invoices data based on the image
+// Invoices data
 const invoices = ref([])
 
 // Computed property for filtered invoices
@@ -183,11 +207,79 @@ const downloadPDF = () => {
   // Implement PDF download logic
 }
 
+// Simulate data loading
+const loadData = () => {
+  // In a real implementation, this would fetch data from an API
+  setTimeout(() => {
+    // Mock data would be replaced with actual API call
+    invoices.value = [
+      {
+        id: 1,
+        checkBN: 'BN2023001',
+        aspOrderCode: 'ASP001',
+        salesInvoiceNumber: 'SIN001',
+        salesOrderCode: 'SOC001',
+        orderedDate: '2023-06-15',
+        deliveredDate: '2023-06-16',
+        orderedQuantity: '1000 Ltr',
+        deliveredQuantity: '1000 Ltr',
+        amount: '₹ 50,000',
+        deliveryLocation: 'Bangalore, Karnataka',
+        pocName: 'Student',
+        pocContact: '9876543210',
+        city: 'bangalore',
+        poc: 'student',
+        selected: false
+      },
+      {
+        id: 2,
+        checkBN: 'BN2023002',
+        aspOrderCode: 'ASP002',
+        salesInvoiceNumber: 'SIN002',
+        salesOrderCode: 'SOC002',
+        orderedDate: '2023-06-14',
+        deliveredDate: '2023-06-15',
+        orderedQuantity: '500 Ltr',
+        deliveredQuantity: '500 Ltr',
+        amount: '₹ 25,000',
+        deliveryLocation: 'Mumbai, Maharashtra',
+        pocName: 'Chetan',
+        pocContact: '9876543211',
+        city: 'mumbai',
+        poc: 'chetan',
+        selected: false
+      },
+      {
+        id: 3,
+        checkBN: 'BN2023003',
+        aspOrderCode: 'ASP003',
+        salesInvoiceNumber: 'SIN003',
+        salesOrderCode: 'SOC003',
+        orderedDate: '2023-06-13',
+        deliveredDate: '2023-06-14',
+        orderedQuantity: '750 Ltr',
+        deliveredQuantity: '750 Ltr',
+        amount: '₹ 37,500',
+        deliveryLocation: 'Delhi',
+        pocName: 'Gaurav',
+        pocContact: '9876543212',
+        city: 'delhi',
+        poc: 'gaurav',
+        selected: false
+      }
+    ]
+    loading.value = false
+  }, 1000)
+}
+
 // Initialize animations on component mount
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
+  
+  // Simulate data loading
+  loadData()
 })
 </script>
 

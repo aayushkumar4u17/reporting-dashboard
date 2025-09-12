@@ -434,6 +434,15 @@
   }
 }
 
+/* Skeleton Loader Styles */
+.skeleton-loader {
+  border-radius: 8px;
+}
+
+.skeleton-loader .skeleton-content {
+  border-radius: 8px;
+}
+
 /* Landscape orientation on tablets */
 @media (max-width: 1024px) and (orientation: landscape) {
   .metrics-grid {

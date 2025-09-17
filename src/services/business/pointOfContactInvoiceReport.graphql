@@ -1,0 +1,19 @@
+query PointOfContactInvoiceReport($object: PointOfContactInvoiceReportInput!) {
+  pointOfContactInvoiceReport(object: $object) {
+    data {
+      erp_order_code
+      invoice
+      delivered_date
+      app_order_code
+      order_date
+      order_qty
+      order_delivered_qty
+      order_amount
+      shipping_address
+      city
+      first_name
+      last_name
+      phone_number
+    }
+  }
+}

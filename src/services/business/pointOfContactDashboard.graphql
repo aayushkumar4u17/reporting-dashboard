@@ -1,0 +1,16 @@
+query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
+  pointOfContactDashboard(object: $object) {
+    data {
+      cancelled_count
+      cancelled_qty
+      delivered_orders
+      delivered_qty
+      order_count
+      ordered_qty
+      planned_orders
+      planned_qty
+      rescheduled_count
+      rescheduled_qty
+    }
+  }
+}

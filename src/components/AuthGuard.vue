@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Loading state while checking authentication -->
     <div v-if="isChecking" class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
@@ -8,40 +7,12 @@
       </div>
     </div>
 
-    <!-- Render app content if authenticated -->
     <slot v-else-if="isAuthenticated" />
 
-    <!-- Redirect to login if not authenticated -->
     <div v-else class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="text-center">
         <h2 class="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
         <p class="text-gray-600 mb-4">Redirecting to login...</p>
-      </div>
-    </div>
-
-    <!-- Error modal for owner access violations -->
-    <div v-if="showErrorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L3.316 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">{{ errorTitle }}</h3>
-          <div class="mt-2 px-7 py-3">
-            <p class="text-sm text-gray-500">{{ errorMessage }}</p>
-            <p v-if="errorDetails" class="text-xs text-gray-400 mt-2">{{ errorDetails }}</p>
-          </div>
-          <div class="items-center px-4 py-3">
-            <button
-              @click="handleRetry"
-              class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
-            >
-              Return to Login
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -50,25 +21,18 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { signOutUser } from '../actions/auth'
-import { canAccessIndusDashboard, clearLoginState } from '../utils/auth'
-import { useErrorHandler } from '../composables/useErrorHandler'
+import { signOutUser } from '@/api/auth'
+import { canAccessIndusDashboard, clearLoginState } from '@/utils/auth'
 
 const router = useRouter()
-const { errorState, showOwnerAccessError } = useErrorHandler()
 
 const isChecking = ref(true)
 const isAuthenticated = ref(false)
-const showErrorModal = ref(false)
-const errorTitle = ref('')
-const errorMessage = ref('')
-const errorDetails = ref('')
 
-// Debounce flag to prevent multiple simultaneous auth checks
 let isCheckingAuth = false
 
+// Enhanced authentication check with better handling for page refreshes
 const checkAuthentication = async () => {
-  // Prevent multiple simultaneous auth checks
   if (isCheckingAuth) {
     return
   }
@@ -76,17 +40,44 @@ const checkAuthentication = async () => {
   isCheckingAuth = true
   
   try {
-    // Add a small delay to prevent blocking the UI
-    await new Promise(resolve => setTimeout(resolve, 10))
+    // First check localStorage flags as a quick validation
+    const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true'
+    const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true'
     
-    // Check basic login state
+    // If flags are not set, definitely not authenticated
+    if (!hasReportingFlag || !hasIndusFlag) {
+      redirectToLogin()
+      return
+    }
+    
+    // Wait for Firebase to be ready with extended timeout for page refreshes
+    let attempts = 0
+    const maxAttempts = 20 // Increased for page refresh scenarios
+    
+    while (attempts < maxAttempts) {
+      try {
+        const { getAuth } = await import('firebase/auth')
+        const auth = getAuth()
+        
+        // Firebase is ready
+        if (auth.currentUser !== undefined) {
+          break
+        }
+      } catch (error) {
+        // Firebase not ready yet
+      }
+      
+      attempts++
+      // Longer wait time for page refresh scenarios
+      await new Promise(resolve => setTimeout(resolve, 150))
+    }
+    
+    // Final auth check after Firebase is ready or timeout
     if (!canAccessIndusDashboard()) {
-      console.log('AuthGuard: No valid Indus Dashboard access found')
       redirectToLogin()
       return
     }
 
-    // User is authenticated - skip owner checks
     isAuthenticated.value = true
     
   } catch (error) {
@@ -103,26 +94,11 @@ const redirectToLogin = () => {
   router.push('/login')
 }
 
-const showAccessDeniedError = () => {
-  errorTitle.value = 'Access Restricted - Owner Only'
-  errorMessage.value = 'This reporting dashboard is only accessible to organization owners.'
-  errorDetails.value = 'You need to be marked as an owner in the organization_user table with is_owner=true. Please contact your system administrator if you believe you should have access.'
-  showErrorModal.value = true
-}
-
-const handleRetry = () => {
-  showErrorModal.value = false
-  clearLoginState()
-  window.location.href = '/login'
-}
-
 onMounted(() => {
   checkAuthentication()
 })
 
-// Optimize unmounted cleanup
 onUnmounted(() => {
-  // Clean up any pending operations if needed
   isCheckingAuth = false
 })
 </script>

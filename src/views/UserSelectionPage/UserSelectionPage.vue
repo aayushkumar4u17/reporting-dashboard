@@ -1,0 +1,393 @@
+<template>
+  <div class="user-selection-page">
+    <div class="selection-container">
+      <div class="header">
+        <img src="/fuelbuddy-logo.svg" alt="FuelBuddy Logo" class="logo" />
+        <!-- Add logout button for testing -->
+        <button @click="handleLogout" class="logout-btn">Logout</button>
+      </div>
+      
+      <h1 class="title">Select Organization</h1>
+      <p class="subtitle">Choose an organization to access the dashboard</p>
+      
+      <div v-if="loading" class="users-grid">
+        <div v-for="i in 6" :key="i" class="user-card skeleton-card">
+          <SkeletonLoader width="120px" height="120px" class="skeleton-avatar" />
+          <SkeletonLoader width="70%" height="20px" class="skeleton-name" />
+          <SkeletonLoader width="50%" height="16px" class="skeleton-role" />
+        </div>
+      </div>
+      
+      <div v-else-if="error" class="error-message">
+        <p>{{ error }}</p>
+        <button v-if="!error.includes('being set up') && !error.includes('associated with any organizations')" @click="retryFetch" class="retry-btn">Retry</button>
+      </div>
+      
+      <div v-else class="users-grid">
+        <div 
+          v-for="org in organizations" 
+          :key="org.uniqueKey || `${org.id}-${org.name}`"
+          class="user-card"
+          @click="selectOrganization(org)"
+        >
+          <div class="user-avatar" :style="{ background: org.color }">
+            <span class="user-initial">{{ getInitials(org.name) }}</span>
+          </div>
+          <p class="user-name">{{ org.name }}</p>
+        </div>
+      </div>
+      
+      <div v-if="!loading && !error && organizations.length === 0" class="no-organizations">
+        <p>No delivery organizations found. Please contact your administrator.</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getSdk } from '@/sdk'
+import client from '@/api/APIClient'
+import { canAccessIndusDashboard } from '@/utils/auth'
+import { useUserStore } from '@/stores'
+import { usePointOfContactStore } from '@/stores/pointOfContact'
+import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
+
+const router = useRouter()
+const userStore = useUserStore()
+const pointOfContactStore = usePointOfContactStore()
+const organizations = ref([])
+const loading = ref(true)
+const error = ref(null)
+let authStateCheckInterval = null
+
+// Generate a color based on organization name
+const getColorForOrg = (name) => {
+  const colors = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+    'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)'
+  ]
+  
+  // Generate a consistent index based on the name
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  
+  return colors[Math.abs(hash) % colors.length]
+}
+
+// Get initials from organization name
+const getInitials = (name) => {
+  if (!name) return 'O'
+  return name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()
+}
+
+// Select organization and navigate to dashboard
+const selectOrganization = (org) => {
+  // Store selected organization with avatar info
+  const orgWithAvatar = {
+    ...org,
+    avatar: org.color,
+    initials: getInitials(org.name)
+  }
+  localStorage.setItem('selectedOrganization', JSON.stringify(orgWithAvatar))
+  
+  // Store organization_user table ID for point of contact dashboard
+  pointOfContactStore.setSelectedUserId(org.organization_user_id)
+  
+  // Navigate to dashboard
+  router.push('/dashboard')
+}
+
+// Handle logout for testing
+const handleLogout = async () => {
+  try {
+    // Import signOutUser function
+    const { signOutUser } = await import('@/api/auth')
+    
+    // Perform logout
+    await signOutUser(() => {
+      router.push('/')
+    })
+  } catch (error) {
+    console.error('Error during logout:', error)
+    // Fallback navigation
+    router.push('/')
+  }
+}
+
+// Function to get Hasura user ID from Firebase JWT token with retry mechanism
+const getHasuraUserIdFromToken = async (maxRetries = 5) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // Import Firebase auth
+      const { getAuth } = await import('firebase/auth')
+      
+      // Check if Firebase app is initialized
+      let auth
+      try {
+        auth = getAuth()
+      } catch (error) {
+        console.error('Firebase not initialized:', error)
+        throw new Error('Firebase authentication not available')
+      }
+      
+      const user = auth.currentUser
+      
+      if (!user) {
+        throw new Error('No authenticated user found')
+      }
+      
+      // Get the ID token which contains the claims
+      const idToken = await user.getIdToken(true) // Force refresh to get latest claims
+      
+      // Decode the JWT token to get claims
+      const payload = JSON.parse(atob(idToken.split('.')[1]))
+      
+      // Extract Hasura user ID from claims
+      const hasuraClaims = payload['https://hasura.io/jwt/claims']
+      if (hasuraClaims && hasuraClaims['x-hasura-user-id']) {
+        return hasuraClaims['x-hasura-user-id']
+      }
+      
+      // If no claims found and not last attempt, wait and retry
+      if (attempt < maxRetries) {
+        console.log(`Hasura claims not found, waiting for attempt ${attempt + 1}`)
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt))
+        continue
+      }
+      
+      throw new Error('Hasura user ID not found in token claims')
+    } catch (error) {
+      console.error(`Error getting Hasura user ID from token (attempt ${attempt}):`, error)
+      
+      // If not last attempt, wait and retry
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt))
+        continue
+      }
+      
+      throw error
+    }
+  }
+}
+
+// Fetch organizations for the current user
+const fetchOrganizations = async () => {
+  try {
+    // Reset error state
+    error.value = null
+    
+    // Get Hasura user ID from Firebase JWT token with retry mechanism
+    const userId = await getHasuraUserIdFromToken()
+    
+    if (!userId) {
+      // Check if this is a new user without Hasura claims yet
+      const { getAuth } = await import('firebase/auth')
+      const auth = getAuth()
+      const user = auth.currentUser
+      
+      if (user) {
+        // This is likely a new user whose account is being provisioned
+        error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
+        organizations.value = []
+        localStorage.removeItem('cachedOrganizations')
+        loading.value = false
+        return
+      }
+      
+      router.replace('/login')
+      return
+    }
+    
+    // Get GraphQL client
+    const wrappedClient = await client()
+    
+    // Remove the direct graphqlClient creation and use the SDK from APIClient
+    const sdk = getSdk(wrappedClient)
+    
+    // Import and use the new fetchUserOrganizations function
+    const { fetchUserOrganizations } = await import('@/api/IndusDashboardAuthService')
+    const organizationUsers = await fetchUserOrganizations(userId)
+    
+    console.log('Fetched organization users:', organizationUsers.length, organizationUsers)
+    
+    // Transform the data for display
+    if (organizationUsers && organizationUsers.length > 0) {
+      // Handle duplicate entries by creating a unique set based on organization ID
+      const uniqueOrgs = new Map();
+      
+      organizationUsers.forEach(orgUser => {
+        const orgId = orgUser.organization.id;
+        const existing = uniqueOrgs.get(orgId);
+        
+        // Include all DELIVERY type organizations (filtering already done by fetchUserOrganizations)
+        if (!existing || new Date(orgUser.created_at || 0) > new Date(existing.created_at || 0)) {
+          uniqueOrgs.set(orgId, orgUser);
+        }
+      });
+      
+      const orgs = Array.from(uniqueOrgs.values()).map((orgUser, index) => ({
+        id: orgUser.organization.id,
+        name: orgUser.organization.name || 'Unnamed Organization',
+        organization_user_id: orgUser.id, // This is the organization_user table id
+        user_id: orgUser.user_id,
+        is_active: orgUser.is_active,
+        is_owner: orgUser.is_owner,
+        organization_user_type: orgUser.organization_user_type, // Should be 'DELIVERY'
+        created_at: orgUser.created_at,
+        color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization'),
+        uniqueKey: `${orgUser.organization.id}-${index}-${Date.now()}` // Ensure uniqueness
+      }))
+      
+      organizations.value = orgs
+      
+      // Cache organizations in localStorage for quick access on page refresh
+      localStorage.setItem('cachedOrganizations', JSON.stringify(orgs))
+    } else {
+      organizations.value = []
+      localStorage.removeItem('cachedOrganizations')
+      // Show message for users with no qualifying organizations
+      error.value = 'No delivery organizations found. Please contact your administrator.'
+    }
+  } catch (err) {
+    console.error('Error fetching organizations:', err)
+    // Check if this is a JWT claims error
+    if (err.message && err.message.includes('Hasura user ID not found')) {
+      error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
+    } else {
+      error.value = 'Failed to load organizations. Please try again.'
+    }
+    organizations.value = []
+    // Try to load cached organizations if available
+    const cached = localStorage.getItem('cachedOrganizations')
+    if (cached) {
+      try {
+        organizations.value = JSON.parse(cached)
+        error.value = null // Clear error if we have cached data
+      } catch (e) {
+        console.error('Error parsing cached organizations:', e)
+      }
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry fetching organizations
+const retryFetch = () => {
+  loading.value = true
+  fetchOrganizations()
+}
+
+// Check authentication and fetch data
+const checkAuthAndFetch = async () => {
+  try {
+    // Check if user has proper access
+    if (!canAccessIndusDashboard()) {
+      console.warn('User does not have Indus Dashboard access')
+      router.replace('/login')
+      return
+    }
+    
+    // Try to load cached organizations first for immediate display
+    const cached = localStorage.getItem('cachedOrganizations')
+    if (cached) {
+      try {
+        organizations.value = JSON.parse(cached)
+        loading.value = false
+      } catch (e) {
+        console.error('Error parsing cached organizations:', e)
+      }
+    }
+    
+    // Fetch fresh data
+    await fetchOrganizations()
+  } catch (err) {
+    console.error('Error during auth check:', err)
+    error.value = 'Authentication error. Please try logging in again.'
+    loading.value = false
+  }
+}
+
+// Wait for Firebase auth state to be ready with improved logic
+const waitForAuthState = () => {
+  return new Promise((resolve) => {
+    let attempts = 0
+    const maxAttempts = 20 // Increased attempts
+    const authCheckInterval = 500 // Check every 500ms
+    
+    const checkAuth = async () => {
+      attempts++
+      try {
+        const { getAuth } = await import('firebase/auth')
+        const auth = getAuth()
+        if (auth.currentUser) {
+          resolve(true)
+          return
+        }
+      } catch (error) {
+        console.log('Firebase not initialized yet, waiting...')
+      }
+      
+      // Check localStorage flags as fallback
+      const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true'
+      const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true'
+      
+      if (hasReportingFlag && hasIndusFlag) {
+        resolve(true)
+        return
+      }
+      
+      if (attempts < maxAttempts) {
+        setTimeout(checkAuth, authCheckInterval)
+      } else {
+        resolve(false)
+      }
+    }
+    
+    checkAuth()
+  })
+}
+
+onMounted(async () => {
+  // Wait for Firebase auth state to be ready
+  const authReady = await waitForAuthState()
+  if (!authReady) {
+    console.warn('Firebase auth not ready and no valid localStorage flags found')
+    // Still proceed with checkAuthAndFetch which will handle redirect if needed
+  }
+  
+  // Check authentication and fetch organizations
+  await checkAuthAndFetch()
+  
+  // Set up interval to periodically check auth state
+  authStateCheckInterval = setInterval(async () => {
+    if (!canAccessIndusDashboard()) {
+      console.warn('User lost authentication, redirecting to login')
+      clearInterval(authStateCheckInterval)
+      router.replace('/login')
+    }
+  }, 5000)
+})
+
+onUnmounted(() => {
+  // Clear any intervals
+  if (authStateCheckInterval) {
+    clearInterval(authStateCheckInterval)
+  }
+})
+</script>
+
+<style scoped>
+  /* All CSS has been moved to UserSelectionPage.css */
+  @import './UserSelectionPage.css';
+</style>

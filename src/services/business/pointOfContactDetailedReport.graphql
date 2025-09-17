@@ -1,0 +1,22 @@
+query PointOfContactDetailedReport($object: PointOfContactDetailedReportInput!) {
+  pointOfContactDetailedReport(object: $object) {
+    data {
+      erp_order_code
+      app_order_code
+      order_date
+      delivery_slot
+      order_qty
+      erp_order_status
+      backend_order_status
+      customer_name
+      actual_delivery_date
+      shipping_address
+      city
+      first_name
+      last_name
+      phone_number
+      order_delivered_qty
+      order_amount
+    }
+  }
+}

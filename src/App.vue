@@ -1,10 +1,7 @@
 <script setup>
-//imports
 import { useRouter } from "vue-router";
 import { useErrorHandler } from "@/composables/useErrorHandler";
-
-//components
-import Navbar from "@/components/common/Navbar.vue";
+import Navbar from "@/components/layout/Navbar.vue";
 import ErrorNotification from "@/components/ErrorNotification.vue";
 import AuthGuard from "@/components/AuthGuard.vue";
 
@@ -16,13 +13,10 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 
 <template>
 	<main>
-		<!-- Wrap entire app with AuthGuard except login page -->
 		<template v-if="router.currentRoute.value.fullPath === '/login'">
-			<!-- Login page - no authentication required -->
 			<router-view></router-view>
 		</template>
 		<AuthGuard v-else>
-			<!-- Protected content - requires authentication -->
 			<Navbar
 				v-if="
 					router.currentRoute.value.fullPath !== '/login' &&
@@ -48,7 +42,6 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 			</div>
 		</AuthGuard>
 		
-		<!-- Global Error Notification -->
 		<ErrorNotification
 			:show="errorState.show"
 			:title="errorState.title"
@@ -62,41 +55,35 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 </template>
 
 <style scoped>
-/* Global styles for the app */
 main {
   height: 100vh;
   background-color: #f5f5f5;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden; /* Prevent main container scroll */
+  overflow: hidden;
 }
-
-/* Content wrapper styles */
 .content-wrapper {
   height: 100vh;
-  overflow-y: auto; /* Allow content to scroll */
+  overflow-y: auto;
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #00C851 #f1f1f1;
 }
 
-/* With sidebar (dashboard, point-of-contact, my-orders, my-invoices, payments) */
 .content-wrapper.with-sidebar {
-  margin-left: 200px; /* Account for sidebar width */
-  padding-top: 64px; /* Account for navbar height */
+  margin-left: 200px;
+  padding-top: 64px;
   padding-left: 0;
   padding-right: 0;
 }
 
-/* Without sidebar (other pages) */
 .content-wrapper.without-sidebar {
-  padding-top: 80px; /* 64px navbar + 16px extra */
+  padding-top: 80px;
   padding-left: 3rem;
   padding-right: 3rem;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* Fullscreen content for user selection */
 .fullscreen-content {
   position: fixed;
   top: 0;
@@ -106,11 +93,10 @@ main {
   z-index: 9999;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .content-wrapper.with-sidebar {
     margin-left: 0;
-    padding-top: 64px; /* Account for navbar height only on mobile */
+    padding-top: 64px;
   }
   
   .content-wrapper.without-sidebar {

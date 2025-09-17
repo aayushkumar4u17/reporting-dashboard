@@ -24266,6 +24266,30 @@ export type FetchCustomersNameForTeamReportOutput = {
   data?: Maybe<Scalars['jsonb']>;
 };
 
+export type FetchDeliveredAgingCityReportInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchDeliveredAgingCityReportOutput = {
+  __typename?: 'fetchDeliveredAgingCityReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchDeliveredAgingReportInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchDeliveredAgingReportOutput = {
+  __typename?: 'fetchDeliveredAgingReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
 export type FetchDriverAndTruckLevelForTowerBussinessReportInput = {
   end_date: Scalars['timestamp'];
   start_date: Scalars['timestamp'];
@@ -24572,6 +24596,30 @@ export type FetchNewCustomerOrdersOutput = {
   metadata?: Maybe<Scalars['jsonb']>;
 };
 
+export type FetchNonDeliveredAgingCityReportInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchNonDeliveredAgingCityReportOutput = {
+  __typename?: 'fetchNonDeliveredAgingCityReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchNonDeliveredAgingReportInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchNonDeliveredAgingReportOutput = {
+  __typename?: 'fetchNonDeliveredAgingReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
 export type FetchOrderCountForPartnerInput = {
   end_date: Scalars['timestamp'];
   end_time?: InputMaybe<Scalars['timetz']>;
@@ -24695,6 +24743,18 @@ export type FetchOrderCountForUserOutput = {
   in_transit_count?: Maybe<Scalars['String']>;
   new_count: Scalars['String'];
   rescheduled_count?: Maybe<Scalars['String']>;
+};
+
+export type FetchOrderDeliveryAnalyticsInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchOrderDeliveryAnalyticsOutput = {
+  __typename?: 'fetchOrderDeliveryAnalyticsOutput';
+  data?: Maybe<Scalars['jsonb']>;
 };
 
 export type FetchOrderDetailsForDashboardInput = {
@@ -24843,6 +24903,18 @@ export type FetchPumpsWithinAreaInput = {
 export type FetchPumpsWithinAreaOutput = {
   __typename?: 'fetchPumpsWithinAreaOutput';
   data: Scalars['jsonb'];
+};
+
+export type FetchRawDataSummaryReportInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchRawDataSummaryReportOutput = {
+  __typename?: 'fetchRawDataSummaryReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
 };
 
 export type FetchRoDocsInput = {
@@ -89522,6 +89594,8 @@ export type Query_Root = {
   fetchCustomerOrganizationOrders?: Maybe<FetchCustomerOrganizationOrdersOutput>;
   fetchCustomerRecordStreamData?: Maybe<FetchCustomerRecordStreamDataOutput>;
   fetchCustomersNameForTeamReport?: Maybe<FetchCustomersNameForTeamReportOutput>;
+  fetchDeliveredAgingCityReport?: Maybe<FetchDeliveredAgingCityReportOutput>;
+  fetchDeliveredAgingReport?: Maybe<FetchDeliveredAgingReportOutput>;
   /** This will fetch delivery fees for an item */
   fetchDeliveryFees: DeliveryFeesOutput;
   fetchDriverAndTruckLevelForTowerBussinessReport?: Maybe<FetchDriverAndTruckLevelForTowerBussinessReportOutput>;
@@ -89549,11 +89623,14 @@ export type Query_Root = {
   fetchNearFillingStation?: Maybe<FetchNearFillingStationOutput>;
   fetchNearbyPartners?: Maybe<FetchNearbyPartnersOutput>;
   fetchNewCustomerOrders?: Maybe<FetchNewCustomerOrdersOutput>;
+  fetchNonDeliveredAgingCityReport?: Maybe<FetchNonDeliveredAgingCityReportOutput>;
+  fetchNonDeliveredAgingReport?: Maybe<FetchNonDeliveredAgingReportOutput>;
   fetchOrderCountForPartner?: Maybe<FetchOrderCountForPartnerOutput>;
   fetchOrderCountForPartnerV1?: Maybe<FetchOrderCountForPartnerV1Output>;
   fetchOrderCountForPartnerV2?: Maybe<FetchOrderCountForPartnerV2Output>;
   fetchOrderCountForPartnerV3?: Maybe<FetchOrderCountForPartnerV3Output>;
   fetchOrderCountForUser?: Maybe<FetchOrderCountForUserOutput>;
+  fetchOrderDeliveryAnalytics?: Maybe<FetchOrderDeliveryAnalyticsOutput>;
   fetchOrderDetailsForDashboard?: Maybe<FetchOrderDetailsForDashboardOutput>;
   fetchOrderItemStatus?: Maybe<FetchOrderItemStatusOutput>;
   fetchOrderStats?: Maybe<OrderStatsOutput>;
@@ -89567,6 +89644,7 @@ export type Query_Root = {
   fetchPartnerBasedOnLocalitiesPrice?: Maybe<FetchPartnerBasedOnLocalitiesPriceOutput>;
   fetchPaymentCards?: Maybe<FetchPaymentCardsOutput>;
   fetchPumpsWithinArea?: Maybe<FetchPumpsWithinAreaOutput>;
+  fetchRawDataSummaryReport?: Maybe<FetchRawDataSummaryReportOutput>;
   fetchSalesInvoicePdf: SalesInvoicePdfOutput;
   /** fetchSenselDataByVehicle */
   fetchSenselDataByVehicle?: Maybe<FetchSenselDataByVehicleOutput>;
@@ -92499,6 +92577,16 @@ export type Query_RootFetchCustomersNameForTeamReportArgs = {
 };
 
 
+export type Query_RootFetchDeliveredAgingCityReportArgs = {
+  object: FetchDeliveredAgingCityReportInput;
+};
+
+
+export type Query_RootFetchDeliveredAgingReportArgs = {
+  object: FetchDeliveredAgingReportInput;
+};
+
+
 export type Query_RootFetchDeliveryFeesArgs = {
   object: DeliveryFeesInput;
 };
@@ -92619,6 +92707,16 @@ export type Query_RootFetchNewCustomerOrdersArgs = {
 };
 
 
+export type Query_RootFetchNonDeliveredAgingCityReportArgs = {
+  object: FetchNonDeliveredAgingCityReportInput;
+};
+
+
+export type Query_RootFetchNonDeliveredAgingReportArgs = {
+  object: FetchNonDeliveredAgingReportInput;
+};
+
+
 export type Query_RootFetchOrderCountForPartnerArgs = {
   object: FetchOrderCountForPartnerInput;
 };
@@ -92641,6 +92739,11 @@ export type Query_RootFetchOrderCountForPartnerV3Args = {
 
 export type Query_RootFetchOrderCountForUserArgs = {
   object: FetchOrderCountForUserInput;
+};
+
+
+export type Query_RootFetchOrderDeliveryAnalyticsArgs = {
+  object: FetchOrderDeliveryAnalyticsInput;
 };
 
 
@@ -92701,6 +92804,11 @@ export type Query_RootFetchPaymentCardsArgs = {
 
 export type Query_RootFetchPumpsWithinAreaArgs = {
   object: FetchPumpsWithinAreaInput;
+};
+
+
+export type Query_RootFetchRawDataSummaryReportArgs = {
+  object: FetchRawDataSummaryReportInput;
 };
 
 
@@ -129906,10 +130014,10 @@ export type FetchUserOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
+export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 export type PointOfContactDashboardQueryVariables = Exact<{
-  object: PointOfContactDashboardInput;
+  organizationUserId: Scalars['String'];
 }>;
 
 
@@ -129920,17 +130028,20 @@ export type ValidateIndusDashboardUserQueryVariables = Exact<{
 }>;
 
 
-export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
+export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 
 export const FetchUserOrganizationsDocument = gql`
     query fetchUserOrganizations($user_id: uuid!) {
-  organization_user(where: {user_id: {_eq: $user_id}, is_active: {_eq: true}}) {
+  organization_user(
+    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}}
+  ) {
     id
     user_id
     is_active
     is_owner
     organization_id
+    organization_user_type
     organization {
       id
       name
@@ -129954,8 +130065,8 @@ export function useFetchUserOrganizationsQuery(options: Omit<Urql.UseQueryArgs<n
   return Urql.useQuery<FetchUserOrganizationsQuery>({ query: FetchUserOrganizationsDocument, ...options });
 };
 export const PointOfContactDashboardDocument = gql`
-    query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
-  pointOfContactDashboard(object: $object) {
+    query PointOfContactDashboard($organizationUserId: String!) {
+  pointOfContactDashboard(object: {point_of_contact: [$organizationUserId]}) {
     data {
       cancelled_count
       cancelled_qty
@@ -129978,13 +130089,14 @@ export function usePointOfContactDashboardQuery(options: Omit<Urql.UseQueryArgs<
 export const ValidateIndusDashboardUserDocument = gql`
     query validateIndusDashboardUser($user_id: uuid!) {
   organization_user(
-    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, is_owner: {_eq: true}}
+    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, is_owner: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}}
   ) {
     id
     user_id
     is_active
     is_owner
     organization_id
+    organization_user_type
     organization {
       id
       name

@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-page">
-    <div class="dashboard-container">
+    <div class="dashboard-container" :class="{ 'fade-in': isLoaded }">
       <!-- Filter Bar -->
       <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
         <div class="filter-group">
@@ -142,8 +142,35 @@
             </div>
           </div>
 
+          <!-- Total Planned Orders Card -->
+          <div class="metric-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 1.0s;">
+            <div class="metric-header">
+              <div class="metric-icon orders-planned">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <h3 class="metric-title">Total Planned Orders</h3>
+            </div>
+            <div class="metric-content">
+              <div class="metric-item">
+                <span class="metric-label">Count</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalPlannedOrders.count }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Quantity</span>
+                <span v-if="!loading" class="metric-value">{{ dashboardData.totalPlannedOrders.quantity }}</span>
+                <SkeletonLoader v-else height="1.5rem" width="3rem" />
+              </div>
+            </div>
+          </div>
+
           <!-- Total Cost Saved Card -->
-          <div class="metric-card cost-saved-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 1.0s;">
+          <div class="metric-card cost-saved-card" :class="{ 'animate-fade-in-up': isLoaded }" style="animation-delay: 1.2s;">
             <div class="metric-header">
               <div class="metric-icon cost-saved">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -185,12 +212,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import ErrorPopup from '@/components/layout/ErrorPopup.vue'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { fetchPointOfContactDashboard } from '@/api/pointOfContactDashboard'
 import { useFilters } from '@/composables/useFilters'
+
+const router = useRouter()
 
 // Animation state
 const isLoaded = ref(false)
@@ -216,6 +246,10 @@ const dashboardData = ref({
     quantity: 0
   },
   totalOrdersCancelled: {
+    count: 0,
+    quantity: 0
+  },
+  totalPlannedOrders: {
     count: 0,
     quantity: 0
   },
@@ -287,22 +321,27 @@ const fetchDashboardData = async () => {
     const data = await fetchPointOfContactDashboard(organizationUserId, filterPayload)
     
     if (data) {
+      // Map the GraphQL response to our dashboard data structure
       dashboardData.value = {
         totalOrdersPlaced: {
           count: data.order_count || 0,
-          quantity: Number(data.ordered_qty) || 0
+          quantity: data.ordered_qty ? Number(data.ordered_qty) : 0
         },
         totalOrdersDelivered: {
           count: data.delivered_orders || 0,
-          quantity: Number(data.delivered_qty) || 0
+          quantity: data.delivered_qty ? Number(data.delivered_qty) : 0
         },
         totalOrdersRescheduled: {
           count: data.rescheduled_count || 0,
-          quantity: Number(data.rescheduled_qty) || 0
+          quantity: data.rescheduled_qty ? Number(data.rescheduled_qty) : 0
         },
         totalOrdersCancelled: {
           count: data.cancelled_count || 0,
-          quantity: Number(data.cancelled_qty) || 0
+          quantity: data.cancelled_qty ? Number(data.cancelled_qty) : 0
+        },
+        totalPlannedOrders: {
+          count: data.planned_orders || 0,
+          quantity: data.planned_qty ? Number(data.planned_qty) : 0
         },
         totalCostSaved: {
           quantity: `${data.planned_qty ?? 0} Litres`,
@@ -325,6 +364,7 @@ const fetchDashboardData = async () => {
       totalOrdersDelivered: { count: 0, quantity: 0 },
       totalOrdersRescheduled: { count: 0, quantity: 0 },
       totalOrdersCancelled: { count: 0, quantity: 0 },
+      totalPlannedOrders: { count: 0, quantity: 0 },
       totalCostSaved: { quantity: '0 Litres', amount: 'Rs. 0' }
     }
   } finally {
@@ -334,9 +374,12 @@ const fetchDashboardData = async () => {
 }
 
 onMounted(() => {
+  // Check if coming from select-user page
+  const fromSelectUser = router.options.history.state.back === '/select-user'
+  
   setTimeout(() => {
     isLoaded.value = true
-  }, 1000)
+  }, fromSelectUser ? 500 : 100)
   
   fetchDashboardData()
 })

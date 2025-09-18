@@ -1,15 +1,19 @@
 import client from './APIClient'
 import type { FilterPayload } from '@/composables/useFilters'
 
+export interface OrderDate {
+  value: string;
+}
+
 export interface PointOfContactInvoiceReportData {
   erp_order_code?: string | null
   invoice?: string | null
-  delivered_date?: string | null
+  delivered_date?: string | OrderDate | null
   app_order_code?: string | null
-  order_date?: string | null
+  order_date?: string | OrderDate | null
   order_qty?: number | null
   order_delivered_qty?: number | null
-  order_amount?: number | null
+  order_amount?: number | string | null
   shipping_address?: string | null
   city?: string | null
   first_name?: string | null

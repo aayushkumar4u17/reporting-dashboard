@@ -1,9 +1,6 @@
 <template>
   <div class="payments-page">
-    <!-- Debug: Simple test content -->
-    <!-- <div style="background: red; color: white; padding: 20px; margin: 20px; font-size: 24px; z-index: 9999; position: relative;">
-      🔥 PAYMENTS PAGE IS LOADING! 🔥
-    </div> -->
+
     
     <div class="payments-container">
       <!-- Filter Section -->
@@ -131,18 +128,14 @@
             <th class="checkbox-column">
               <input type="checkbox" v-model="selectAll" @change="toggleAllSelection">
             </th>
-            <th>Asp Order Code</th>
-            <th>Sales Invoice Number</th>
-            <th>Order Date</th>
-            <th>Delivery Date</th>
-            <th>Payment Due Date</th>
-            <th>Order Quantity</th>
-            <th>Delivery Quantity</th>
-            <th>Amount</th>
-            <th>Delivery Location</th>
-            <th>POC Name</th>
-            <th>POC Contact</th>
-            <th>Invoice Status</th>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th>Credit Limit</th>
+            <th>Outstanding Amount</th>
+            <th>Overdue Amount</th>
+            <th>Payment Terms</th>
+            <th>Phone Number</th>
+            <th>Credit Breach</th>
           </tr>
         </thead>
         <tbody>
@@ -172,25 +165,26 @@
             <td class="checkbox-column">
               <input type="checkbox" v-model="payment.selected">
             </td>
-            <td>{{ payment.aspOrderCode }}</td>
-            <td>{{ payment.salesInvoiceNumber }}</td>
-            <td>{{ payment.orderedDate }}</td>
-            <td>{{ payment.deliveredDate }}</td>
-            <td>{{ payment.paymentDueDate }}</td>
-            <td>{{ payment.orderedQuantity }}</td>
-            <td>{{ payment.deliveredQuantity }}</td>
-            <td>{{ formatCurrency(payment.amount) }}</td>
-            <td>{{ payment.deliveryLocation }}</td>
-            <td>{{ payment.pocName }}</td>
-            <td>{{ payment.pocContact }}</td>
+            <td>{{ payment.customerId }}</td>
+            <td>{{ payment.customerName }}</td>
+            <td>{{ formatCurrency(payment.creditLimit) }}</td>
+            <td>{{ formatCurrency(payment.outstandingAmount) }}</td>
+            <td>{{ formatCurrency(payment.overdueAmount) }}</td>
+            <td>{{ payment.paymentTerms }} days</td>
+            <td>{{ payment.phoneNumber }}</td>
             <td>
-              <span :class="['status-badge', getStatusClass(payment.invoiceStatus)]">
-                {{ payment.invoiceStatus }}
+              <span :class="['status-badge', payment.allowedCreditBreach === 'Y' ? 'status-allowed' : 'status-not-allowed']">
+                {{ payment.allowedCreditBreach === 'Y' ? 'Allowed' : 'Not Allowed' }}
               </span>
             </td>
           </tr>
         </tbody>
       </table>
+      
+      <!-- No data message -->
+      <div v-if="!loading && payments.length === 0" class="no-data-message">
+        No data found
+      </div>
     </div>
     </div>
   </div>
@@ -199,12 +193,18 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
+import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import { useFilters } from '@/composables/useFilters'
+import { usePointOfContactStore } from '@/stores/pointOfContact'
+import { fetchPointOfContactPaymentReport, mapPaymentData, calculateSummary } from '@/api/pointOfContactPaymentReport'
 
 // Animation state
 const isLoaded = ref(false)
 const loading = ref(true)
 const summaryLoading = ref(true)
+
+// Point of Contact Store
+const pointOfContactStore = usePointOfContactStore()
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
@@ -226,10 +226,29 @@ const summaryData = ref({
   totalOverdue: '₹ 0'
 })
 
-const loadData = () => {
-  // TODO: Implement API call to fetch payments data
-  loading.value = false
-  summaryLoading.value = false
+const loadData = async () => {
+  try {
+    loading.value = true
+    summaryLoading.value = true
+    
+    const organizationUserId = pointOfContactStore.selectedUserId
+    
+    if (!organizationUserId) {
+      throw new Error('No organization selected. Please go back and select an organization.')
+    }
+    
+    const filterPayload = buildFilterPayload(organizationUserId)
+    const rawData = await fetchPointOfContactPaymentReport(organizationUserId, filterPayload)
+    
+    payments.value = mapPaymentData(rawData)
+    summaryData.value = calculateSummary(rawData)
+    
+  } catch (error) {
+    console.error('Error loading payment data:', error)
+  } finally {
+    loading.value = false
+    summaryLoading.value = false
+  }
 }
 
 // Methods
@@ -262,11 +281,12 @@ const toggleAllSelection = () => {
 }
 
 const formatCurrency = (amount) => {
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     minimumFractionDigits: 0
-  }).format(amount)
+  }).format(numAmount || 0)
 }
 
 const getStatusClass = (status) => {
@@ -282,13 +302,11 @@ const getStatusClass = (status) => {
   }
 }
 
-// Initialize animations on component mount
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
   
-  // Simulate data loading
   loadData()
 })
 </script>

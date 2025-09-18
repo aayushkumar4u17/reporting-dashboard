@@ -137,7 +137,8 @@
   border: 1px solid rgba(0, 200, 81, 0.15);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   transform: translateY(20px);
@@ -173,6 +174,7 @@
   width: 40px;
   text-align: center;
   padding: 0.6rem 0.2rem;
+  vertical-align: middle;
 }
 
 .download-col {
@@ -212,6 +214,7 @@
   width: 16px;
   height: 16px;
   accent-color: #00C851;
+  vertical-align: middle;
 }
 
 /* Skeleton Loader Styles */
@@ -221,6 +224,15 @@
 
 .skeleton-row .skeleton-loader {
   border-radius: 4px;
+}
+
+/* No Data Message Styles */
+.no-data-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 /* Responsive Design */
@@ -274,6 +286,11 @@
     padding: 0.5rem 0.25rem;
     font-size: 0.7rem;
   }
+  
+  .checkbox-column {
+    padding: 0.5rem 0.25rem;
+    vertical-align: middle;
+  }
 }
 
 @media (max-width: 480px) {
@@ -310,5 +327,10 @@
   .table-cell {
     padding: 0.4rem 0.2rem;
     font-size: 0.65rem;
+  }
+  
+  .checkbox-column {
+    padding: 0.4rem 0.2rem;
+    vertical-align: middle;
   }
 }

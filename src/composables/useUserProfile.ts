@@ -12,6 +12,7 @@ export interface UserProfile {
   email?: string
   organizationName?: string
   organizationId?: string
+  organizationUserId?: string
   organizationAvatar?: string
   organizationInitials?: string
 }
@@ -82,6 +83,7 @@ export const useUserProfile = () => {
           email: userData.email || undefined,
           organizationName: selectedOrg.name || orgData.name || 'Unknown Organization',
           organizationId: validation.data.organization_id,
+          organizationUserId: validation.data.id,
           organizationAvatar: selectedOrg.avatar || selectedOrg.color,
           organizationInitials: selectedOrg.initials || orgData.name?.substring(0, 2).toUpperCase()
         }
@@ -93,6 +95,7 @@ export const useUserProfile = () => {
             id: hasuraUserId,
             organizationName: orgData.name,
             organizationId: orgData.id,
+            organizationUserId: undefined, // Not available in fallback
             organizationAvatar: selectedOrg.avatar || selectedOrg.color,
             organizationInitials: selectedOrg.initials || orgData.name?.substring(0, 2).toUpperCase()
           }
@@ -112,6 +115,7 @@ export const useUserProfile = () => {
           id: getCurrentUserId() || 'unknown',
           organizationName: orgData.name,
           organizationId: orgData.id,
+          organizationUserId: undefined, // Not available in fallback
           organizationAvatar: selectedOrg.avatar || selectedOrg.color,
           organizationInitials: selectedOrg.initials || orgData.name?.substring(0, 2).toUpperCase()
         }

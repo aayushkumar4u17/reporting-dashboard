@@ -6,7 +6,8 @@ import {
 import { useAuthStore, useUserStore } from "@/stores";
 import { auth } from "@/config/firebase";
 import { validateIndusDashboardUser } from "./IndusDashboardAuthService";
-import { setReportingLoginState, clearLoginState, setIndusDashboardLoginState } from "@/utils/auth";
+import { setReportingLoginState, clearLoginState, setIndusDashboardLoginState, invalidateAuthCache } from "@/utils/auth";
+import { clearRouterAuthCache } from "@/router";
 
 export const startTimer = () => {
   const authStore = useAuthStore();
@@ -67,7 +68,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     };
     
     cleanup();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     let recaptchaContainer: HTMLElement;
     
@@ -81,7 +82,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       }
       
       document.body.appendChild(recaptchaContainer);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const containerCheck = document.getElementById("recaptcha-container");
       if (!containerCheck) {
@@ -330,6 +331,17 @@ export const signOutUser = async (callback?: () => void): Promise<void> => {
 
   try {
     await signOut(auth);
+    
+    // Wait for Firebase to fully sign out
+    await new Promise(resolve => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        if (!user) {
+          unsubscribe();
+          resolve(void 0);
+        }
+      });
+    });
+    
     userStore.clearUser();
 
     if (authStore.hideErrorPopup) authStore.hideErrorPopup();
@@ -341,17 +353,28 @@ export const signOutUser = async (callback?: () => void): Promise<void> => {
     localStorage.removeItem("firebaseUserId");
     localStorage.removeItem("userOrganizationId");
     localStorage.removeItem("userOrganizationName");
+    localStorage.removeItem("selectedOrganization");
+    localStorage.removeItem("cachedOrganizations");
     clearLoginState();
+    invalidateAuthCache();
+    clearRouterAuthCache();
 
     if (callback && typeof callback === "function") {
       callback();
     }
+    
+    // Force page refresh to clear all cached state
+    window.location.reload();
   } catch (error: any) {
     clearLoginState();
+    invalidateAuthCache();
     userStore.clearUser();
     localStorage.removeItem("firebaseUserId");
     localStorage.removeItem("userOrganizationId");
     localStorage.removeItem("userOrganizationName");
+    localStorage.removeItem("selectedOrganization");
+    localStorage.removeItem("cachedOrganizations");
+    clearRouterAuthCache();
 
     if (callback && typeof callback === "function") {
       callback();

@@ -20,7 +20,7 @@ export const isReportingLoggedIn = (): boolean => {
     return authStateCache.isReportingLoggedIn;
   }
   
-  const isLoggedIn = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
+  const isLoggedIn = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true';
   authStateCache.isReportingLoggedIn = isLoggedIn;
   authStateCache.lastChecked = now;
   
@@ -35,7 +35,7 @@ export const isIndusDashboardLoggedIn = (): boolean => {
     return authStateCache.isIndusDashboardLoggedIn;
   }
   
-  const isLoggedIn = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+  const isLoggedIn = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true';
   authStateCache.isIndusDashboardLoggedIn = isLoggedIn;
   authStateCache.lastChecked = now;
   
@@ -80,9 +80,9 @@ export const hasOwnerRole = async (): Promise<boolean> => {
 
 export const canAccessIndusDashboard = (): boolean => {
 	try {
-		// First check localStorage flags as quick validation
-		const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
-		const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+		// First check sessionStorage flags as quick validation
+		const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true';
+		const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true';
 		
 		// If either flag is missing, definitely not logged in
 		if (!hasReportingFlag || !hasIndusFlag) {
@@ -115,9 +115,9 @@ export const canAccessIndusDashboard = (): boolean => {
 		return hasAccess;
 	} catch (error) {
 		console.error('Error checking Indus Dashboard access:', error);
-		// Fallback to localStorage flags in case of error
-		const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
-		const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+		// Fallback to sessionStorage flags in case of error
+		const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true';
+		const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true';
 		return hasReportingFlag && hasIndusFlag;
 	}
 };
@@ -132,8 +132,8 @@ export const invalidateAuthCache = (): void => {
 
 export const getUserOrganizationData = (): { id: string; name: string } | null => {
 	try {
-		const orgId = localStorage.getItem('userOrganizationId');
-		const orgName = localStorage.getItem('userOrganizationName');
+		const orgId = sessionStorage.getItem('userOrganizationId');
+		const orgName = sessionStorage.getItem('userOrganizationName');
 		
 		if (orgId && orgName) {
 			return { id: orgId, name: orgName };
@@ -173,8 +173,8 @@ export const initializeAuthState = async (): Promise<void> => {
 		const hasFirebaseUser = !!auth.currentUser;
 		
 		if (!hasFirebaseUser) {
-			const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
-			const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+			const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true';
+			const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true';
 			
 			if (hasReportingFlag || hasIndusFlag) {
 				clearLoginState();
@@ -189,22 +189,34 @@ export const initializeAuthState = async (): Promise<void> => {
 };
 
 export const clearLoginState = (): void => {
-	localStorage.setItem('isLoggedInReportingDashboard', 'false');
-	localStorage.setItem('isLoggedInIndusDashboard', 'false');
-	localStorage.removeItem('firebaseUserId');
-	localStorage.removeItem('userOrganizationId');
-	localStorage.removeItem('userOrganizationName');
+	sessionStorage.setItem('isLoggedInReportingDashboard', 'false');
+	sessionStorage.setItem('isLoggedInIndusDashboard', 'false');
+	sessionStorage.removeItem('firebaseUserId');
+	sessionStorage.removeItem('userOrganizationId');
+	sessionStorage.removeItem('userOrganizationName');
 	
+  // Clear reCAPTCHA containers
+  try {
+    const recaptchaContainers = document.querySelectorAll('[id*="recaptcha"], [class*="recaptcha"], iframe[src*="recaptcha"]');
+    recaptchaContainers.forEach(container => container.remove());
+    
+    if ((window as any).grecaptcha) {
+      (window as any).grecaptcha.reset();
+    }
+  } catch (e) {
+    // Ignore cleanup errors
+  }
+  
   invalidateAuthCache();
 };
 
 export const setReportingLoginState = (): void => {
-	localStorage.setItem('isLoggedInReportingDashboard', 'true');
+	sessionStorage.setItem('isLoggedInReportingDashboard', 'true');
 	invalidateAuthCache();
 };
 
 export const setIndusDashboardLoginState = (): void => {
-	localStorage.setItem('isLoggedInIndusDashboard', 'true');
+	sessionStorage.setItem('isLoggedInIndusDashboard', 'true');
 	invalidateAuthCache();
 };
 

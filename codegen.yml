@@ -3,7 +3,7 @@ schema:
       headers:
         # Admin secret for build-time code generation only (not used at runtime)
         x-hasura-admin-secret: ${HASURA_GRAPHQL_ADMIN_SECRET:myadminsecretkey}
-documents: 'src/graphql/**/*.graphql'
+documents: 'src/services/business/**/*.graphql'
 generates:
   graphql.schema.json:
     plugins:

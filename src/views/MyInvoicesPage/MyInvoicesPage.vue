@@ -53,16 +53,16 @@
       </div>
 
       <!-- Download Options -->
-      <div class="download-options" :class="{ 'animate-fade-in-up': isLoaded }">
+      <!-- <div class="download-options" :class="{ 'animate-fade-in-up': isLoaded }"> -->
         <!-- <div class="download-format">
           <span class="format-label">Excel</span>
           <AnimatedButton @click="downloadExcel" variant="success" size="small">📄</AnimatedButton>
         </div> -->
-        <div class="download-format">
+        <!-- <div class="download-format">
           <span class="format-label">PDF</span>
           <AnimatedButton @click="downloadPDF" variant="danger" size="small">📄</AnimatedButton>
         </div>
-      </div>
+      </div> -->
 
       <!-- Invoices Table -->
       <div class="table-container" :class="{ 'animate-fade-in-up': isLoaded }">
@@ -115,7 +115,6 @@
               <td class="table-cell checkbox-column">
                 <input type="checkbox" v-model="invoice.selected" class="row-checkbox" />
               </td>
-              <td class="table-cell">{{ invoice.checkBN }}</td>
               <td class="table-cell">{{ invoice.aspOrderCode }}</td>
               <td class="table-cell">{{ invoice.salesInvoiceNumber }}</td>
               <td class="table-cell">{{ invoice.salesOrderCode }}</td>
@@ -135,6 +134,11 @@
             </tr>
           </tbody>
         </table>
+        
+        <!-- No data message -->
+        <div v-if="!loading && filteredInvoices.length === 0" class="no-data-message">
+          No data found
+        </div>
       </div>
     </div>
   </div>
@@ -166,7 +170,7 @@ const invoices = ref([])
 const filteredInvoices = computed(() => {
   return invoices.value.filter(invoice => {
     const cityMatch = !selectedCity.value || invoice.city === selectedCity.value
-    const pocMatch = !selectedPOC.value || invoice.poc === selectedPOC.value
+    const pocMatch = !selectedPOC.value || `${invoice.pocName}`.includes(selectedPOC.value)
     // Add date filtering logic here when implementing actual date filtering
     return cityMatch && pocMatch
   })
@@ -228,23 +232,48 @@ const loadData = async () => {
     const filterPayload = buildFilterPayload(userId)
     
     const reportData = await fetchPointOfContactInvoiceReport(userId, filterPayload)
-    invoices.value = reportData.map((item, index) => ({
-      id: index + 1,
-      checkBN: item.erp_order_code || '',
-      aspOrderCode: item.app_order_code || '',
-      salesInvoiceNumber: item.invoice || '',
-      salesOrderCode: item.erp_order_code || '',
-      orderedDate: item.order_date || '',
-      deliveredDate: item.delivered_date || '',
-      orderedQuantity: `${item.order_qty || 0} Ltr`,
-      deliveredQuantity: `${item.order_delivered_qty || 0} Ltr`,
-      amount: `₹ ${item.order_amount || 0}`,
-      deliveryLocation: item.shipping_address || '',
-      pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
-      pocContact: item.phone_number || '',
-      city: item.city || '',
-      selected: false
-    }))
+    invoices.value = reportData.map((item, index) => {
+      // Extract order date value if it exists
+      let orderDate = ''
+      if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
+        orderDate = item.order_date.value
+      } else if (typeof item.order_date === 'string') {
+        orderDate = item.order_date
+      }
+      
+      // Extract delivered date value if it exists
+      let deliveredDate = ''
+      if (item.delivered_date && typeof item.delivered_date === 'object' && item.delivered_date.value) {
+        deliveredDate = item.delivered_date.value
+      } else if (typeof item.delivered_date === 'string') {
+        deliveredDate = item.delivered_date
+      }
+      
+      // Handle order amount (can be number or string)
+      let orderAmount = 0
+      if (typeof item.order_amount === 'number') {
+        orderAmount = item.order_amount
+      } else if (typeof item.order_amount === 'string') {
+        orderAmount = parseFloat(item.order_amount) || 0
+      }
+      
+      return {
+        id: index + 1,
+        aspOrderCode: item.app_order_code || '',
+        salesInvoiceNumber: item.invoice || '',
+        salesOrderCode: item.erp_order_code || '',
+        orderedDate: orderDate,
+        deliveredDate: deliveredDate,
+        orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
+        deliveredQuantity: item.order_delivered_qty ? `${item.order_delivered_qty} Ltr` : '0 Ltr',
+        amount: `₹ ${orderAmount.toFixed(2)}`,
+        deliveryLocation: item.city || '',
+        pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
+        pocContact: item.phone_number || '',
+        city: item.city || '',
+        selected: false
+      }
+    })
   } catch (error) {
     console.error('Error loading invoices:', error)
   } finally {

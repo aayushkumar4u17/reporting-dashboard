@@ -59,6 +59,53 @@ body, html {
   padding-bottom: 3rem;
   box-sizing: border-box;
   min-height: 100vh;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.selection-container.fade-in {
+  opacity: 1;
+}
+
+.initial-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.initial-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #00C851;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.initial-loader p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
 }
 
 .header {
@@ -183,6 +230,7 @@ body, html {
   font-weight: 500;
   color: #666;
   margin: 0 0 0.5rem 0;
+  text-align: center;
 }
 
 .user-role {
@@ -192,6 +240,7 @@ body, html {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .edit-overlay {
@@ -286,14 +335,24 @@ body, html {
 
 .skeleton-name {
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .skeleton-role {
   margin-bottom: 0;
+  text-align: center;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .initial-loader p {
+    font-size: 0.9rem;
+  }
+  
+  .spinner {
+    width: 35px;
+    height: 35px;
+  }
   .selection-container {
     padding: 0.5rem;
     padding-top: 4rem;

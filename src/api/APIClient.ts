@@ -36,7 +36,6 @@ const getToken = async (): Promise<string> => {
     return currentToken;
   }
   
-  // Wait for Firebase to be initialized
   await waitForFirebaseInit();
   
   return new Promise<string>((resolve, reject) => {
@@ -95,11 +94,9 @@ const createClient = async (): Promise<ReturnType<typeof getSdk>> => {
   try {
     const token = await getToken();
     graphQLClient.setHeader("Authorization", `Bearer ${token}`);
-
     return getSdk(graphQLClient, withJWTRefresh);
   } catch (error) {
     console.error("Error creating GraphQL client:", error);
-    // Return client without auth header if token retrieval fails
     return getSdk(graphQLClient);
   }
 };

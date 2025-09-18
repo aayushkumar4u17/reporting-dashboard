@@ -2,6 +2,11 @@ import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
 export const generateInvoicesPDF = (invoices, selectedOnly = false) => {
+  // Ensure secure context for PDF generation
+  if (typeof window !== 'undefined' && !window.isSecureContext && window.location.protocol !== 'https:') {
+    console.warn('PDF generation should be performed in a secure context')
+  }
+  
   const doc = new jsPDF()
   
   // Filter data based on selection
@@ -10,8 +15,7 @@ export const generateInvoicesPDF = (invoices, selectedOnly = false) => {
     : invoices
 
   if (dataToExport.length === 0) {
-    alert('No data to export')
-    return
+    throw new Error('No data to export')
   }
 
   // Add title
@@ -73,6 +77,11 @@ export const generateInvoicesPDF = (invoices, selectedOnly = false) => {
 }
 
 export const generatePaymentsPDF = (payments, selectedOnly = false) => {
+  // Ensure secure context for PDF generation
+  if (typeof window !== 'undefined' && !window.isSecureContext && window.location.protocol !== 'https:') {
+    console.warn('PDF generation should be performed in a secure context')
+  }
+  
   const doc = new jsPDF()
   
   // Filter data based on selection
@@ -81,8 +90,7 @@ export const generatePaymentsPDF = (payments, selectedOnly = false) => {
     : payments
 
   if (dataToExport.length === 0) {
-    alert('No data to export')
-    return
+    throw new Error('No data to export')
   }
 
   // Add title

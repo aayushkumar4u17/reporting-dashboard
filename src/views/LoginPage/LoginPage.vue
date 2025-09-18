@@ -332,8 +332,20 @@ const verifyOTPHandler = async () => {
         otpCode.value = ''
         isVerifying.value = false
         
-        // For access denied errors, the verifyOTPAction will handle the redirect
-        if (result.errorCode !== 'USER_NOT_FOUND' && result.errorCode !== 'AUTH_ERROR') {
+        // Handle specific error codes
+        if (result.errorCode === 'auth/invalid-verification-code') {
+          authStore.showErrorPopup({
+            title: 'Invalid OTP',
+            message: 'Invalid OTP. Please try again.',
+            showRetry: true
+          })
+        } else if (result.errorCode === 'auth/code-expired') {
+          authStore.showErrorPopup({
+            title: 'OTP Expired',
+            message: 'The OTP has expired. Please request a new one.',
+            showRetry: true
+          })
+        } else if (result.errorCode !== 'USER_NOT_FOUND' && result.errorCode !== 'AUTH_ERROR') {
           authStore.showErrorPopup({
             title: 'Verification Failed',
             message: result.error || 'OTP verification failed. Please try again.',
@@ -350,8 +362,8 @@ const verifyOTPHandler = async () => {
       if (error && typeof error === 'object' && 'code' in error) {
         if (error.code === 'auth/invalid-verification-code') {
           authStore.showErrorPopup({
-            title: 'Invalid OTP',
-            message: 'The OTP you entered is incorrect. Please try again.',
+            title: 'Incorrect OTP',
+            message: 'Incorrect OTP. Please try again.',
             showRetry: true
           })
         } else if (error.code === 'auth/code-expired') {

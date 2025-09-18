@@ -39,3 +39,42 @@ coverage
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Security files
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Secrets and credentials
+secrets/
+.secrets
+*.secret
+
+# Build artifacts
+build/
+out/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Production bundle analysis
+bundle-analyzer-report.html
+stats.json

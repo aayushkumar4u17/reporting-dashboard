@@ -46,7 +46,7 @@
           <AnimatedButton @click="clearAllFilters" variant="clear" size="small">
             Clear All Filters
           </AnimatedButton>
-          <AnimatedButton @click="downloadAllInvoices" variant="success" size="small">
+          <AnimatedButton @click="downloadInvoices" variant="success" size="small">
             Download Invoice
           </AnimatedButton>
         </div>
@@ -147,9 +147,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
+import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import { fetchPointOfContactInvoiceReport } from '@/api/pointOfContactInvoiceReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
+import { generateInvoicesPDF } from '@/utils/pdfGenerator'
 
 // Animation state
 const isLoaded = ref(false)
@@ -206,9 +208,10 @@ const downloadInvoice = (invoiceId) => {
   // Implement individual invoice download logic
 }
 
-const downloadAllInvoices = () => {
-  console.log('Downloading all selected invoices')
-  // Implement bulk download logic
+const downloadInvoices = () => {
+  const selectedInvoices = invoices.value.filter(invoice => invoice.selected)
+  const hasSelection = selectedInvoices.length > 0
+  generateInvoicesPDF(invoices.value, hasSelection)
 }
 
 const downloadExcel = () => {
@@ -225,7 +228,14 @@ const pointOfContactStore = usePointOfContactStore()
 
 const loadData = async () => {
   try {
-    const userId = pointOfContactStore.selectedUserId
+    let userId = pointOfContactStore.selectedUserId
+    
+    // If store is empty, try to refresh from localStorage
+    if (!userId) {
+      pointOfContactStore.refreshFromStorage()
+      userId = pointOfContactStore.selectedUserId
+    }
+    
     if (!userId) return
     
     // Build filter payload

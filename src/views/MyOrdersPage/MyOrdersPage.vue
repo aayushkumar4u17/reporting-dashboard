@@ -196,7 +196,14 @@ const pointOfContactStore = usePointOfContactStore()
 
 const loadData = async () => {
   try {
-    const userId = pointOfContactStore.selectedUserId
+    let userId = pointOfContactStore.selectedUserId
+    
+    // If store is empty, try to refresh from localStorage
+    if (!userId) {
+      pointOfContactStore.refreshFromStorage()
+      userId = pointOfContactStore.selectedUserId
+    }
+    
     if (!userId) return
     
     // Build filter payload

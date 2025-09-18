@@ -309,7 +309,13 @@ const fetchDashboardData = async () => {
     error.value = null
     
     // Get selected organization user ID from store
-    const organizationUserId = pointOfContactStore.selectedUserId
+    let organizationUserId = pointOfContactStore.selectedUserId
+    
+    // If store is empty, try to refresh from localStorage
+    if (!organizationUserId) {
+      pointOfContactStore.refreshFromStorage()
+      organizationUserId = pointOfContactStore.selectedUserId
+    }
     
     if (!organizationUserId) {
       throw new Error('No organization selected. Please go back and select an organization.')

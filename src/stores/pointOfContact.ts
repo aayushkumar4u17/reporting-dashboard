@@ -2,8 +2,22 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { PointOfContactData } from '@/api/pointOfContactDashboard'
 
+// Helper function to get selected user ID from localStorage
+const getStoredUserId = (): string => {
+  try {
+    const selectedOrg = localStorage.getItem('selectedOrganization')
+    if (selectedOrg) {
+      const org = JSON.parse(selectedOrg)
+      return org.organization_user_id || ''
+    }
+  } catch (error) {
+    console.error('Error parsing stored organization:', error)
+  }
+  return ''
+}
+
 export const usePointOfContactStore = defineStore('pointOfContact', () => {
-  const selectedUserId = ref<string>('')
+  const selectedUserId = ref<string>(getStoredUserId())
   const dashboardData = ref<PointOfContactData | null>(null)
   const isLoading = ref(false)
 
@@ -19,6 +33,10 @@ export const usePointOfContactStore = defineStore('pointOfContact', () => {
     isLoading.value = loading
   }
 
+  const refreshFromStorage = () => {
+    selectedUserId.value = getStoredUserId()
+  }
+
   const clearData = () => {
     selectedUserId.value = ''
     dashboardData.value = null
@@ -32,6 +50,7 @@ export const usePointOfContactStore = defineStore('pointOfContact', () => {
     setSelectedUserId,
     setDashboardData,
     setLoading,
+    refreshFromStorage,
     clearData
   }
 })

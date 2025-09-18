@@ -53,19 +53,7 @@
         
         <!-- Download Section -->
         <div class="download-section">
-          <!-- <button class="download-btn excel">
-            <span>Download Invoice</span>
-            <div class="download-options">
-              <span>Excel</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7,10 12,15 17,10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-            </div>
-          </button> -->
-          
-          <AnimatedButton variant="danger" size="small">
+          <AnimatedButton @click="downloadPayments" variant="danger" size="small">
             <span>PDF</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -197,6 +185,7 @@ import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import { useFilters } from '@/composables/useFilters'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { fetchPointOfContactPaymentReport, mapPaymentData, calculateSummary } from '@/api/pointOfContactPaymentReport'
+import { generatePaymentsPDF } from '@/utils/pdfGenerator'
 
 // Animation state
 const isLoaded = ref(false)
@@ -231,7 +220,13 @@ const loadData = async () => {
     loading.value = true
     summaryLoading.value = true
     
-    const organizationUserId = pointOfContactStore.selectedUserId
+    let organizationUserId = pointOfContactStore.selectedUserId
+    
+    // If store is empty, try to refresh from localStorage
+    if (!organizationUserId) {
+      pointOfContactStore.refreshFromStorage()
+      organizationUserId = pointOfContactStore.selectedUserId
+    }
     
     if (!organizationUserId) {
       throw new Error('No organization selected. Please go back and select an organization.')
@@ -287,6 +282,12 @@ const formatCurrency = (amount) => {
     currency: 'INR',
     minimumFractionDigits: 0
   }).format(numAmount || 0)
+}
+
+const downloadPayments = () => {
+  const selectedPayments = payments.value.filter(payment => payment.selected)
+  const hasSelection = selectedPayments.length > 0
+  generatePaymentsPDF(payments.value, hasSelection)
 }
 
 const getStatusClass = (status) => {

@@ -1,10 +1,16 @@
 <template>
   <div class="user-selection-page">
-    <div class="selection-container">
+    <!-- Loading Spinner Overlay -->
+    <div v-if="showInitialLoader" class="initial-loader-overlay">
+      <div class="initial-loader">
+        <div class="spinner"></div>
+        <p>Loading organizations...</p>
+      </div>
+    </div>
+    
+    <div class="selection-container" :class="{ 'fade-in': !showInitialLoader }">
       <div class="header">
         <img src="/fuelbuddy-logo.svg" alt="FuelBuddy Logo" class="logo" />
-        <!-- Add logout button for testing -->
-        <button @click="handleLogout" class="logout-btn">Logout</button>
       </div>
       
       <h1 class="title">Select Organization</h1>
@@ -60,7 +66,11 @@ const pointOfContactStore = usePointOfContactStore()
 const organizations = ref([])
 const loading = ref(true)
 const error = ref(null)
+const showInitialLoader = ref(true)
 let authStateCheckInterval = null
+
+// Development mode check
+const isDevelopment = import.meta.env.MODE === 'development'
 
 // Generate a color based on organization name
 const getColorForOrg = (name) => {
@@ -107,76 +117,45 @@ const selectOrganization = (org) => {
   router.push('/dashboard')
 }
 
-// Handle logout for testing
-const handleLogout = async () => {
-  try {
-    // Import signOutUser function
-    const { signOutUser } = await import('@/api/auth')
-    
-    // Perform logout
-    await signOutUser(() => {
-      router.push('/')
-    })
-  } catch (error) {
-    console.error('Error during logout:', error)
-    // Fallback navigation
-    router.push('/')
-  }
-}
 
-// Function to get Hasura user ID from Firebase JWT token with retry mechanism
-const getHasuraUserIdFromToken = async (maxRetries = 5) => {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+
+// Function to get user ID for API calls (uses Firebase UID in development)
+const getUserIdForAPI = async () => {
+  try {
+    // Import Firebase auth
+    const { getAuth } = await import('firebase/auth')
+    
+    const auth = getAuth()
+    const user = auth.currentUser
+    
+    if (!user) {
+      throw new Error('No authenticated user found')
+    }
+    
+    // In development, use Firebase UID directly
+    const isDevelopment = import.meta.env.MODE === 'development'
+    if (isDevelopment) {
+      return user.uid
+    }
+    
+    // In production, try to get Hasura user ID from claims
     try {
-      // Import Firebase auth
-      const { getAuth } = await import('firebase/auth')
-      
-      // Check if Firebase app is initialized
-      let auth
-      try {
-        auth = getAuth()
-      } catch (error) {
-        console.error('Firebase not initialized:', error)
-        throw new Error('Firebase authentication not available')
-      }
-      
-      const user = auth.currentUser
-      
-      if (!user) {
-        throw new Error('No authenticated user found')
-      }
-      
-      // Get the ID token which contains the claims
-      const idToken = await user.getIdToken(true) // Force refresh to get latest claims
-      
-      // Decode the JWT token to get claims
+      const idToken = await user.getIdToken(true)
       const payload = JSON.parse(atob(idToken.split('.')[1]))
-      
-      // Extract Hasura user ID from claims
       const hasuraClaims = payload['https://hasura.io/jwt/claims']
+      
       if (hasuraClaims && hasuraClaims['x-hasura-user-id']) {
         return hasuraClaims['x-hasura-user-id']
       }
-      
-      // If no claims found and not last attempt, wait and retry
-      if (attempt < maxRetries) {
-        console.log(`Hasura claims not found, waiting for attempt ${attempt + 1}`)
-        await new Promise(resolve => setTimeout(resolve, 2000 * attempt))
-        continue
-      }
-      
-      throw new Error('Hasura user ID not found in token claims')
-    } catch (error) {
-      console.error(`Error getting Hasura user ID from token (attempt ${attempt}):`, error)
-      
-      // If not last attempt, wait and retry
-      if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, 2000 * attempt))
-        continue
-      }
-      
-      throw error
+    } catch (claimsError) {
+      console.warn('Could not get Hasura claims, falling back to Firebase UID:', claimsError)
     }
+    
+    // Fallback to Firebase UID
+    return user.uid
+  } catch (error) {
+    console.error('Error getting user ID for API:', error)
+    throw error
   }
 }
 
@@ -186,25 +165,14 @@ const fetchOrganizations = async () => {
     // Reset error state
     error.value = null
     
-    // Get Hasura user ID from Firebase JWT token with retry mechanism
-    const userId = await getHasuraUserIdFromToken()
+    // Get user ID for API calls
+    const userId = await getUserIdForAPI()
     
     if (!userId) {
-      // Check if this is a new user without Hasura claims yet
-      const { getAuth } = await import('firebase/auth')
-      const auth = getAuth()
-      const user = auth.currentUser
-      
-      if (user) {
-        // This is likely a new user whose account is being provisioned
-        error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
-        organizations.value = []
-        localStorage.removeItem('cachedOrganizations')
-        loading.value = false
-        return
-      }
-      
-      router.replace('/login')
+      error.value = 'Authentication error. Please try logging in again.'
+      organizations.value = []
+      localStorage.removeItem('cachedOrganizations')
+      loading.value = false
       return
     }
     
@@ -217,8 +185,6 @@ const fetchOrganizations = async () => {
     // Import and use the new fetchUserOrganizations function
     const { fetchUserOrganizations } = await import('@/api/IndusDashboardAuthService')
     const organizationUsers = await fetchUserOrganizations(userId)
-    
-    console.log('Fetched organization users:', organizationUsers.length, organizationUsers)
     
     // Transform the data for display
     if (organizationUsers && organizationUsers.length > 0) {
@@ -260,23 +226,19 @@ const fetchOrganizations = async () => {
     }
   } catch (err) {
     console.error('Error fetching organizations:', err)
-    // Check if this is a JWT claims error
-    if (err.message && err.message.includes('Hasura user ID not found')) {
-      error.value = 'Your account is being set up. This process may take a few moments. Please refresh the page or try again shortly.'
+    
+    if (err.message && err.message.includes('being set up')) {
+      error.value = err.message
+    } else if (err.message && err.message.includes('associated with any organizations')) {
+      error.value = 'You are not associated with any organizations. Please contact your administrator.'
+    } else if (isDevelopment) {
+      error.value = 'Development Mode: Unable to load organizations. This may be due to backend services not running locally.'
     } else {
       error.value = 'Failed to load organizations. Please try again.'
     }
+    
     organizations.value = []
-    // Try to load cached organizations if available
-    const cached = localStorage.getItem('cachedOrganizations')
-    if (cached) {
-      try {
-        organizations.value = JSON.parse(cached)
-        error.value = null // Clear error if we have cached data
-      } catch (e) {
-        console.error('Error parsing cached organizations:', e)
-      }
-    }
+    localStorage.removeItem('cachedOrganizations')
   } finally {
     loading.value = false
   }
@@ -359,6 +321,11 @@ const waitForAuthState = () => {
 }
 
 onMounted(async () => {
+  // Show initial loader for 1 second for smooth transition
+  setTimeout(() => {
+    showInitialLoader.value = false
+  }, 1000)
+  
   // Wait for Firebase auth state to be ready
   const authReady = await waitForAuthState()
   if (!authReady) {

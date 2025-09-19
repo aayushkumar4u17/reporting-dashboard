@@ -12,8 +12,17 @@ export const ROUTES = {
 } as const;
 
 export const API_ENDPOINTS = {
-  AUTH: '/auth',
+  AUTHENTICATION: '/auth',
   DASHBOARD: '/dashboard',
   ORDERS: '/orders',
   INVOICES: '/invoices'
 } as const;
+
+// Environment-based configuration
+export const getConfig = () => ({
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
+  graphqlEndpoint: import.meta.env.VITE_GRAPHQL_ENDPOINT,
+  environment: import.meta.env.VITE_APP_ENVIRONMENT || 'production',
+  isDevelopment: import.meta.env.MODE === 'development',
+  isProduction: import.meta.env.MODE === 'production'
+});

@@ -53,13 +53,13 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api/, ''),
           configure: (proxy, _options) => {
             proxy.on('error', (err, _req, _res) => {
-              console.log('Proxy error for refreshToken:', err.message);
+              console.log('Proxy error for refreshToken:', { hasError: true });
             });
             proxy.on('proxyReq', (proxyReq, req, _res) => {
-              console.log('Sending Request to the Target:', req.method, req.url);
+              console.log('Sending Request to the Target:', { method: req.method, hasUrl: !!req.url });
             });
             proxy.on('proxyRes', (proxyRes, req, _res) => {
-              console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+              console.log('Received Response from the Target:', { statusCode: proxyRes.statusCode, hasUrl: !!req.url });
             });
           },
         },

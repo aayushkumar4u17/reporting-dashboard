@@ -57,13 +57,13 @@
               <th class="header-cell checkbox-column">
                 <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="header-checkbox" />
               </th>
-              <!-- <th class="header-cell">Check BN</th> -->
+              <th class="header-cell">Check BN</th>
               <th class="header-cell">Asp Order No</th>
               <th class="header-cell">Sales Order Code</th>
-              <th class="header-cell">Ordered Date</th>
+              <th class="header-cell">Order Date</th>
               <th class="header-cell">Delivery Date</th>
-              <th class="header-cell">Delivery Time/Slot</th>
-              <th class="header-cell">Ordered Quantity</th>
+              <th class="header-cell">Delivery Time</th>
+              <th class="header-cell">Order Quantity</th>
               <th class="header-cell">Delivery Location</th>
               <th class="header-cell">POC Name</th>
               <th class="header-cell">POC Contact</th>
@@ -112,6 +112,11 @@
             </tr>
           </tbody>
         </table>
+        
+        <!-- No data message -->
+        <div v-if="!loading && filteredOrders.length === 0" class="no-data-message">
+          No data found
+        </div>
       </div>
     </div>
   </div>
@@ -143,7 +148,7 @@ const orders = ref([])
 const filteredOrders = computed(() => {
   return orders.value.filter(order => {
     const cityMatch = !selectedCity.value || order.city === selectedCity.value
-    const pocMatch = !selectedPOC.value || order.poc === selectedPOC.value
+    const pocMatch = !selectedPOC.value || `${order.pocName}`.includes(selectedPOC.value)
     // Add date filtering logic here when implementing actual date filtering
     return cityMatch && pocMatch
   })
@@ -191,29 +196,48 @@ const pointOfContactStore = usePointOfContactStore()
 
 const loadData = async () => {
   try {
-    const userId = pointOfContactStore.selectedUserId
+    let userId = pointOfContactStore.selectedUserId
+    
+    // If store is empty, try to refresh from localStorage
+    if (!userId) {
+      pointOfContactStore.refreshFromStorage()
+      userId = pointOfContactStore.selectedUserId
+    }
+    
     if (!userId) return
     
     // Build filter payload
     const filterPayload = buildFilterPayload(userId)
     
     const reportData = await fetchPointOfContactDetailedReport(userId, filterPayload)
-    orders.value = reportData.map((item, index) => ({
-      id: index + 1,
-      checkBN: item.erp_order_code || '',
-      aspOrderNo: item.app_order_code || '',
-      salesOrderCode: item.erp_order_code || '',
-      orderedDate: item.order_date || '',
-      deliveryDate: item.actual_delivery_date || '',
-      deliveryTimeSlot: item.delivery_slot || '',
-      orderedQuantity: `${item.order_qty || 0} Ltr`,
-      deliveryLocation: item.shipping_address || '',
-      pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
-      pocContact: item.phone_number || '',
-      deliveryStatus: item.backend_order_status || '',
-      city: item.city || '',
-      selected: false
-    }))
+    orders.value = reportData.map((item, index) => {
+      // Extract order date value if it exists
+      let orderDate = ''
+      if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
+        orderDate = item.order_date.value
+      } else if (typeof item.order_date === 'string') {
+        orderDate = item.order_date
+      }
+      
+      return {
+        id: index + 1,
+        checkBN: item.erp_order_code || '',
+        aspOrderNo: item.app_order_code || '',
+        salesOrderCode: item.erp_order_code || '',
+        orderedDate: orderDate,
+        deliveryDate: item.actual_delivery_date || '',
+        deliveryTimeSlot: item.delivery_slot || '',
+        orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
+        deliveryLocation: item.city || '',
+        pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
+        pocContact: item.phone_number || '',
+        deliveryStatus: item.backend_order_status || '',
+        city: item.city || '',
+        selected: false,
+        // Additional fields for filtering
+        shippingAddress: item.shipping_address || ''
+      }
+    })
   } catch (error) {
     console.error('Error loading orders:', error)
   } finally {

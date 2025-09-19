@@ -3,6 +3,7 @@ query fetchUserOrganizations($user_id: uuid!) {
     where: {
       user_id: { _eq: $user_id }
       is_active: { _eq: true }
+      is_owner: { _eq: true }
       organization_user_type: { _eq: "DELIVERY" }
     }
   ) {

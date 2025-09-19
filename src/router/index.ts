@@ -58,6 +58,11 @@ const router = createRouter({
 let cachedAuthState: { isLoggedIn: boolean; timestamp: number } | null = null
 const AUTH_CACHE_DURATION = 3000
 
+// Function to clear router auth cache
+export const clearRouterAuthCache = () => {
+  cachedAuthState = null
+}
+
 // Enhanced auth state waiting with better handling for page refreshes
 const waitForAuthState = (): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -84,9 +89,9 @@ const waitForAuthState = (): Promise<boolean> => {
       if (attempts < maxAttempts) {
         setTimeout(checkAuth, authCheckInterval)
       } else {
-        // Even if we've exhausted attempts, check localStorage as fallback
-        const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true'
-        const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true'
+        // Even if we've exhausted attempts, check sessionStorage as fallback
+        const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true'
+        const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true'
         resolve(hasReportingFlag && hasIndusFlag)
       }
     }
@@ -97,6 +102,8 @@ const waitForAuthState = (): Promise<boolean> => {
 
 router.beforeEach(async (to, _from) => {
   if (to.path === '/' || to.path === '/login') {
+    // Clear cache when going to login page
+    cachedAuthState = null
     return true;
   }
   
@@ -113,9 +120,9 @@ router.beforeEach(async (to, _from) => {
     if (hasFirebaseUser) {
       isLoggedIn = canAccessIndusDashboard();
     } else {
-      // Check localStorage as a fallback for page refresh scenarios
-      const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true';
-      const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true';
+      // Check sessionStorage as a fallback for page refresh scenarios
+      const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true';
+      const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true';
       isLoggedIn = hasReportingFlag && hasIndusFlag;
     }
     

@@ -40,9 +40,9 @@ const checkAuthentication = async () => {
   isCheckingAuth = true
   
   try {
-    // First check localStorage flags as a quick validation
-    const hasReportingFlag = localStorage.getItem('isLoggedInReportingDashboard') === 'true'
-    const hasIndusFlag = localStorage.getItem('isLoggedInIndusDashboard') === 'true'
+    // First check sessionStorage flags as a quick validation
+    const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true'
+    const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true'
     
     // If flags are not set, definitely not authenticated
     if (!hasReportingFlag || !hasIndusFlag) {

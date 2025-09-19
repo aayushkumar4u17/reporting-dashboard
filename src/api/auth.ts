@@ -6,7 +6,8 @@ import {
 import { useAuthStore, useUserStore } from "@/stores";
 import { auth } from "@/config/firebase";
 import { validateIndusDashboardUser } from "./IndusDashboardAuthService";
-import { setReportingLoginState, clearLoginState, setIndusDashboardLoginState } from "@/utils/auth";
+import { setReportingLoginState, clearLoginState, setIndusDashboardLoginState, invalidateAuthCache } from "@/utils/auth";
+import { clearRouterAuthCache } from "@/router";
 
 export const startTimer = () => {
   const authStore = useAuthStore();
@@ -67,7 +68,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     };
     
     cleanup();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     let recaptchaContainer: HTMLElement;
     
@@ -81,7 +82,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       }
       
       document.body.appendChild(recaptchaContainer);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const containerCheck = document.getElementById("recaptcha-container");
       if (!containerCheck) {
@@ -104,13 +105,13 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
             console.log('reCAPTCHA solved:', !!response);
           },
           "error-callback": (error: any) => {
-            console.error('reCAPTCHA error callback:', error);
+            console.error('reCAPTCHA error callback:', { hasError: true });
           },
         }
       );
       
     } catch (verifierError) {
-      console.error('Failed to create reCAPTCHA verifier:', verifierError);
+      console.error('Failed to create reCAPTCHA verifier:', { hasError: true });
       cleanup();
       throw new Error("Failed to initialize reCAPTCHA verifier. Please try again.");
     }
@@ -120,13 +121,13 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
       
     } catch (otpError) {
-      console.error('Failed to send OTP:', otpError);
+      console.error('Failed to send OTP:', { code: otpError?.code, message: 'OTP sending failed' });
       
       // Clean up verifier on error
       try {
         recaptchaVerifier.clear();
       } catch (clearError) {
-        console.warn('Error clearing reCAPTCHA verifier:', clearError);
+        console.warn('Error clearing reCAPTCHA verifier:', { hasError: true });
       }
       
       cleanup();
@@ -147,7 +148,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     }, 2000);
 
   } catch (err: any) {
-    console.error('sendOTP error:', err);
+    console.error('sendOTP error:', { code: err?.code, message: 'OTP process failed' });
     
     authStore.toggleOTPVerificationModal && authStore.toggleOTPVerificationModal(false);
 
@@ -293,34 +294,8 @@ export const verifyOTP = async ({ otp, confirmationResult }: { otp: string; conf
 
     return { success: false, error: "No user found" };
   } catch (error: any) {
-    if (error.code === "auth/invalid-verification-code") {
-      authStore.showErrorPopup({
-        title: "Invalid OTP",
-        message: "The OTP you entered is incorrect. Please try again.",
-        showRetry: true,
-      });
-    } else if (error.code === "auth/code-expired") {
-      authStore.showErrorPopup({
-        title: "OTP Expired",
-        message: "The OTP has expired. Please request a new code.",
-        showRetry: true,
-      });
-    } else if (error.code === "auth/too-many-requests") {
-      authStore.showErrorPopup({
-        title: "Too Many Attempts",
-        message:
-          "Too many unsuccessful attempts. Please wait before trying again.",
-        showRetry: false,
-      });
-    } else {
-      authStore.showErrorPopup({
-        title: "Authentication Failed",
-        message: "Authentication failed. Please try again.",
-        showRetry: true,
-      });
-    }
-
-    return { success: false, error: error.message };
+    // Don't show error popup here - let the component handle it
+    return { success: false, error: error.message, errorCode: error.code };
   }
 };
 
@@ -330,6 +305,17 @@ export const signOutUser = async (callback?: () => void): Promise<void> => {
 
   try {
     await signOut(auth);
+    
+    // Wait for Firebase to fully sign out
+    await new Promise(resolve => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        if (!user) {
+          unsubscribe();
+          resolve(void 0);
+        }
+      });
+    });
+    
     userStore.clearUser();
 
     if (authStore.hideErrorPopup) authStore.hideErrorPopup();
@@ -341,17 +327,28 @@ export const signOutUser = async (callback?: () => void): Promise<void> => {
     localStorage.removeItem("firebaseUserId");
     localStorage.removeItem("userOrganizationId");
     localStorage.removeItem("userOrganizationName");
+    localStorage.removeItem("selectedOrganization");
+    localStorage.removeItem("cachedOrganizations");
     clearLoginState();
+    invalidateAuthCache();
+    clearRouterAuthCache();
 
     if (callback && typeof callback === "function") {
       callback();
     }
+    
+    // Force page refresh to clear all cached state
+    window.location.reload();
   } catch (error: any) {
     clearLoginState();
+    invalidateAuthCache();
     userStore.clearUser();
     localStorage.removeItem("firebaseUserId");
     localStorage.removeItem("userOrganizationId");
     localStorage.removeItem("userOrganizationName");
+    localStorage.removeItem("selectedOrganization");
+    localStorage.removeItem("cachedOrganizations");
+    clearRouterAuthCache();
 
     if (callback && typeof callback === "function") {
       callback();

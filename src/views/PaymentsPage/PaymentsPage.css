@@ -121,7 +121,8 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   transform: translateY(20px);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .table-container.animate-fade-in-up {
@@ -170,6 +171,13 @@
   padding: 0.6rem 0.2rem;
 }
 
+.payments-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #00C851;
+  vertical-align: middle;
+}
+
 .payments-table tbody tr:hover {
   background-color: #f8f9fa;
 }
@@ -204,6 +212,16 @@
 .status-default {
   background: #e2e3e5;
   color: #383d41;
+}
+
+.status-allowed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-not-allowed {
+  background: #f8d7da;
+  color: #721c24;
 }
 
 /* Summary Section */
@@ -287,6 +305,15 @@
   border-radius: 4px;
 }
 
+/* No Data Message Styles */
+.no-data-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .action-buttons {
   display: flex;
   gap: 12px; /* Adjust spacing between buttons */
@@ -315,5 +342,68 @@
 
   .summary-cards {
     grid-template-columns: 1fr;
+  }
+  
+  .payments-table th,
+  .payments-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .payments-table th.checkbox-column,
+  .payments-table td.checkbox-column {
+    padding: 0.5rem 0.25rem;
+    vertical-align: middle;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-section {
+    padding: 0.75rem;
+  }
+
+  .filter-group label {
+    font-size: 0.8rem;
+  }
+
+  .filter-select {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .filter-actions {
+    gap: 0.5rem;
+  }
+
+  .download-section {
+    gap: 8px;
+  }
+
+  .summary-cards {
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 0.75rem;
+  }
+
+  .card-header {
+    font-size: 0.7rem;
+  }
+
+  .card-value {
+    font-size: 1rem;
+  }
+  
+  .payments-table th,
+  .payments-table td {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.65rem;
+  }
+  
+  .payments-table th.checkbox-column,
+  .payments-table td.checkbox-column {
+    padding: 0.4rem 0.2rem;
+    vertical-align: middle;
   }
 }

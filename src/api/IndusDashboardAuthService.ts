@@ -56,7 +56,6 @@ export interface ValidationResult {
 const refreshTokenWithRetry = async (uid: string, maxAttempts: number = 3): Promise<boolean> => {
   // In development, skip token refresh as the endpoint may not be available
   if (isDevelopment) {
-    console.log('Development mode: skipping token refresh');
     return false;
   }
   
@@ -77,7 +76,6 @@ const refreshTokenWithRetry = async (uid: string, maxAttempts: number = 3): Prom
       
       await response.json(); // We don't need to use the data, just check if the request was successful
       
-      console.log(`Token refresh successful on attempt ${attempt}`);
       return true;
     } catch (error: any) {
       console.warn(`Token refresh attempt ${attempt} failed:`, {
@@ -151,7 +149,6 @@ const waitForHasuraClaims = async (userId: string, maxAttempts: number = 5): Pro
       const hasuraUserId = await checkHasuraUserId();
       
       if (hasuraUserId && typeof hasuraUserId === 'string') {
-        console.log(`Hasura claims found on attempt ${attempt}`);
         return hasuraUserId;
       }
       
@@ -159,7 +156,6 @@ const waitForHasuraClaims = async (userId: string, maxAttempts: number = 5): Pro
       if (attempt < maxAttempts) {
         if (isDevelopment) {
           // In development, skip token refresh and just wait
-          console.log(`Development mode: waiting for claims without refresh on attempt ${attempt}`);
           await new Promise(resolve => setTimeout(resolve, 3000));
           
           // Force refresh the token locally to check for claims
@@ -180,7 +176,6 @@ const waitForHasuraClaims = async (userId: string, maxAttempts: number = 5): Pro
             if (refreshed) {
               // Wait a bit for the claims to propagate
               const waitTime = Math.min(3000 + (attempt * 1000), 5000);
-              console.log(`Waiting ${waitTime}ms for claims to propagate after refresh...`);
               await new Promise(resolve => setTimeout(resolve, waitTime));
               
               // Force refresh the token locally
@@ -231,30 +226,20 @@ export const validateIndusDashboardUser = async (userId: string): Promise<Valida
     
     if (hasuraUserId && typeof hasuraUserId === 'string') {
       hasuraUserIdString = hasuraUserId;
-      console.log('Found existing Hasura claims');
     }
     
     // Step 2: If no claims, wait for them to be added (but don't fail immediately)
     if (!hasuraUserIdString) {
-      console.log('No Hasura claims found, attempting to get them...');
-      
-      // In development, provide a more helpful message
+      // In development, provide a more helpful message and allow bypass
       if (isDevelopment) {
-        console.warn('Development environment: Hasura claims not available');
-        return {
-          success: false,
-          error: 'Development Environment: Backend services are starting up. Please wait a moment and try logging in again.',
-          errorCode: 'AUTH_ERROR'
-        };
+        // For development, we can use the Firebase UID as a fallback
+        hasuraUserIdString = userId;
       }
       
       // In production, try to get claims
       hasuraUserIdString = await waitForHasuraClaims(userId);
       
       if (!hasuraUserIdString) {
-        // Don't fail immediately - provide specific messaging about configuration
-        console.warn('Hasura claims not available after waiting - user may need setup');
-        
         return {
           success: false,
           error: 'Account permissions not yet configured. Please contact support or try again later.',
@@ -265,7 +250,6 @@ export const validateIndusDashboardUser = async (userId: string): Promise<Valida
 
     // Step 3: Use JWT-authenticated GraphQL client for user validation
     try {
-      console.log('Validating user with Hasura user ID:', hasuraUserIdString);
       const graphqlClient = await client();
       
       // Use the SDK method instead of generic request
@@ -326,7 +310,6 @@ export const validateIndusDashboardUser = async (userId: string): Promise<Valida
         };
       }
 
-      console.log('User validation successful');
       return {
         success: true,
         data: organizationUser
@@ -451,10 +434,14 @@ export const fetchUserOrganizations = async (userId: string) => {
     }
     
     if (!hasuraUserIdString) {
-      hasuraUserIdString = await waitForHasuraClaims(userId);
-      
-      if (!hasuraUserIdString) {
-        throw new Error('Account permissions are being configured. Please try again in a few moments.');
+      if (isDevelopment) {
+        hasuraUserIdString = userId;
+      } else {
+        hasuraUserIdString = await waitForHasuraClaims(userId);
+        
+        if (!hasuraUserIdString) {
+          throw new Error('Account permissions are being configured. Please try again in a few moments.');
+        }
       }
     }
 
@@ -466,9 +453,11 @@ export const fetchUserOrganizations = async (userId: string) => {
 
     const allOrganizations = result.organization_user || [];
     
-    // Filter only by organization_user_type = DELIVERY
+    // Filter by organization_user_type = DELIVERY, is_active = true, and is_owner = true
     const filteredOrganizations = allOrganizations.filter(orgUser => {
-      return orgUser.organization_user_type === 'DELIVERY';
+      return orgUser.organization_user_type === 'DELIVERY' && 
+             orgUser.is_active === true && 
+             orgUser.is_owner === true;
     });
     
     return filteredOrganizations;

@@ -81,7 +81,11 @@
       </div>
       
       <div class="otp-popup-content">
-        <p class="otp-info">We've sent a 6-digit code to +91 {{ phoneNumber }}</p>
+        <div v-if="isLoading" class="otp-sending-status">
+          <div class="loading-spinner"></div>
+          <p>Sending OTP to +91 {{ phoneNumber }}...</p>
+        </div>
+        <p v-else class="otp-info">We've sent a 6-digit code to +91 {{ phoneNumber }}</p>
         
         <div class="otp-input-container" :class="{ 'focused': isOtpFocused }">
           <input 
@@ -213,20 +217,22 @@ onMounted(() => {
   // Show the page immediately
   isLoaded.value = true;
   
-  // Setup reCAPTCHA early
+  // Setup reCAPTCHA early and preload container
   setupRecaptcha();
   
-  // Check authentication in background without blocking UI
+  // Preload recaptcha container for faster OTP sending
   setTimeout(() => {
-    const getCurrentUser = () => Promise.resolve(auth.currentUser);
-    getCurrentUser().then((user: any) => {
-      if (user) {
-        router.replace('/select-user');
-      }
-    }).catch(() => {
-      // Ignore errors - user can still use login page
-    });
-  }, 0);
+    try {
+      const preloadContainer = document.createElement("div");
+      preloadContainer.id = "recaptcha-preload";
+      preloadContainer.style.cssText = 'display: none !important; visibility: hidden !important; position: absolute; top: -9999px; left: -9999px;';
+      document.body.appendChild(preloadContainer);
+    } catch (e) {
+      // Ignore preload errors
+    }
+  }, 1000);
+  
+  // Remove automatic redirect check to prevent navigation loops
 })
 
 onUnmounted(() => {
@@ -234,6 +240,9 @@ onUnmounted(() => {
     clearInterval(resendInterval)
     resendInterval = null
   }
+  
+  // Clean up reCAPTCHA on unmount
+  setupRecaptcha()
 })
 
 // Watch for confirmation result from auth store
@@ -242,14 +251,12 @@ watch(
   (confirmationResult) => {
     if (confirmationResult) {
       isLoading.value = false
-      otpSent.value = true
-      startResendTimer()
-      // Auto-focus OTP input after popup appears
+      // OTP popup is already shown, just ensure focus
       setTimeout(() => {
         if (otpInputRef.value) {
           otpInputRef.value.focus()
         }
-      }, 300)
+      }, 50)
     }
   }
 )
@@ -257,15 +264,36 @@ watch(
 const sendOTPHandler = async () => {
   if (isPhoneNumberValid.value && isAgreed.value) {
     isLoading.value = true
-    setupRecaptcha()
+    
+    // Show OTP popup immediately for better UX
+    otpSent.value = true
+    startResendTimer()
+    
+    // Focus OTP input immediately
+    setTimeout(() => {
+      if (otpInputRef.value) {
+        otpInputRef.value.focus()
+      }
+    }, 100)
     
     try {
+      // Setup recaptcha and send OTP in background
+      setupRecaptcha()
       await sendOTPAction(`+91${phoneNumber.value}`, (confirmationResult) => {
         authStore.setLoginConfirmationResult(confirmationResult)
       })
       startTimer()
-    } catch (error: unknown) {
       isLoading.value = false
+    } catch (error: unknown) {
+      // Hide popup and reset on error
+      otpSent.value = false
+      isLoading.value = false
+      
+      if (resendInterval !== null) {
+        clearInterval(resendInterval)
+        resendInterval = null
+      }
+      resendTimer.value = 0
       
       if (error && typeof error === 'object' && 'message' in error && error.message === 'Unauthorized user') {
         authStore.showErrorPopup({
@@ -295,15 +323,29 @@ const verifyOTPHandler = async () => {
       })
       
       if (result.success) {
-        // Redirect to dashboard on successful verification
-        router.push('/select-user')
+        // Small delay to ensure sessionStorage is properly set
+        setTimeout(() => {
+          router.push('/select-user')
+        }, 100)
       } else {
         // Clear OTP on failure and show error
         otpCode.value = ''
         isVerifying.value = false
         
-        // For access denied errors, the verifyOTPAction will handle the redirect
-        if (result.errorCode !== 'USER_NOT_FOUND' && result.errorCode !== 'AUTH_ERROR') {
+        // Handle specific error codes
+        if (result.errorCode === 'auth/invalid-verification-code') {
+          authStore.showErrorPopup({
+            title: 'Invalid OTP',
+            message: 'Invalid OTP. Please try again.',
+            showRetry: true
+          })
+        } else if (result.errorCode === 'auth/code-expired') {
+          authStore.showErrorPopup({
+            title: 'OTP Expired',
+            message: 'The OTP has expired. Please request a new one.',
+            showRetry: true
+          })
+        } else if (result.errorCode !== 'USER_NOT_FOUND' && result.errorCode !== 'AUTH_ERROR') {
           authStore.showErrorPopup({
             title: 'Verification Failed',
             message: result.error || 'OTP verification failed. Please try again.',
@@ -320,8 +362,8 @@ const verifyOTPHandler = async () => {
       if (error && typeof error === 'object' && 'code' in error) {
         if (error.code === 'auth/invalid-verification-code') {
           authStore.showErrorPopup({
-            title: 'Invalid OTP',
-            message: 'The OTP you entered is incorrect. Please try again.',
+            title: 'Incorrect OTP',
+            message: 'Incorrect OTP. Please try again.',
             showRetry: true
           })
         } else if (error.code === 'auth/code-expired') {

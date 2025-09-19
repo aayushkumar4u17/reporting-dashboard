@@ -396,21 +396,22 @@ export type PayThroughWalletOutput = {
 export type PointOfContactDashboardData = {
   __typename?: 'PointOfContactDashboardData';
   cancelled_count?: Maybe<Scalars['Int']>;
-  cancelled_qty?: Maybe<Scalars['Float']>;
+  cancelled_qty?: Maybe<Scalars['Int']>;
   delivered_orders?: Maybe<Scalars['Int']>;
-  delivered_qty?: Maybe<Scalars['Float']>;
+  delivered_qty?: Maybe<Scalars['Int']>;
   order_count?: Maybe<Scalars['Int']>;
-  ordered_qty?: Maybe<Scalars['Float']>;
+  ordered_qty?: Maybe<Scalars['Int']>;
   planned_orders?: Maybe<Scalars['Int']>;
-  planned_qty?: Maybe<Scalars['Float']>;
+  planned_qty?: Maybe<Scalars['Int']>;
   rescheduled_count?: Maybe<Scalars['Int']>;
-  rescheduled_qty?: Maybe<Scalars['Float']>;
+  rescheduled_qty?: Maybe<Scalars['Int']>;
 };
 
 export type PointOfContactDashboardInput = {
   cities?: InputMaybe<Array<Scalars['String']>>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
+  org_user_id?: InputMaybe<Array<Scalars['String']>>;
   point_of_contact?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -443,6 +444,7 @@ export type PointOfContactDetailedReportInput = {
   cities?: InputMaybe<Array<Scalars['String']>>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
+  org_user_id?: InputMaybe<Array<Scalars['String']>>;
   point_of_contact?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -472,6 +474,7 @@ export type PointOfContactInvoiceReportInput = {
   cities?: InputMaybe<Array<Scalars['String']>>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
+  org_user_id?: InputMaybe<Array<Scalars['String']>>;
   point_of_contact?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -498,6 +501,7 @@ export type PointOfContactPaymentReportInput = {
   cities?: InputMaybe<Array<Scalars['String']>>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
+  org_user_id?: InputMaybe<Array<Scalars['String']>>;
   point_of_contact?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -130017,11 +130021,32 @@ export type FetchUserOrganizationsQueryVariables = Exact<{
 export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 export type PointOfContactDashboardQueryVariables = Exact<{
-  organizationUserId: Scalars['String'];
+  object: PointOfContactDashboardInput;
 }>;
 
 
 export type PointOfContactDashboardQuery = { __typename?: 'query_root', pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, delivered_qty?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null, rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null };
+
+export type PointOfContactDetailedReportQueryVariables = Exact<{
+  object: PointOfContactDetailedReportInput;
+}>;
+
+
+export type PointOfContactDetailedReportQuery = { __typename?: 'query_root', pointOfContactDetailedReport?: { __typename?: 'PointOfContactDetailedReportOutput', data: Array<{ __typename?: 'PointOfContactDetailedReportData', erp_order_code?: string | null, app_order_code?: string | null, order_date?: string | null, delivery_slot?: string | null, order_qty?: number | null, erp_order_status?: string | null, backend_order_status?: string | null, customer_name?: string | null, actual_delivery_date?: string | null, shipping_address?: string | null, city?: string | null, first_name?: string | null, last_name?: string | null, phone_number?: string | null, order_delivered_qty?: number | null, order_amount?: number | null }> } | null };
+
+export type PointOfContactInvoiceReportQueryVariables = Exact<{
+  object: PointOfContactInvoiceReportInput;
+}>;
+
+
+export type PointOfContactInvoiceReportQuery = { __typename?: 'query_root', pointOfContactInvoiceReport?: { __typename?: 'PointOfContactInvoiceReportOutput', data: Array<{ __typename?: 'PointOfContactInvoiceReportData', erp_order_code?: string | null, invoice?: string | null, delivered_date?: string | null, app_order_code?: string | null, order_date?: string | null, order_qty?: number | null, order_delivered_qty?: number | null, order_amount?: number | null, shipping_address?: string | null, city?: string | null, first_name?: string | null, last_name?: string | null, phone_number?: string | null }> } | null };
+
+export type PointOfContactPaymentReportQueryVariables = Exact<{
+  object: PointOfContactPaymentReportInput;
+}>;
+
+
+export type PointOfContactPaymentReportQuery = { __typename?: 'query_root', pointOfContactPaymentReport?: { __typename?: 'PointOfContactPaymentReportOutput', data: Array<{ __typename?: 'PointOfContactPaymentReportData', allowed_credit_breach?: string | null, credit_limit?: number | null, customer_id?: string | null, customer_name?: string | null, first_name?: string | null, last_name?: string | null, outstanding_amount?: number | null, overdue_amount?: number | null, payment_terms?: number | null, phone_number?: string | null }> } | null };
 
 export type ValidateIndusDashboardUserQueryVariables = Exact<{
   user_id: Scalars['uuid'];
@@ -130034,7 +130059,7 @@ export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organ
 export const FetchUserOrganizationsDocument = gql`
     query fetchUserOrganizations($user_id: uuid!) {
   organization_user(
-    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}}
+    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, is_owner: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}}
   ) {
     id
     user_id
@@ -130065,8 +130090,8 @@ export function useFetchUserOrganizationsQuery(options: Omit<Urql.UseQueryArgs<n
   return Urql.useQuery<FetchUserOrganizationsQuery>({ query: FetchUserOrganizationsDocument, ...options });
 };
 export const PointOfContactDashboardDocument = gql`
-    query PointOfContactDashboard($organizationUserId: String!) {
-  pointOfContactDashboard(object: {point_of_contact: [$organizationUserId]}) {
+    query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
+  pointOfContactDashboard(object: $object) {
     data {
       cancelled_count
       cancelled_qty
@@ -130085,6 +130110,81 @@ export const PointOfContactDashboardDocument = gql`
 
 export function usePointOfContactDashboardQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactDashboardQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<PointOfContactDashboardQuery>({ query: PointOfContactDashboardDocument, ...options });
+};
+export const PointOfContactDetailedReportDocument = gql`
+    query PointOfContactDetailedReport($object: PointOfContactDetailedReportInput!) {
+  pointOfContactDetailedReport(object: $object) {
+    data {
+      erp_order_code
+      app_order_code
+      order_date
+      delivery_slot
+      order_qty
+      erp_order_status
+      backend_order_status
+      customer_name
+      actual_delivery_date
+      shipping_address
+      city
+      first_name
+      last_name
+      phone_number
+      order_delivered_qty
+      order_amount
+    }
+  }
+}
+    `;
+
+export function usePointOfContactDetailedReportQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactDetailedReportQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactDetailedReportQuery>({ query: PointOfContactDetailedReportDocument, ...options });
+};
+export const PointOfContactInvoiceReportDocument = gql`
+    query PointOfContactInvoiceReport($object: PointOfContactInvoiceReportInput!) {
+  pointOfContactInvoiceReport(object: $object) {
+    data {
+      erp_order_code
+      invoice
+      delivered_date
+      app_order_code
+      order_date
+      order_qty
+      order_delivered_qty
+      order_amount
+      shipping_address
+      city
+      first_name
+      last_name
+      phone_number
+    }
+  }
+}
+    `;
+
+export function usePointOfContactInvoiceReportQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactInvoiceReportQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactInvoiceReportQuery>({ query: PointOfContactInvoiceReportDocument, ...options });
+};
+export const PointOfContactPaymentReportDocument = gql`
+    query PointOfContactPaymentReport($object: PointOfContactPaymentReportInput!) {
+  pointOfContactPaymentReport(object: $object) {
+    data {
+      allowed_credit_breach
+      credit_limit
+      customer_id
+      customer_name
+      first_name
+      last_name
+      outstanding_amount
+      overdue_amount
+      payment_terms
+      phone_number
+    }
+  }
+}
+    `;
+
+export function usePointOfContactPaymentReportQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactPaymentReportQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactPaymentReportQuery>({ query: PointOfContactPaymentReportDocument, ...options });
 };
 export const ValidateIndusDashboardUserDocument = gql`
     query validateIndusDashboardUser($user_id: uuid!) {

@@ -1,0 +1,16 @@
+query PointOfContactPaymentReport($object: PointOfContactPaymentReportInput!) {
+  pointOfContactPaymentReport(object: $object) {
+    data {
+      allowed_credit_breach
+      credit_limit
+      customer_id
+      customer_name
+      first_name
+      last_name
+      outstanding_amount
+      overdue_amount
+      payment_terms
+      phone_number
+    }
+  }
+}

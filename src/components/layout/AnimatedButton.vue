@@ -9,7 +9,15 @@
     :disabled="disabled || loading"
     @click="handleClick"
   >
-    <span v-if="loading" class="loading-spinner"></span>
+    <div v-if="loading" class="modern-loader">
+      <div class="loader-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
     <span :class="{ 'btn-content': loading }">
       <slot></slot>
     </span>
@@ -190,21 +198,49 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .btn-content {
-  opacity: 0.7;
+  opacity: 0;
 }
 
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
+.modern-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.loader-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: currentColor;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: dotPulse 1.4s ease-in-out infinite both;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.dot:nth-child(1) { animation-delay: -0.4s; }
+.dot:nth-child(2) { animation-delay: -0.3s; }
+.dot:nth-child(3) { animation-delay: -0.2s; }
+.dot:nth-child(4) { animation-delay: -0.1s; }
+.dot:nth-child(5) { animation-delay: 0s; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive */

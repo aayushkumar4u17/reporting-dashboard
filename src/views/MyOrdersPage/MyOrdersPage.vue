@@ -29,6 +29,9 @@
           <label class="filter-label">City</label>
           <select v-model="selectedCity" class="filter-select">
             <option value="">Select City</option>
+            <option v-for="city in uniqueCities" :key="city" :value="city">
+              {{ city }}
+            </option>
           </select>
         </div>
         
@@ -36,6 +39,9 @@
           <label class="filter-label">Point of Contact</label>
           <select v-model="selectedPOC" class="filter-select">
             <option value="">Select POC</option>
+            <option v-for="poc in uniquePOCs" :key="poc" :value="poc">
+              {{ poc }}
+            </option>
           </select>
         </div>
         
@@ -143,16 +149,21 @@ const selectAll = ref(false)
 
 // Orders data
 const orders = ref([])
+const allOrdersData = ref([]) // Store initial data for filter options
 
-// Computed property for filtered orders
-const filteredOrders = computed(() => {
-  return orders.value.filter(order => {
-    const cityMatch = !selectedCity.value || order.city === selectedCity.value
-    const pocMatch = !selectedPOC.value || `${order.pocName}`.includes(selectedPOC.value)
-    // Add date filtering logic here when implementing actual date filtering
-    return cityMatch && pocMatch
-  })
+// Computed properties for filter options (from initial data)
+const uniqueCities = computed(() => {
+  const cities = allOrdersData.value.map(order => order.city).filter(city => city && city.trim())
+  return [...new Set(cities)].sort()
 })
+
+const uniquePOCs = computed(() => {
+  const pocs = allOrdersData.value.map(order => order.pocName).filter(poc => poc && poc.trim())
+  return [...new Set(pocs)].sort()
+})
+
+// Use orders directly (already filtered from API)
+const filteredOrders = computed(() => orders.value)
 
 const applyFilters = () => {
   // Update filters object with current values
@@ -160,8 +171,8 @@ const applyFilters = () => {
   filters.value.deliveryDate = deliveryDate.value
   filters.value.selectedCity = selectedCity.value
   filters.value.selectedPOC = selectedPOC.value
-  // Apply current filter values
-  loadData()
+  // Load filtered data
+  loadFilteredData()
 }
 
 const clearAllFilters = () => {
@@ -194,11 +205,40 @@ const getStatusClass = (status) => {
 
 const pointOfContactStore = usePointOfContactStore()
 
-const loadData = async () => {
+const mapOrderData = (reportData) => {
+  return reportData.map((item, index) => {
+    // Extract order date value if it exists
+    let orderDate = ''
+    if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
+      orderDate = item.order_date.value
+    } else if (typeof item.order_date === 'string') {
+      orderDate = item.order_date
+    }
+    
+    return {
+      id: index + 1,
+      checkBN: item.erp_order_code || '',
+      aspOrderNo: item.app_order_code || '',
+      salesOrderCode: item.erp_order_code || '',
+      orderedDate: orderDate,
+      deliveryDate: item.actual_delivery_date || '',
+      deliveryTimeSlot: item.delivery_slot || '',
+      orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
+      deliveryLocation: item.city || '',
+      pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
+      pocContact: item.phone_number || '',
+      deliveryStatus: item.backend_order_status || '',
+      city: item.city || '',
+      selected: false,
+      shippingAddress: item.shipping_address || ''
+    }
+  })
+}
+
+const loadInitialData = async () => {
   try {
     let userId = pointOfContactStore.selectedUserId
     
-    // If store is empty, try to refresh from localStorage
     if (!userId) {
       pointOfContactStore.refreshFromStorage()
       userId = pointOfContactStore.selectedUserId
@@ -206,40 +246,35 @@ const loadData = async () => {
     
     if (!userId) return
     
-    // Build filter payload
-    const filterPayload = buildFilterPayload(userId)
+    // Fetch all data without filters for dropdown options
+    const reportData = await fetchPointOfContactDetailedReport(userId, {})
+    allOrdersData.value = mapOrderData(reportData)
+    orders.value = [...allOrdersData.value] // Show all data initially
+  } catch (error) {
+    console.error('Error loading initial data:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadFilteredData = async () => {
+  try {
+    loading.value = true
+    let userId = pointOfContactStore.selectedUserId
+    
+    if (!userId) return
+    
+    // Build filter payload with selected filters
+    const filterPayload = {
+      ...buildFilterPayload(userId),
+      city: selectedCity.value || undefined,
+      poc: selectedPOC.value || undefined
+    }
     
     const reportData = await fetchPointOfContactDetailedReport(userId, filterPayload)
-    orders.value = reportData.map((item, index) => {
-      // Extract order date value if it exists
-      let orderDate = ''
-      if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
-        orderDate = item.order_date.value
-      } else if (typeof item.order_date === 'string') {
-        orderDate = item.order_date
-      }
-      
-      return {
-        id: index + 1,
-        checkBN: item.erp_order_code || '',
-        aspOrderNo: item.app_order_code || '',
-        salesOrderCode: item.erp_order_code || '',
-        orderedDate: orderDate,
-        deliveryDate: item.actual_delivery_date || '',
-        deliveryTimeSlot: item.delivery_slot || '',
-        orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
-        deliveryLocation: item.city || '',
-        pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
-        pocContact: item.phone_number || '',
-        deliveryStatus: item.backend_order_status || '',
-        city: item.city || '',
-        selected: false,
-        // Additional fields for filtering
-        shippingAddress: item.shipping_address || ''
-      }
-    })
+    orders.value = mapOrderData(reportData)
   } catch (error) {
-    console.error('Error loading orders:', error)
+    console.error('Error loading filtered data:', error)
   } finally {
     loading.value = false
   }
@@ -251,8 +286,8 @@ onMounted(() => {
     isLoaded.value = true
   }, 100)
   
-  // Simulate data loading
-  loadData()
+  // Load initial data for filter options and table
+  loadInitialData()
 })
 </script>
 

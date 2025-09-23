@@ -1,0 +1,30 @@
+default:
+  image: node:20
+
+stages:
+  - deploy
+variables:
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 10
+  KUBERNETES_CPU_REQUEST: "1000m"
+  KUBERNETES_CPU_LIMIT: "2000m"
+  KUBERNETES_MEMORY_REQUEST: "2G"
+  KUBERNETES_MEMORY_LIMIT: "3G"
+  KUBERNETES_EPHEMERAL_STORAGE_REQUEST: "2G"
+  KUBERNETES_EPHEMERAL_STORAGE_LIMIT: "3G"
+
+deploy_prod:
+  stage: deploy
+  only:
+    - main
+  script:
+    - npm i -g vercel@latest
+    - npm ci
+    - npx vercel@latest pull --yes --environment=production --token=$VERCEL_TOKEN
+    - npx vercel@latest build --token=$VERCEL_TOKEN
+    - npx vercel@latest deploy --prebuilt --token=$VERCEL_TOKEN
+    - PROD_URL=$(npx vercel@latest deploy --prebuilt --token=$VERCEL_TOKEN --scope $MY_TEAM_SLUG)
+    - npx vercel@latest alias set $PROD_URL dashboard.fuelbuddy.in --token=$VERCEL_TOKEN --scope $MY_TEAM_SLUG
+  environment:
+    name: prod
+    url: https://dashboard.fuelbuddy.in

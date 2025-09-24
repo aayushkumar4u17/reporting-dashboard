@@ -4,31 +4,20 @@
       <!-- Filter Bar -->
       <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
         <div class="filter-group">
-          <label class="filter-label">Ordered Date</label>
-          <select v-model="orderedDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-            <option value="last-month">Last Month</option>
-          </select>
+          <label class="filter-label">Order Date</label>
+          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
         </div>
         
         <div class="filter-group">
-          <label class="filter-label">Delivered Date</label>
-          <select v-model="deliveredDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-            <option value="last-month">Last Month</option>
-          </select>
+          <label class="filter-label">Delivery Date</label>
+          <DatePicker v-model="deliveredDate" placeholder="Select Delivery Date" />
         </div>
         
         <div class="filter-group">
           <label class="filter-label">City</label>
           <select v-model="selectedCity" class="filter-select">
             <option value="">Select City</option>
+            <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
           </select>
         </div>
         
@@ -36,6 +25,7 @@
           <label class="filter-label">Point of Contact</label>
           <select v-model="selectedPOC" class="filter-select">
             <option value="">Select POC</option>
+            <option v-for="poc in availablePOCs" :key="poc" :value="poc">{{ poc }}</option>
           </select>
         </div>
         
@@ -46,7 +36,7 @@
           <AnimatedButton @click="clearAllFilters" variant="clear" size="small">
             Clear All Filters
           </AnimatedButton>
-          <AnimatedButton @click="downloadInvoices" variant="success" size="small">
+          <AnimatedButton @click="downloadInvoices" variant="success" size="small" :loading="downloadingBulk">
             Download Invoice
           </AnimatedButton>
         </div>
@@ -127,7 +117,7 @@
               <td class="table-cell">{{ invoice.pocName }}</td>
               <td class="table-cell">{{ invoice.pocContact }}</td>
               <td class="table-cell download-col">
-                <AnimatedButton @click="downloadInvoice(invoice.id)" variant="primary" size="small">
+                <AnimatedButton @click="downloadInvoice(invoice.id)" variant="primary" size="small" :loading="downloadingInvoice === invoice.id">
                   ⬇️
                 </AnimatedButton>
               </td>
@@ -141,6 +131,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Error Popup -->
+    <div v-if="showNoDataPopup" class="popup-overlay" @click="closeErrorPopup">
+      <div class="popup-content" @click.stop>
+        <h3>{{ errorMessage ? 'Error' : 'No Data Found' }}</h3>
+        <p>{{ errorMessage || 'No data available to download' }}</p>
+        <AnimatedButton @click="closeErrorPopup" variant="primary" size="small">
+          OK
+        </AnimatedButton>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -148,6 +149,7 @@
 import { ref, computed, onMounted } from 'vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
+import DatePicker from '@/components/layout/DatePicker.vue'
 import { fetchPointOfContactInvoiceReport } from '@/api/pointOfContactInvoiceReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
@@ -156,6 +158,10 @@ import { generateInvoicesPDF } from '@/utils/pdfGenerator'
 // Animation state
 const isLoaded = ref(false)
 const loading = ref(true)
+const showNoDataPopup = ref(false)
+const errorMessage = ref('')
+const downloadingInvoice = ref(null)
+const downloadingBulk = ref(false)
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
@@ -167,6 +173,8 @@ const selectAll = ref(false)
 
 // Invoices data
 const invoices = ref([])
+const availableCities = ref([])
+const availablePOCs = ref([])
 
 // Computed property for filtered invoices
 const filteredInvoices = computed(() => {
@@ -203,15 +211,63 @@ const toggleSelectAll = () => {
   })
 }
 
-const downloadInvoice = (invoiceId) => {
-  console.log(`Downloading invoice for ID: ${invoiceId}`)
-  // Implement individual invoice download logic
+const downloadInvoice = async (invoiceId) => {
+  try {
+    console.log('Starting PDF download for invoice ID:', invoiceId)
+    downloadingInvoice.value = invoiceId
+    const invoice = invoices.value.find(inv => inv.id === invoiceId)
+    if (!invoice) {
+      console.error('Invoice not found for ID:', invoiceId)
+      errorMessage.value = 'Invoice not found'
+      showNoDataPopup.value = true
+      return
+    }
+    console.log('Invoice data:', invoice)
+    // Generate PDF for single invoice
+    const filename = await generateInvoicesPDF([invoice], false)
+    console.log('PDF generated successfully:', filename)
+  } catch (error) {
+    console.error('Error downloading invoice:', error)
+    errorMessage.value = `Failed to generate PDF: ${error.message}`
+    showNoDataPopup.value = true
+  } finally {
+    downloadingInvoice.value = null
+  }
 }
 
-const downloadInvoices = () => {
-  const selectedInvoices = invoices.value.filter(invoice => invoice.selected)
-  const hasSelection = selectedInvoices.length > 0
-  generateInvoicesPDF(invoices.value, hasSelection)
+const downloadInvoices = async () => {
+  try {
+    console.log('Starting bulk PDF download')
+    downloadingBulk.value = true
+    if (filteredInvoices.value.length === 0) {
+      console.log('No filtered invoices available')
+      errorMessage.value = 'No data available to download'
+      showNoDataPopup.value = true
+      return
+    }
+    const selectedInvoices = invoices.value.filter(invoice => invoice.selected)
+    const hasSelection = selectedInvoices.length > 0
+    
+    // Use selected invoices if any are selected, otherwise use all filtered invoices
+    const invoicesToDownload = hasSelection ? selectedInvoices : filteredInvoices.value
+    
+    console.log('Invoices to download:', invoicesToDownload.length, 'invoices')
+    
+    if (invoicesToDownload.length === 0) {
+      errorMessage.value = 'No invoices selected for download'
+      showNoDataPopup.value = true
+      return
+    }
+    
+    const filename = await generateInvoicesPDF(invoicesToDownload, false)
+    console.log('Bulk PDF generated successfully:', filename)
+  } catch (error) {
+    console.error('Error downloading invoices:', error)
+    errorMessage.value = `Failed to generate PDF: ${error.message}`
+    showNoDataPopup.value = true
+  } finally {
+    downloadingBulk.value = false
+  }
 }
 
 const downloadExcel = () => {
@@ -284,11 +340,23 @@ const loadData = async () => {
         selected: false
       }
     })
+    
+    // Extract unique cities and POCs from the data
+    const cities = [...new Set(reportData.map(item => item.city).filter(Boolean))]
+    const pocs = [...new Set(reportData.map(item => `${item.first_name || ''} ${item.last_name || ''}`.trim()).filter(Boolean))]
+    
+    availableCities.value = cities.sort()
+    availablePOCs.value = pocs.sort()
   } catch (error) {
     console.error('Error loading invoices:', error)
   } finally {
     loading.value = false
   }
+}
+
+const closeErrorPopup = () => {
+  showNoDataPopup.value = false
+  errorMessage.value = ''
 }
 
 // Initialize animations on component mount
@@ -305,4 +373,35 @@ onMounted(() => {
 <style scoped>
   /* All CSS has been moved to MyInvoicesPage.css */
   @import './MyInvoicesPage.css';
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 300px;
+  }
+
+  .popup-content h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+  }
+
+  .popup-content p {
+    margin: 0 0 20px 0;
+    color: #666;
+  }
 </style>

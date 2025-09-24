@@ -3,32 +3,24 @@
     <div class="dashboard-container" :class="{ 'fade-in': isLoaded }">
       <!-- Filter Bar -->
       <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
-        <div class="filter-group">
-          <label class="filter-label">Ordered Date</label>
-          <select v-model="orderedDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-          </select>
-        </div>
+        
         
         <div class="filter-group">
-          <label class="filter-label">Delivered Date</label>
-          <select v-model="deliveredDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-          </select>
+          <label class="filter-label">Delivery Date</label>
+          <DatePicker v-model="deliveredDate" placeholder="Select Delivery Date" />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Order Date</label>
+          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
         </div>
         
-        <div class="filter-group">
+        <!-- <div class="filter-group">
           <label class="filter-label">City</label>
           <select v-model="selectedCity" class="filter-select">
             <option value="">Select City</option>
           </select>
-        </div>
+        </div> -->
         
         <div class="filter-actions">
           <AnimatedButton @click="applyFilters" variant="primary" size="small">
@@ -216,6 +208,7 @@ import { useRouter } from 'vue-router'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import ErrorPopup from '@/components/layout/ErrorPopup.vue'
+import DatePicker from '@/components/layout/DatePicker.vue'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { fetchPointOfContactDashboard } from '@/api/pointOfContactDashboard'
 import { useFilters } from '@/composables/useFilters'
@@ -230,6 +223,12 @@ const { filters, clearFilters, buildFilterPayload } = useFilters()
 const orderedDate = ref('')
 const deliveredDate = ref('')
 const selectedCity = ref('')
+
+// Get current date in YYYY-MM-DD format
+const getCurrentDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
 
 // Dashboard data
 const dashboardData = ref({
@@ -254,8 +253,8 @@ const dashboardData = ref({
     quantity: 0
   },
   totalCostSaved: {
-    quantity: '0 Litres',
-    amount: 'Rs. 0'
+    quantity: '0',
+    amount: '0'
   }
 })
 
@@ -270,16 +269,19 @@ const pointOfContactStore = usePointOfContactStore()
 
 const applyFilters = () => {
   // Update filters object with current values
-  filters.value.orderedDate = orderedDate.value
-  filters.value.deliveredDate = deliveredDate.value
+  filters.value.orderedDateFrom = orderedDate.value
+  filters.value.orderedDateTo = orderedDate.value
+  filters.value.deliveredDateFrom = deliveredDate.value
+  filters.value.deliveredDateTo = deliveredDate.value
   filters.value.selectedCity = selectedCity.value
   // Apply current filter values and fetch data
   fetchDashboardData()
 }
 
 const clearAllFilters = () => {
-  orderedDate.value = ''
-  deliveredDate.value = ''
+  const currentDate = getCurrentDate()
+  orderedDate.value = currentDate
+  deliveredDate.value = currentDate
   selectedCity.value = ''
   clearFilters()
   // Refetch data after clearing filters
@@ -321,6 +323,18 @@ const fetchDashboardData = async () => {
       throw new Error('No organization selected. Please go back and select an organization.')
     }
     
+    // Set default current date if no dates selected
+    const currentDate = getCurrentDate()
+    const orderDate = orderedDate.value || currentDate
+    const deliveryDate = deliveredDate.value || currentDate
+    
+    // Update filters with current or default dates
+    filters.value.orderedDateFrom = orderDate
+    filters.value.orderedDateTo = orderDate
+    filters.value.deliveredDateFrom = deliveryDate
+    filters.value.deliveredDateTo = deliveryDate
+    filters.value.selectedCity = selectedCity.value
+    
     // Build filter payload
     const filterPayload = buildFilterPayload(organizationUserId)
     
@@ -350,8 +364,8 @@ const fetchDashboardData = async () => {
           quantity: data.planned_qty ? Number(data.planned_qty) : 0
         },
         totalCostSaved: {
-          quantity: `${data.planned_qty ?? 0} Litres`,
-          amount: `Rs. ${((data.planned_orders ?? 0) * 100).toString()}`
+          quantity: `${data.planned_qty ?? 0}`,
+          amount: `${((data.planned_orders ?? 0) * 100).toString()}`
         }
       }
       
@@ -371,7 +385,7 @@ const fetchDashboardData = async () => {
       totalOrdersRescheduled: { count: 0, quantity: 0 },
       totalOrdersCancelled: { count: 0, quantity: 0 },
       totalPlannedOrders: { count: 0, quantity: 0 },
-      totalCostSaved: { quantity: '0 Litres', amount: 'Rs. 0' }
+      totalCostSaved: { quantity: '0', amount: '0' }
     }
   } finally {
     loading.value = false
@@ -387,14 +401,13 @@ onMounted(() => {
     isLoaded.value = true
   }, fromSelectUser ? 500 : 100)
   
+  // Set default dates to current date for initial load
+  const currentDate = getCurrentDate()
+  orderedDate.value = currentDate
+  deliveredDate.value = currentDate
+  
   fetchDashboardData()
 })
-
-watch([orderedDate, deliveredDate, selectedCity], () => {
-  if (isLoaded.value) {
-    fetchDashboardData()
-  }
-}, { deep: true })
 </script>
 
 <style scoped>

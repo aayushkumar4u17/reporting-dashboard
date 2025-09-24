@@ -24,17 +24,23 @@ export interface PointOfContactDetailedReportData {
   shipping_address?: string | null
 }
 
-export const fetchPointOfContactDetailedReport = async (organizationUserId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactDetailedReportData[]> => {
+interface FilterParams {
+  city?: string
+  delivered_date?: string
+  ordered_date?: string
+  point_of_contact?: string
+}
+
+export const fetchPointOfContactDetailedReport = async (organizationId: string, filters?: FilterParams): Promise<PointOfContactDetailedReportData[]> => {
   try {
     const graphqlClient = await client()
     
-    const payload = {
-      org_user_id: [organizationUserId],
-      ...filters
-    }
-    
-    const response = await graphqlClient.PointOfContactDetailedReport({
-      object: payload
+    const response = await graphqlClient.OrdersQuery({
+      org_id: organizationId,
+      city: filters?.city || '',
+      delivered_date: filters?.delivered_date || '',
+      ordered_date: filters?.ordered_date || '',
+      point_of_contact: filters?.point_of_contact || ''
     })
 
     return response.pointOfContactDetailedReport?.data || []

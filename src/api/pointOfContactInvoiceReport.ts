@@ -21,17 +21,16 @@ export interface PointOfContactInvoiceReportData {
   phone_number?: string | null
 }
 
-export const fetchPointOfContactInvoiceReport = async (organizationUserId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactInvoiceReportData[]> => {
+export const fetchPointOfContactInvoiceReport = async (organizationId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactInvoiceReportData[]> => {
   try {
     const graphqlClient = await client()
     
-    const payload = {
-      org_user_id: [organizationUserId],
-      ...filters
-    }
-    
-    const response = await graphqlClient.PointOfContactInvoiceReport({
-      object: payload
+    const response = await graphqlClient.InvoicesQuery({
+      org_id: organizationId,
+      city: filters?.city || '',
+      delivered_date: filters?.delivered_date || '',
+      ordered_date: filters?.ordered_date || '',
+      point_of_contact: ''
     })
 
     return response.pointOfContactInvoiceReport?.data || []

@@ -403,21 +403,38 @@ export type PointOfContactDashboardData = {
   ordered_qty?: Maybe<Scalars['Int']>;
   planned_orders?: Maybe<Scalars['Int']>;
   planned_qty?: Maybe<Scalars['Int']>;
-  rescheduled_count?: Maybe<Scalars['Int']>;
-  rescheduled_qty?: Maybe<Scalars['Int']>;
 };
 
 export type PointOfContactDashboardInput = {
-  cities?: InputMaybe<Array<Scalars['String']>>;
+  city?: InputMaybe<Scalars['String']>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
-  org_user_id?: InputMaybe<Array<Scalars['String']>>;
-  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+  org_id: Scalars['String'];
+  point_of_contact?: InputMaybe<Scalars['String']>;
 };
 
 export type PointOfContactDashboardOutput = {
   __typename?: 'PointOfContactDashboardOutput';
   data: Array<PointOfContactDashboardData>;
+};
+
+export type PointOfContactDashboardRescheduleData = {
+  __typename?: 'PointOfContactDashboardRescheduleData';
+  rescheduled_count?: Maybe<Scalars['Int']>;
+  rescheduled_qty?: Maybe<Scalars['Int']>;
+};
+
+export type PointOfContactDashboardRescheduleInput = {
+  city?: InputMaybe<Scalars['String']>;
+  delivered_date?: InputMaybe<Scalars['String']>;
+  ordered_date?: InputMaybe<Scalars['String']>;
+  org_id: Scalars['String'];
+  point_of_contact?: InputMaybe<Scalars['String']>;
+};
+
+export type PointOfContactDashboardRescheduleOutput = {
+  __typename?: 'PointOfContactDashboardRescheduleOutput';
+  data: Array<PointOfContactDashboardRescheduleData>;
 };
 
 export type PointOfContactDetailedReportData = {
@@ -441,11 +458,11 @@ export type PointOfContactDetailedReportData = {
 };
 
 export type PointOfContactDetailedReportInput = {
-  cities?: InputMaybe<Array<Scalars['String']>>;
+  city?: InputMaybe<Scalars['String']>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
-  org_user_id?: InputMaybe<Array<Scalars['String']>>;
-  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+  org_id: Scalars['String'];
+  point_of_contact?: InputMaybe<Scalars['String']>;
 };
 
 export type PointOfContactDetailedReportOutput = {
@@ -471,11 +488,11 @@ export type PointOfContactInvoiceReportData = {
 };
 
 export type PointOfContactInvoiceReportInput = {
-  cities?: InputMaybe<Array<Scalars['String']>>;
+  city?: InputMaybe<Scalars['String']>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
-  org_user_id?: InputMaybe<Array<Scalars['String']>>;
-  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+  org_id: Scalars['String'];
+  point_of_contact?: InputMaybe<Scalars['String']>;
 };
 
 export type PointOfContactInvoiceReportOutput = {
@@ -489,20 +506,16 @@ export type PointOfContactPaymentReportData = {
   credit_limit?: Maybe<Scalars['Float']>;
   customer_id?: Maybe<Scalars['String']>;
   customer_name?: Maybe<Scalars['String']>;
-  first_name?: Maybe<Scalars['String']>;
-  last_name?: Maybe<Scalars['String']>;
   outstanding_amount?: Maybe<Scalars['Float']>;
   overdue_amount?: Maybe<Scalars['Float']>;
-  payment_terms?: Maybe<Scalars['Int']>;
-  phone_number?: Maybe<Scalars['String']>;
 };
 
 export type PointOfContactPaymentReportInput = {
-  cities?: InputMaybe<Array<Scalars['String']>>;
+  city?: InputMaybe<Scalars['String']>;
   delivered_date?: InputMaybe<Scalars['String']>;
   ordered_date?: InputMaybe<Scalars['String']>;
-  org_user_id?: InputMaybe<Array<Scalars['String']>>;
-  point_of_contact?: InputMaybe<Array<Scalars['String']>>;
+  org_id: Scalars['String'];
+  point_of_contact?: InputMaybe<Scalars['String']>;
 };
 
 export type PointOfContactPaymentReportOutput = {
@@ -24037,6 +24050,21 @@ export type FetchAllSiteCountsOutput = {
   data?: Maybe<Scalars['jsonb']>;
 };
 
+export type FetchAllTrucksWithSiteIdInput = {
+  address_title?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city_id?: InputMaybe<Scalars['uuid']>;
+  end_date?: InputMaybe<Scalars['timestamp']>;
+  start_date?: InputMaybe<Scalars['timestamp']>;
+  task_states?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type FetchAllTrucksWithSiteIdOutput = {
+  __typename?: 'fetchAllTrucksWithSiteIdOutput';
+  count?: Maybe<Scalars['Int']>;
+  data?: Maybe<Scalars['jsonb']>;
+};
+
 export type FetchAvailableInventoryForTowerReportInput = {
   registration_number?: InputMaybe<Array<Scalars['String']>>;
 };
@@ -24337,6 +24365,20 @@ export type FetchDriverVehicleLocationByIdsInput = {
 
 export type FetchDriverVehicleLocationByIdsOutput = {
   __typename?: 'fetchDriverVehicleLocationByIdsOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchDriverVehicleLocationsWithFiltersInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city_id?: InputMaybe<Scalars['uuid']>;
+  end_date?: InputMaybe<Scalars['timestamp']>;
+  start_date?: InputMaybe<Scalars['timestamp']>;
+  task_states?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type FetchDriverVehicleLocationsWithFiltersOutput = {
+  __typename?: 'fetchDriverVehicleLocationsWithFiltersOutput';
+  count?: Maybe<Scalars['Int']>;
   data?: Maybe<Scalars['jsonb']>;
 };
 
@@ -25109,6 +25151,20 @@ export type FetchThirdPartyDataForPartnerInput = {
 
 export type FetchThirdPartyDataForPartnerOutput = {
   __typename?: 'fetchThirdPartyDataForPartnerOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchTrucksByCityInput = {
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  city_id?: InputMaybe<Scalars['uuid']>;
+  end_date?: InputMaybe<Scalars['timestamp']>;
+  start_date?: InputMaybe<Scalars['timestamp']>;
+  task_states?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type FetchTrucksByCityOutput = {
+  __typename?: 'fetchTrucksByCityOutput';
+  count?: Maybe<Scalars['Int']>;
   data?: Maybe<Scalars['jsonb']>;
 };
 
@@ -27077,6 +27133,7 @@ export type Filtered_Orders_Dashboard = {
   start_time?: Maybe<Scalars['timetz']>;
   tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_last_modified?: Maybe<Scalars['timestamp']>;
   task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
   third_party_gps?: Maybe<Scalars['String']>;
@@ -27184,6 +27241,7 @@ export type Filtered_Orders_Dashboard_Bool_Exp = {
   start_time?: InputMaybe<Timetz_Comparison_Exp>;
   tanker_capacity?: InputMaybe<Int_Comparison_Exp>;
   task_id?: InputMaybe<Uuid_Comparison_Exp>;
+  task_last_modified?: InputMaybe<Timestamp_Comparison_Exp>;
   task_rank_id?: InputMaybe<Int_Comparison_Exp>;
   task_state?: InputMaybe<String_Comparison_Exp>;
   third_party_gps?: InputMaybe<String_Comparison_Exp>;
@@ -27239,6 +27297,7 @@ export type Filtered_Orders_Dashboard_Max_Fields = {
   start_time?: Maybe<Scalars['timetz']>;
   tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_last_modified?: Maybe<Scalars['timestamp']>;
   task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
   third_party_gps?: Maybe<Scalars['String']>;
@@ -27294,6 +27353,7 @@ export type Filtered_Orders_Dashboard_Min_Fields = {
   start_time?: Maybe<Scalars['timetz']>;
   tanker_capacity?: Maybe<Scalars['Int']>;
   task_id?: Maybe<Scalars['uuid']>;
+  task_last_modified?: Maybe<Scalars['timestamp']>;
   task_rank_id?: Maybe<Scalars['Int']>;
   task_state?: Maybe<Scalars['String']>;
   third_party_gps?: Maybe<Scalars['String']>;
@@ -27354,6 +27414,7 @@ export type Filtered_Orders_Dashboard_Order_By = {
   start_time?: InputMaybe<Order_By>;
   tanker_capacity?: InputMaybe<Order_By>;
   task_id?: InputMaybe<Order_By>;
+  task_last_modified?: InputMaybe<Order_By>;
   task_rank_id?: InputMaybe<Order_By>;
   task_state?: InputMaybe<Order_By>;
   third_party_gps?: InputMaybe<Order_By>;
@@ -27464,6 +27525,8 @@ export enum Filtered_Orders_Dashboard_Select_Column {
   TankerCapacity = 'tanker_capacity',
   /** column name */
   TaskId = 'task_id',
+  /** column name */
+  TaskLastModified = 'task_last_modified',
   /** column name */
   TaskRankId = 'task_rank_id',
   /** column name */
@@ -27580,6 +27643,7 @@ export type Filtered_Orders_Dashboard_Stream_Cursor_Value_Input = {
   start_time?: InputMaybe<Scalars['timetz']>;
   tanker_capacity?: InputMaybe<Scalars['Int']>;
   task_id?: InputMaybe<Scalars['uuid']>;
+  task_last_modified?: InputMaybe<Scalars['timestamp']>;
   task_rank_id?: InputMaybe<Scalars['Int']>;
   task_state?: InputMaybe<Scalars['String']>;
   third_party_gps?: InputMaybe<Scalars['String']>;
@@ -89577,6 +89641,7 @@ export type Query_Root = {
   fetchActiveZonesv1?: Maybe<FetchActiveZonesv1Output>;
   fetchAddressTitleForIndus?: Maybe<FetchAddressTitleForIndusOutput>;
   fetchAllSiteCounts?: Maybe<FetchAllSiteCountsOutput>;
+  fetchAllTrucksWithSiteId?: Maybe<FetchAllTrucksWithSiteIdOutput>;
   fetchAvailableInventoryForTowerReport?: Maybe<FetchAvailableInventoryForTowerReportOutput>;
   fetchCircleForCustomer?: Maybe<FetchCircleForCustomerOutput>;
   fetchCircleForTeamReport?: Maybe<FetchCircleForTeamReportOutput>;
@@ -89607,6 +89672,7 @@ export type Query_Root = {
   /** fetchCustomerOrderItemSlotsById */
   fetchDriverDutyLogs?: Maybe<FetchDriverDutyLogsOutput>;
   fetchDriverVehicleLocationByIds?: Maybe<FetchDriverVehicleLocationByIdsOutput>;
+  fetchDriverVehicleLocationsWithFilters?: Maybe<FetchDriverVehicleLocationsWithFiltersOutput>;
   fetchERPBalanceQtyByVehicleRegNumber?: Maybe<FetchErpBalanceQtyByVehicleRegNumberOutput>;
   fetchFile?: Maybe<FileOutput>;
   fetchFilteredOrdersByCity?: Maybe<FetchFilteredOrdersByCityOutput>;
@@ -89663,6 +89729,7 @@ export type Query_Root = {
   fetchTaskValueForCustomerAsset?: Maybe<FetchTaskValueForCustomerAssetOutput>;
   fetchTasksOrderQtyByVehicleId?: Maybe<FetchTasksOrderQtyByVehicleIdOutput>;
   fetchThirdPartyDataForPartner?: Maybe<FetchThirdPartyDataForPartnerOutput>;
+  fetchTrucksByCity?: Maybe<FetchTrucksByCityOutput>;
   fetchUserDetails?: Maybe<UserDetailsOutput>;
   fetchUserLedgerData?: Maybe<UserLedgerDataOutput>;
   fetchVaultVehicleLiveInfoAndOrderStats?: Maybe<FetchVaultVehicleLiveInfoAndOrderStatsOutput>;
@@ -90343,6 +90410,7 @@ export type Query_Root = {
   /** fetch data from the table: "poc_to_add" using primary key columns */
   poc_to_add_by_pk?: Maybe<Poc_To_Add>;
   pointOfContactDashboard?: Maybe<PointOfContactDashboardOutput>;
+  pointOfContactDashboardReschedule?: Maybe<PointOfContactDashboardRescheduleOutput>;
   pointOfContactDetailedReport?: Maybe<PointOfContactDetailedReportOutput>;
   pointOfContactInvoiceReport?: Maybe<PointOfContactInvoiceReportOutput>;
   pointOfContactPaymentReport?: Maybe<PointOfContactPaymentReportOutput>;
@@ -90442,6 +90510,7 @@ export type Query_Root = {
   reasons_aggregate: Reasons_Aggregate;
   /** fetch data from the table: "reasons" using primary key columns */
   reasons_by_pk?: Maybe<Reasons>;
+  rescheduledOrdersReport?: Maybe<RescheduledOrdersReportOutput>;
   /** fetch data from the table: "role" */
   role: Array<Role>;
   /** fetch aggregated fields from the table: "role" */
@@ -92496,6 +92565,11 @@ export type Query_RootFetchAllSiteCountsArgs = {
 };
 
 
+export type Query_RootFetchAllTrucksWithSiteIdArgs = {
+  object: FetchAllTrucksWithSiteIdInput;
+};
+
+
 export type Query_RootFetchAvailableInventoryForTowerReportArgs = {
   object?: InputMaybe<FetchAvailableInventoryForTowerReportInput>;
 };
@@ -92613,6 +92687,11 @@ export type Query_RootFetchDriverDutyLogsArgs = {
 
 export type Query_RootFetchDriverVehicleLocationByIdsArgs = {
   object: FetchDriverVehicleLocationByIdsInput;
+};
+
+
+export type Query_RootFetchDriverVehicleLocationsWithFiltersArgs = {
+  object: FetchDriverVehicleLocationsWithFiltersInput;
 };
 
 
@@ -92858,6 +92937,11 @@ export type Query_RootFetchTasksOrderQtyByVehicleIdArgs = {
 
 export type Query_RootFetchThirdPartyDataForPartnerArgs = {
   object: FetchThirdPartyDataForPartnerInput;
+};
+
+
+export type Query_RootFetchTrucksByCityArgs = {
+  object: FetchTrucksByCityInput;
 };
 
 
@@ -95515,6 +95599,11 @@ export type Query_RootPointOfContactDashboardArgs = {
 };
 
 
+export type Query_RootPointOfContactDashboardRescheduleArgs = {
+  object: PointOfContactDashboardRescheduleInput;
+};
+
+
 export type Query_RootPointOfContactDetailedReportArgs = {
   object: PointOfContactDetailedReportInput;
 };
@@ -95895,6 +95984,11 @@ export type Query_RootReasons_AggregateArgs = {
 
 export type Query_RootReasons_By_PkArgs = {
   id: Scalars['uuid'];
+};
+
+
+export type Query_RootRescheduledOrdersReportArgs = {
+  object: RescheduledOrdersReportInput;
 };
 
 
@@ -98231,6 +98325,21 @@ export type RescheduleOrderInput = {
 export type RescheduleOrderOutput = {
   __typename?: 'rescheduleOrderOutput';
   data: Scalars['jsonb'];
+};
+
+export type RescheduledOrdersReportInput = {
+  address?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  circle?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  cities?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  end_date: Scalars['timestamp'];
+  site_type?: InputMaybe<Scalars['String']>;
+  start_date: Scalars['timestamp'];
+};
+
+export type RescheduledOrdersReportOutput = {
+  __typename?: 'rescheduledOrdersReportOutput';
+  data?: Maybe<Scalars['jsonb']>;
 };
 
 export type RoDocLinkObj = {
@@ -130020,33 +130129,49 @@ export type FetchUserOrganizationsQueryVariables = Exact<{
 
 export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
-export type PointOfContactDashboardQueryVariables = Exact<{
-  object: PointOfContactDashboardInput;
+export type DashboardQueryQueryVariables = Exact<{
+  org_id: Scalars['String'];
+  delivered_date: Scalars['String'];
+  city: Scalars['String'];
+  ordered_date: Scalars['String'];
+  point_of_contact: Scalars['String'];
 }>;
 
 
-export type PointOfContactDashboardQuery = { __typename?: 'query_root', pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, delivered_qty?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null, rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null };
+export type DashboardQueryQuery = { __typename?: 'query_root', pointOfContactDashboardReschedule?: { __typename?: 'PointOfContactDashboardRescheduleOutput', data: Array<{ __typename?: 'PointOfContactDashboardRescheduleData', rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null, pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null, delivered_qty?: number | null }> } | null };
 
-export type PointOfContactDetailedReportQueryVariables = Exact<{
-  object: PointOfContactDetailedReportInput;
+export type OrdersQueryQueryVariables = Exact<{
+  org_id: Scalars['String'];
+  city: Scalars['String'];
+  delivered_date: Scalars['String'];
+  ordered_date: Scalars['String'];
+  point_of_contact: Scalars['String'];
 }>;
 
 
-export type PointOfContactDetailedReportQuery = { __typename?: 'query_root', pointOfContactDetailedReport?: { __typename?: 'PointOfContactDetailedReportOutput', data: Array<{ __typename?: 'PointOfContactDetailedReportData', erp_order_code?: string | null, app_order_code?: string | null, order_date?: string | null, delivery_slot?: string | null, order_qty?: number | null, erp_order_status?: string | null, backend_order_status?: string | null, customer_name?: string | null, actual_delivery_date?: string | null, shipping_address?: string | null, city?: string | null, first_name?: string | null, last_name?: string | null, phone_number?: string | null, order_delivered_qty?: number | null, order_amount?: number | null }> } | null };
+export type OrdersQueryQuery = { __typename?: 'query_root', pointOfContactDetailedReport?: { __typename?: 'PointOfContactDetailedReportOutput', data: Array<{ __typename?: 'PointOfContactDetailedReportData', city?: string | null, actual_delivery_date?: string | null, app_order_code?: string | null, backend_order_status?: string | null, customer_name?: string | null, delivery_slot?: string | null, erp_order_code?: string | null, erp_order_status?: string | null, first_name?: string | null, last_name?: string | null, order_amount?: number | null, order_delivered_qty?: number | null, order_date?: string | null, order_qty?: number | null, phone_number?: string | null, shipping_address?: string | null }> } | null };
 
-export type PointOfContactInvoiceReportQueryVariables = Exact<{
-  object: PointOfContactInvoiceReportInput;
+export type InvoicesQueryQueryVariables = Exact<{
+  org_id: Scalars['String'];
+  city: Scalars['String'];
+  delivered_date: Scalars['String'];
+  ordered_date: Scalars['String'];
+  point_of_contact: Scalars['String'];
 }>;
 
 
-export type PointOfContactInvoiceReportQuery = { __typename?: 'query_root', pointOfContactInvoiceReport?: { __typename?: 'PointOfContactInvoiceReportOutput', data: Array<{ __typename?: 'PointOfContactInvoiceReportData', erp_order_code?: string | null, invoice?: string | null, delivered_date?: string | null, app_order_code?: string | null, order_date?: string | null, order_qty?: number | null, order_delivered_qty?: number | null, order_amount?: number | null, shipping_address?: string | null, city?: string | null, first_name?: string | null, last_name?: string | null, phone_number?: string | null }> } | null };
+export type InvoicesQueryQuery = { __typename?: 'query_root', pointOfContactInvoiceReport?: { __typename?: 'PointOfContactInvoiceReportOutput', data: Array<{ __typename?: 'PointOfContactInvoiceReportData', app_order_code?: string | null, city?: string | null, delivered_date?: string | null, erp_order_code?: string | null, first_name?: string | null, invoice?: string | null, order_amount?: number | null, last_name?: string | null, order_date?: string | null, order_delivered_qty?: number | null, order_qty?: number | null, phone_number?: string | null, shipping_address?: string | null }> } | null };
 
-export type PointOfContactPaymentReportQueryVariables = Exact<{
-  object: PointOfContactPaymentReportInput;
+export type PaymentsQueryQueryVariables = Exact<{
+  org_id: Scalars['String'];
+  city: Scalars['String'];
+  delivered_date: Scalars['String'];
+  ordered_date: Scalars['String'];
+  point_of_contact: Scalars['String'];
 }>;
 
 
-export type PointOfContactPaymentReportQuery = { __typename?: 'query_root', pointOfContactPaymentReport?: { __typename?: 'PointOfContactPaymentReportOutput', data: Array<{ __typename?: 'PointOfContactPaymentReportData', allowed_credit_breach?: string | null, credit_limit?: number | null, customer_id?: string | null, customer_name?: string | null, first_name?: string | null, last_name?: string | null, outstanding_amount?: number | null, overdue_amount?: number | null, payment_terms?: number | null, phone_number?: string | null }> } | null };
+export type PaymentsQueryQuery = { __typename?: 'query_root', pointOfContactPaymentReport?: { __typename?: 'PointOfContactPaymentReportOutput', data: Array<{ __typename?: 'PointOfContactPaymentReportData', allowed_credit_breach?: string | null, credit_limit?: number | null, customer_id?: string | null, customer_name?: string | null, outstanding_amount?: number | null, overdue_amount?: number | null }> } | null };
 
 export type ValidateIndusDashboardUserQueryVariables = Exact<{
   user_id: Scalars['uuid'];
@@ -130085,83 +130210,93 @@ export const FetchUserOrganizationsDocument = gql`
   }
 }
     `;
-export const PointOfContactDashboardDocument = gql`
-    query PointOfContactDashboard($object: PointOfContactDashboardInput!) {
-  pointOfContactDashboard(object: $object) {
+export const DashboardQueryDocument = gql`
+    query DashboardQuery($org_id: String!, $delivered_date: String!, $city: String!, $ordered_date: String!, $point_of_contact: String!) {
+  pointOfContactDashboardReschedule(
+    object: {org_id: $org_id, delivered_date: $delivered_date, city: $city, ordered_date: $ordered_date, point_of_contact: $point_of_contact}
+  ) {
     data {
-      cancelled_count
-      cancelled_qty
-      delivered_orders
-      delivered_qty
-      order_count
-      ordered_qty
-      planned_orders
-      planned_qty
       rescheduled_count
       rescheduled_qty
     }
   }
+  pointOfContactDashboard(
+    object: {org_id: $org_id, city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, point_of_contact: $point_of_contact}
+  ) {
+    data {
+      cancelled_count
+      cancelled_qty
+      delivered_orders
+      order_count
+      ordered_qty
+      planned_orders
+      planned_qty
+      delivered_qty
+    }
+  }
 }
     `;
-export const PointOfContactDetailedReportDocument = gql`
-    query PointOfContactDetailedReport($object: PointOfContactDetailedReportInput!) {
-  pointOfContactDetailedReport(object: $object) {
+export const OrdersQueryDocument = gql`
+    query OrdersQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
+  pointOfContactDetailedReport(
+    object: {city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, org_id: $org_id, point_of_contact: $point_of_contact}
+  ) {
     data {
-      erp_order_code
+      city
+      actual_delivery_date
       app_order_code
-      order_date
-      delivery_slot
-      order_qty
-      erp_order_status
       backend_order_status
       customer_name
-      actual_delivery_date
-      shipping_address
-      city
+      delivery_slot
+      erp_order_code
+      erp_order_status
       first_name
       last_name
-      phone_number
-      order_delivered_qty
       order_amount
-    }
-  }
-}
-    `;
-export const PointOfContactInvoiceReportDocument = gql`
-    query PointOfContactInvoiceReport($object: PointOfContactInvoiceReportInput!) {
-  pointOfContactInvoiceReport(object: $object) {
-    data {
-      erp_order_code
-      invoice
-      delivered_date
-      app_order_code
+      order_delivered_qty
       order_date
       order_qty
-      order_delivered_qty
-      order_amount
-      shipping_address
-      city
-      first_name
-      last_name
       phone_number
+      shipping_address
     }
   }
 }
     `;
-export const PointOfContactPaymentReportDocument = gql`
-    query PointOfContactPaymentReport($object: PointOfContactPaymentReportInput!) {
-  pointOfContactPaymentReport(object: $object) {
+export const InvoicesQueryDocument = gql`
+    query InvoicesQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
+  pointOfContactInvoiceReport(
+    object: {org_id: $org_id, city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, point_of_contact: $point_of_contact}
+  ) {
+    data {
+      app_order_code
+      city
+      delivered_date
+      erp_order_code
+      first_name
+      invoice
+      order_amount
+      last_name
+      order_date
+      order_delivered_qty
+      order_qty
+      phone_number
+      shipping_address
+    }
+  }
+}
+    `;
+export const PaymentsQueryDocument = gql`
+    query PaymentsQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
+  pointOfContactPaymentReport(
+    object: {org_id: $org_id, city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, point_of_contact: $point_of_contact}
+  ) {
     data {
       allowed_credit_breach
       credit_limit
       customer_id
       customer_name
-      first_name
-      last_name
       outstanding_amount
       overdue_amount
-      payment_terms
-      phone_number
     }
   }
 }
@@ -130206,17 +130341,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     fetchUserOrganizations(variables: FetchUserOrganizationsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<FetchUserOrganizationsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<FetchUserOrganizationsQuery>(FetchUserOrganizationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'fetchUserOrganizations', 'query');
     },
-    PointOfContactDashboard(variables: PointOfContactDashboardQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactDashboardQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactDashboardQuery>(PointOfContactDashboardDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactDashboard', 'query');
+    DashboardQuery(variables: DashboardQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<DashboardQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<DashboardQueryQuery>(DashboardQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'DashboardQuery', 'query');
     },
-    PointOfContactDetailedReport(variables: PointOfContactDetailedReportQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactDetailedReportQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactDetailedReportQuery>(PointOfContactDetailedReportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactDetailedReport', 'query');
+    OrdersQuery(variables: OrdersQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<OrdersQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<OrdersQueryQuery>(OrdersQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'OrdersQuery', 'query');
     },
-    PointOfContactInvoiceReport(variables: PointOfContactInvoiceReportQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactInvoiceReportQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactInvoiceReportQuery>(PointOfContactInvoiceReportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactInvoiceReport', 'query');
+    InvoicesQuery(variables: InvoicesQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<InvoicesQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<InvoicesQueryQuery>(InvoicesQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'InvoicesQuery', 'query');
     },
-    PointOfContactPaymentReport(variables: PointOfContactPaymentReportQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactPaymentReportQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactPaymentReportQuery>(PointOfContactPaymentReportDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactPaymentReport', 'query');
+    PaymentsQuery(variables: PaymentsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PaymentsQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PaymentsQueryQuery>(PaymentsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PaymentsQuery', 'query');
     },
     validateIndusDashboardUser(variables: ValidateIndusDashboardUserQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<ValidateIndusDashboardUserQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ValidateIndusDashboardUserQuery>(ValidateIndusDashboardUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'validateIndusDashboardUser', 'query');

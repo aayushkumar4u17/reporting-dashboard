@@ -6,29 +6,36 @@
       </div>
     </div>
     <div class="navbar-right">
-      <div class="user-profile" @click="toggleUserPopup">
-        <div class="avatar" :style="{ background: userProfile?.organizationAvatar || 'linear-gradient(135deg, #00C851, #00A844)' }">
-          <span v-if="userProfile?.organizationInitials" class="avatar-initials">{{ userProfile.organizationInitials }}</span>
+      <div class="user-section">
+        <!-- Clickable Avatar -->
+        <div class="avatar-container" @click="navigateToSelectUser" title="Switch Organization">
+          <div class="avatar" :style="{ background: userProfile?.organizationAvatar || 'linear-gradient(135deg, #00C851, #00A844)' }">
+            <span v-if="userProfile?.organizationInitials" class="avatar-initials">{{ userProfile.organizationInitials }}</span>
+          </div>
         </div>
-        <span class="username" :class="{ 'loading': isLoading }">{{ displayName }}</span>
         
-        <!-- User Info Popup -->
-        <div v-if="showUserPopup" class="user-popup" :class="{ 'show': showUserPopup }" @click.stop>
-          <div class="popup-item">
-            <span class="popup-label">Name:</span>
-            <span class="popup-value">{{ displayName }}</span>
-          </div>
-          <div class="popup-item">
-            <span class="popup-label">Email:</span>
-            <span class="popup-value">{{ userProfile?.email || 'N/A' }}</span>
-          </div>
-          <div class="popup-item">
-            <span class="popup-label">Phone:</span>
-            <span class="popup-value">{{ userProfile?.phoneNumber || 'N/A' }}</span>
-          </div>
-          <div class="popup-item">
-            <span class="popup-label">Organization:</span>
-            <span class="popup-value">{{ userProfile?.organizationName || 'N/A' }}</span>
+        <!-- Username with popup -->
+        <div class="user-profile" @click="toggleUserPopup">
+          <span class="username" :class="{ 'loading': isLoading }">{{ displayName }}</span>
+          
+          <!-- User Info Popup -->
+          <div v-if="showUserPopup" class="user-popup" :class="{ 'show': showUserPopup }" @click.stop>
+            <div class="popup-item">
+              <span class="popup-label">Name:</span>
+              <span class="popup-value">{{ displayName }}</span>
+            </div>
+            <div class="popup-item">
+              <span class="popup-label">Email:</span>
+              <span class="popup-value">{{ userProfile?.email || 'N/A' }}</span>
+            </div>
+            <div class="popup-item">
+              <span class="popup-label">Phone:</span>
+              <span class="popup-value">{{ userProfile?.phoneNumber || 'N/A' }}</span>
+            </div>
+            <div class="popup-item">
+              <span class="popup-label">Organization:</span>
+              <span class="popup-value">{{ userProfile?.organizationName || 'N/A' }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -122,6 +129,10 @@ const closeMobileMenu = () => {
 
 const toggleUserPopup = () => {
   showUserPopup.value = !showUserPopup.value
+}
+
+const navigateToSelectUser = () => {
+  router.push('/select-user')
 }
 
 // Close popup when clicking outside
@@ -247,10 +258,27 @@ onUnmounted(() => {
   }
 }
 
+.user-section {
+  display: flex;
+  align-items: center;
+  /* gap: 0.2rem; */
+}
+
+.avatar-container {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.avatar-container:hover {
+  background-color: rgba(0, 200, 81, 0.1);
+  transform: scale(1.1);
+}
+
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   padding: 0.5rem;
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -264,8 +292,8 @@ onUnmounted(() => {
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: linear-gradient(135deg, #00C851, #00A844);
   transition: transform 0.3s ease;
@@ -276,7 +304,7 @@ onUnmounted(() => {
 
 .avatar-initials {
   color: white;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -329,9 +357,7 @@ onUnmounted(() => {
   word-break: break-word;
 }
 
-.user-profile:hover .avatar {
-  transform: scale(1.1);
-}
+
 
 .username {
   font-weight: 500;
@@ -570,6 +596,10 @@ onUnmounted(() => {
   
   .username {
     display: none;
+  }
+  
+  .user-section {
+    gap: 0.5rem;
   }
 }
 

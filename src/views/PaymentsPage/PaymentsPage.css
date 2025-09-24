@@ -38,7 +38,7 @@
   margin-bottom: 1.5rem;
   border: 1px solid rgba(0, 200, 81, 0.1);
   position: relative;
-  z-index: 1;
+  z-index: 10;
   opacity: 0;
   transform: translateY(-20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -228,7 +228,7 @@
 .summary-section {
   margin-bottom: 24px;
   position: relative;
-  z-index: 1;
+  z-index: 5;
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);

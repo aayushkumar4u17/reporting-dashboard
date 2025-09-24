@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { PointOfContactData } from '@/api/pointOfContactDashboard'
 
-// Helper function to get selected user ID from localStorage
+// Helper function to get selected organization ID from localStorage
 const getStoredUserId = (): string => {
   try {
     const selectedOrg = localStorage.getItem('selectedOrganization')
     if (selectedOrg) {
       const org = JSON.parse(selectedOrg)
-      return org.organization_user_id || ''
+      return org.id || ''
     }
   } catch (error) {
     console.error('Error parsing stored organization:', error)

@@ -4,25 +4,13 @@
       <!-- Filter Bar -->
       <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
         <div class="filter-group">
-          <label class="filter-label">Ordered Date</label>
-          <select v-model="orderedDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-            <option value="last-month">Last Month</option>
-          </select>
+          <label class="filter-label">Delivery Date</label>
+          <DatePicker v-model="deliveryDate" placeholder="Select Delivery Date" />
         </div>
         
         <div class="filter-group">
-          <label class="filter-label">Delivery Date</label>
-          <select v-model="deliveryDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last Week</option>
-            <option value="last-month">Last Month</option>
-          </select>
+          <label class="filter-label">Order Date</label>
+          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
         </div>
         
         <div class="filter-group">
@@ -63,14 +51,14 @@
               <th class="header-cell checkbox-column">
                 <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="header-checkbox" />
               </th>
-              <th class="header-cell">Check BN</th>
+              <!-- <th class="header-cell">Check BN</th> -->
               <th class="header-cell">Asp Order No</th>
               <th class="header-cell">Sales Order Code</th>
               <th class="header-cell">Order Date</th>
               <th class="header-cell">Delivery Date</th>
               <th class="header-cell">Delivery Time</th>
               <th class="header-cell">Order Quantity</th>
-              <th class="header-cell">Delivery Location</th>
+              <th class="header-cell">City</th>
               <th class="header-cell">POC Name</th>
               <th class="header-cell">POC Contact</th>
               <th class="header-cell">Delivery Status</th>
@@ -100,7 +88,7 @@
               <td class="table-cell checkbox-column">
                 <input type="checkbox" v-model="order.selected" class="row-checkbox" />
               </td>
-              <td class="table-cell">{{ order.checkBN }}</td>
+              <!-- <td class="table-cell">{{ order.checkBN }}</td> -->
               <td class="table-cell">{{ order.aspOrderNo }}</td>
               <td class="table-cell">{{ order.salesOrderCode }}</td>
               <td class="table-cell">{{ order.orderedDate }}</td>
@@ -131,6 +119,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
+import DatePicker from '@/components/layout/DatePicker.vue'
 import { fetchPointOfContactDetailedReport } from '@/api/pointOfContactDetailedReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
@@ -139,47 +128,97 @@ import { useFilters } from '@/composables/useFilters'
 const isLoaded = ref(false)
 const loading = ref(true)
 
+// Get current date in YYYY-MM-DD format
+const getCurrentDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
-const orderedDate = ref('')
-const deliveryDate = ref('')
+const currentDate = getCurrentDate()
+const orderedDate = ref(currentDate)
+const deliveryDate = ref(currentDate)
 const selectedCity = ref('')
 const selectedPOC = ref('')
 const selectAll = ref(false)
+
+// Applied filter states
+const appliedOrderedDate = ref('')
+const appliedDeliveryDate = ref('')
+const appliedCity = ref('')
+const appliedPOC = ref('')
 
 // Orders data
 const orders = ref([])
 const allOrdersData = ref([]) // Store initial data for filter options
 
-// Computed properties for filter options (from initial data)
+// Computed properties for filter options (from current page data)
 const uniqueCities = computed(() => {
-  const cities = allOrdersData.value.map(order => order.city).filter(city => city && city.trim())
+  const cities = orders.value.map(order => order.deliveryLocation).filter(city => city && city.trim())
   return [...new Set(cities)].sort()
 })
 
 const uniquePOCs = computed(() => {
-  const pocs = allOrdersData.value.map(order => order.pocName).filter(poc => poc && poc.trim())
+  const pocs = orders.value.map(order => order.pocName).filter(poc => poc && poc.trim())
   return [...new Set(pocs)].sort()
 })
 
-// Use orders directly (already filtered from API)
-const filteredOrders = computed(() => orders.value)
+// Frontend filtering with applied filters
+const filteredOrders = computed(() => {
+  let filtered = orders.value
+  
+  if (appliedPOC.value) {
+    filtered = filtered.filter(order => order.pocName === appliedPOC.value)
+  }
+  
+  return filtered
+})
 
 const applyFilters = () => {
-  // Update filters object with current values
-  filters.value.orderedDate = orderedDate.value
-  filters.value.deliveryDate = deliveryDate.value
-  filters.value.selectedCity = selectedCity.value
-  filters.value.selectedPOC = selectedPOC.value
-  // Load filtered data
+  // Ensure dates have values (use current date if empty)
+  const currentDate = getCurrentDate()
+  const orderDateValue = orderedDate.value || currentDate
+  const deliveryDateValue = deliveryDate.value || currentDate
+  
+  // Apply current filter values
+  appliedOrderedDate.value = orderDateValue
+  appliedDeliveryDate.value = deliveryDateValue
+  appliedCity.value = selectedCity.value
+  appliedPOC.value = selectedPOC.value
+  
+  // Check if only POC filter is applied (frontend filter)
+  const onlyPOCFilter = appliedPOC.value && !orderDateValue && !deliveryDateValue && !appliedCity.value
+  
+  if (onlyPOCFilter) {
+    // Use frontend filtering for POC only
+    return
+  }
+  
+  // Clear existing data first
+  orders.value = []
+  loading.value = true
+  
+  // Update filters object with applied values
+  filters.value.orderedDateFrom = orderDateValue
+  filters.value.deliveredDateFrom = deliveryDateValue
+  filters.value.selectedCity = appliedCity.value
+  filters.value.selectedPOC = appliedPOC.value
+  
+  // Load filtered data (exclude POC from API call)
   loadFilteredData()
 }
 
 const clearAllFilters = () => {
-  orderedDate.value = ''
-  deliveryDate.value = ''
+  const currentDate = getCurrentDate()
+  orderedDate.value = currentDate
+  deliveryDate.value = currentDate
   selectedCity.value = ''
   selectedPOC.value = ''
+  appliedOrderedDate.value = ''
+  appliedDeliveryDate.value = ''
+  appliedCity.value = ''
+  appliedPOC.value = ''
   clearFilters()
   loadData()
 }
@@ -246,10 +285,18 @@ const loadInitialData = async () => {
     
     if (!userId) return
     
-    // Fetch all data without filters for dropdown options
-    const reportData = await fetchPointOfContactDetailedReport(userId, {})
+    // Use current date as default for initial load
+    const currentDate = getCurrentDate()
+    const filterParams = {
+      city: '',
+      ordered_date: currentDate,
+      delivered_date: currentDate,
+      point_of_contact: ''
+    }
+    
+    const reportData = await fetchPointOfContactDetailedReport(userId, filterParams)
     allOrdersData.value = mapOrderData(reportData)
-    orders.value = [...allOrdersData.value] // Show all data initially
+    orders.value = [...allOrdersData.value]
   } catch (error) {
     console.error('Error loading initial data:', error)
   } finally {
@@ -264,20 +311,30 @@ const loadFilteredData = async () => {
     
     if (!userId) return
     
-    // Build filter payload with selected filters
-    const filterPayload = {
-      ...buildFilterPayload(userId),
-      city: selectedCity.value || undefined,
-      poc: selectedPOC.value || undefined
+    // Ensure dates have values - use current date if empty
+    const currentDate = getCurrentDate()
+    const orderDate = appliedOrderedDate.value || orderedDate.value || currentDate
+    const deliveryDate = appliedDeliveryDate.value || deliveryDate.value || currentDate
+    
+    // Create filter object with applied values (exclude POC for frontend filtering)
+    const filterParams = {
+      city: appliedCity.value || '',
+      ordered_date: orderDate,
+      delivered_date: deliveryDate,
+      point_of_contact: ''
     }
     
-    const reportData = await fetchPointOfContactDetailedReport(userId, filterPayload)
+    const reportData = await fetchPointOfContactDetailedReport(userId, filterParams)
     orders.value = mapOrderData(reportData)
   } catch (error) {
     console.error('Error loading filtered data:', error)
   } finally {
     loading.value = false
   }
+}
+
+const loadData = () => {
+  loadInitialData()
 }
 
 // Initialize animations on component mount

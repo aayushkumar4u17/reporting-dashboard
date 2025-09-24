@@ -40,6 +40,8 @@
   gap: 1rem;
   align-items: flex-end;
   border: 1px solid rgba(0, 200, 81, 0.1);
+  position: relative;
+  z-index: 10;
   opacity: 0;
   transform: translateY(-20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);

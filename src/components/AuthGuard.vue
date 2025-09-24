@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { signOutUser } from '@/api/auth'
+// import { signOutUser } from '@/api/auth'
 import { canAccessIndusDashboard, clearLoginState } from '@/utils/auth'
 
 const router = useRouter()

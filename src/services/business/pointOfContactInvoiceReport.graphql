@@ -1,19 +1,19 @@
-query PointOfContactInvoiceReport($object: PointOfContactInvoiceReportInput!) {
-  pointOfContactInvoiceReport(object: $object) {
+query InvoicesQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
+  pointOfContactInvoiceReport(object: {org_id: $org_id, city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, point_of_contact: $point_of_contact}) {
     data {
-      erp_order_code
-      invoice
-      delivered_date
       app_order_code
-      order_date
-      order_qty
-      order_delivered_qty
-      order_amount
-      shipping_address
       city
+      delivered_date
+      erp_order_code
       first_name
+      invoice
+      order_amount
       last_name
+      order_date
+      order_delivered_qty
+      order_qty
       phone_number
+      shipping_address
     }
   }
 }

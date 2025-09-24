@@ -7,6 +7,9 @@ export { default as ErrorPopup } from './layout/ErrorPopup.vue'
 export { default as SkeletonLoader } from './layout/SkeletonLoader.vue'
 export { default as TermsPopup } from './layout/TermsPopup.vue'
 
+// Date Components
+export { default as DatePicker } from './layout/DatePicker.vue'
+
 // Other Components
 export { default as AuthGuard } from './AuthGuard.vue'
 export { default as ErrorNotification } from './ErrorNotification.vue'
@@ -17,6 +20,7 @@ import AnimatedButton from './layout/AnimatedButton.vue'
 import ErrorPopup from './layout/ErrorPopup.vue'
 import SkeletonLoader from './layout/SkeletonLoader.vue'
 import TermsPopup from './layout/TermsPopup.vue'
+import DatePicker from './layout/DatePicker.vue'
 import AuthGuard from './AuthGuard.vue'
 import ErrorNotification from './ErrorNotification.vue'
 
@@ -27,6 +31,7 @@ export default {
     app.component('ErrorPopup', ErrorPopup)
     app.component('SkeletonLoader', SkeletonLoader)
     app.component('TermsPopup', TermsPopup)
+    app.component('DatePicker', DatePicker)
     app.component('AuthGuard', AuthGuard)
     app.component('ErrorNotification', ErrorNotification)
   }

@@ -7,31 +7,20 @@
     <div class="filter-section" :class="{ 'animate-slide-down': isLoaded }">
       <div class="filter-row">
         <div class="filter-group">
-          <label>Ordered Date</label>
-          <select v-model="orderedDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last 7 days</option>
-            <option value="last-month">Last 30 days</option>
-          </select>
+          <label>Order Date</label>
+          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
         </div>
         
         <div class="filter-group">
-          <label>Delivered Date</label>
-          <select v-model="deliveredDate" class="filter-select">
-            <option value="">Select Date</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last-week">Last 7 days</option>
-            <option value="last-month">Last 30 days</option>
-          </select>
+          <label>Delivery Date</label>
+          <DatePicker v-model="deliveredDate" placeholder="Select Delivery Date" />
         </div>
         
         <div class="filter-group">
           <label>City</label>
           <select v-model="selectedCity" class="filter-select">
             <option value="">Select City</option>
+            <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
           </select>
         </div>
         
@@ -39,6 +28,7 @@
           <label>Point of Contact</label>
           <select v-model="selectedPOC" class="filter-select">
             <option value="">Select POC</option>
+            <option v-for="poc in availablePOCs" :key="poc" :value="poc">{{ poc }}</option>
           </select>
         </div>
         
@@ -122,7 +112,7 @@
             <th>Outstanding Amount</th>
             <th>Overdue Amount</th>
             <th>Payment Terms</th>
-            <th>Phone Number</th>
+            <!-- <th>Phone Number</th> -->
             <th>Credit Breach</th>
           </tr>
         </thead>
@@ -175,6 +165,17 @@
       </div>
     </div>
     </div>
+
+    <!-- No Data Popup -->
+    <div v-if="showNoDataPopup" class="popup-overlay" @click="showNoDataPopup = false">
+      <div class="popup-content" @click.stop>
+        <h3>No Data Found</h3>
+        <p>No data available to download</p>
+        <AnimatedButton @click="showNoDataPopup = false" variant="primary" size="small">
+          OK
+        </AnimatedButton>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -182,6 +183,7 @@
 import { ref, computed, onMounted } from 'vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
+import DatePicker from '@/components/layout/DatePicker.vue'
 import { useFilters } from '@/composables/useFilters'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { fetchPointOfContactPaymentReport, mapPaymentData, calculateSummary } from '@/api/pointOfContactPaymentReport'
@@ -191,6 +193,7 @@ import { generatePaymentsPDF } from '@/utils/pdfGenerator'
 const isLoaded = ref(false)
 const loading = ref(true)
 const summaryLoading = ref(true)
+const showNoDataPopup = ref(false)
 
 // Point of Contact Store
 const pointOfContactStore = usePointOfContactStore()
@@ -201,11 +204,12 @@ const orderedDate = ref('')
 const deliveredDate = ref('')
 const selectedCity = ref('')
 const selectedPOC = ref('')
-const paymentDueDate = ref('')
 
 // Reactive data
 const selectAll = ref(false)
 const payments = ref([])
+const availableCities = ref([])
+const availablePOCs = ref([])
 
 // Summary data with initial values set to 0
 const summaryData = ref({
@@ -238,6 +242,13 @@ const loadData = async () => {
     payments.value = mapPaymentData(rawData)
     summaryData.value = calculateSummary(rawData)
     
+    // Extract unique cities and POCs from the data
+    const cities = [...new Set(rawData.map(item => item.city).filter(Boolean))]
+    const pocs = [...new Set(rawData.map(item => item.point_of_contact).filter(Boolean))]
+    
+    availableCities.value = cities.sort()
+    availablePOCs.value = pocs.sort()
+    
   } catch (error) {
     console.error('Error loading payment data:', error)
   } finally {
@@ -253,7 +264,6 @@ const applyFilters = () => {
   filters.value.deliveredDate = deliveredDate.value
   filters.value.selectedCity = selectedCity.value
   filters.value.selectedPOC = selectedPOC.value
-  filters.value.paymentDueDate = paymentDueDate.value
   // Apply current filter values
   loadData()
 }
@@ -263,7 +273,6 @@ const clearAllFilters = () => {
   deliveredDate.value = ''
   selectedCity.value = ''
   selectedPOC.value = ''
-  paymentDueDate.value = ''
   clearFilters()
   // Clear all filter values and reload data
   loadData()
@@ -285,6 +294,10 @@ const formatCurrency = (amount) => {
 }
 
 const downloadPayments = () => {
+  if (payments.value.length === 0) {
+    showNoDataPopup.value = true
+    return
+  }
   const selectedPayments = payments.value.filter(payment => payment.selected)
   const hasSelection = selectedPayments.length > 0
   generatePaymentsPDF(payments.value, hasSelection)
@@ -315,4 +328,35 @@ onMounted(() => {
 <style scoped>
   /* All CSS has been moved to PaymentsPage.css */
   @import './PaymentsPage.css';
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 300px;
+  }
+
+  .popup-content h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+  }
+
+  .popup-content p {
+    margin: 0 0 20px 0;
+    color: #666;
+  }
 </style>

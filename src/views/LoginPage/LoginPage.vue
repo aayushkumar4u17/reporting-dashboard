@@ -73,7 +73,7 @@
   </div>
   
   <!-- OTP Popup -->
-  <div v-if="otpSent" class="otp-popup-overlay" @click="closeOtpPopup">
+  <div v-if="otpSent" class="otp-popup-overlay" :class="{ 'show': otpSent }" @click="closeOtpPopup">
     <div class="otp-popup" @click.stop :class="{ 'animate-popup': otpSent }">
       <div class="otp-popup-header">
         <h3>Enter OTP</h3>
@@ -81,11 +81,7 @@
       </div>
       
       <div class="otp-popup-content">
-        <div v-if="isLoading" class="otp-sending-status">
-          <div class="loading-spinner"></div>
-          <p>Sending OTP to +91 {{ phoneNumber }}...</p>
-        </div>
-        <p v-else class="otp-info">We've sent a 6-digit code to +91 {{ phoneNumber }}</p>
+        <p class="otp-info">We've sent a 6-digit code to +91 {{ phoneNumber }}</p>
         
         <div class="otp-input-container" :class="{ 'focused': isOtpFocused }">
           <input 
@@ -265,35 +261,26 @@ const sendOTPHandler = async () => {
   if (isPhoneNumberValid.value && isAgreed.value) {
     isLoading.value = true
     
-    // Show OTP popup immediately for better UX
-    otpSent.value = true
-    startResendTimer()
-    
-    // Focus OTP input immediately
-    setTimeout(() => {
-      if (otpInputRef.value) {
-        otpInputRef.value.focus()
-      }
-    }, 100)
-    
     try {
-      // Setup recaptcha and send OTP in background
       setupRecaptcha()
       await sendOTPAction(`+91${phoneNumber.value}`, (confirmationResult) => {
         authStore.setLoginConfirmationResult(confirmationResult)
       })
       startTimer()
       isLoading.value = false
-    } catch (error: unknown) {
-      // Hide popup and reset on error
-      otpSent.value = false
-      isLoading.value = false
       
-      if (resendInterval !== null) {
-        clearInterval(resendInterval)
-        resendInterval = null
-      }
-      resendTimer.value = 0
+      // Show OTP popup only after successful send
+      otpSent.value = true
+      startResendTimer()
+      
+      // Focus OTP input
+      setTimeout(() => {
+        if (otpInputRef.value) {
+          otpInputRef.value.focus()
+        }
+      }, 100)
+    } catch (error: unknown) {
+      isLoading.value = false
       
       if (error && typeof error === 'object' && 'message' in error && error.message === 'Unauthorized user') {
         authStore.showErrorPopup({

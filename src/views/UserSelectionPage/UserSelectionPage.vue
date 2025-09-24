@@ -16,6 +16,29 @@
       <h1 class="title">Select Organization</h1>
       <p class="subtitle">Choose an organization to access the dashboard</p>
       
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input 
+            v-model="searchInput" 
+            @keyup.enter="performSearch"
+            type="text" 
+            placeholder="Search organizations..." 
+            class="search-input"
+          />
+          <button v-if="searchQuery" @click="clearSearch" class="clear-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
       <div v-if="loading" class="users-grid">
         <div v-for="i in 6" :key="i" class="user-card skeleton-card">
           <SkeletonLoader width="120px" height="120px" class="skeleton-avatar" />
@@ -31,7 +54,7 @@
       
       <div v-else class="users-grid">
         <div 
-          v-for="org in organizations" 
+          v-for="org in filteredOrganizations" 
           :key="org.uniqueKey || `${org.id}-${org.name}`"
           class="user-card"
           @click="selectOrganization(org)"
@@ -46,12 +69,17 @@
       <div v-if="!loading && !error && organizations.length === 0" class="no-organizations">
         <p>No delivery organizations found. Please contact your administrator.</p>
       </div>
+      
+      <div v-if="!loading && !error && organizations.length > 0 && filteredOrganizations.length === 0" class="no-results">
+        <p>No organizations found matching "{{ searchQuery }}"</p>
+        <button @click="clearSearch" class="clear-search-btn">Clear Search</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
@@ -67,6 +95,8 @@ const organizations = ref([])
 const loading = ref(true)
 const error = ref(null)
 const showInitialLoader = ref(true)
+const searchQuery = ref('')
+const searchInput = ref('')
 let authStateCheckInterval = null
 
 // Development mode check
@@ -100,6 +130,37 @@ const getInitials = (name) => {
   return name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()
 }
 
+// Clear search query
+const clearSearch = () => {
+  searchQuery.value = ''
+  searchInput.value = ''
+}
+
+// Perform search when Enter is pressed
+const performSearch = () => {
+  searchQuery.value = searchInput.value
+}
+
+// Computed property for filtered and sorted organizations
+const filteredOrganizations = computed(() => {
+  let filtered = organizations.value
+  
+  // Filter by search query
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    filtered = filtered.filter(org => 
+      org.name.toLowerCase().includes(query)
+    )
+  }
+  
+  // Sort by creation date (newest first)
+  return filtered.sort((a, b) => {
+    const dateA = new Date(a.created_at || 0)
+    const dateB = new Date(b.created_at || 0)
+    return dateB - dateA // Newest first
+  })
+})
+
 // Select organization and navigate to dashboard
 const selectOrganization = (org) => {
   // Store selected organization with avatar info
@@ -110,8 +171,8 @@ const selectOrganization = (org) => {
   }
   localStorage.setItem('selectedOrganization', JSON.stringify(orgWithAvatar))
   
-  // Store organization_user table ID for point of contact dashboard
-  pointOfContactStore.setSelectedUserId(org.organization_user_id)
+  // Store organization ID for point of contact dashboard
+  pointOfContactStore.setSelectedUserId(org.id)
   
   // Navigate to dashboard
   router.push('/dashboard')
@@ -209,12 +270,17 @@ const fetchOrganizations = async () => {
         is_active: orgUser.is_active,
         is_owner: orgUser.is_owner,
         organization_user_type: orgUser.organization_user_type, // Should be 'DELIVERY'
-        created_at: orgUser.created_at,
+        created_at: orgUser.organization.created_at || orgUser.created_at, // Use organization creation date first
         color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization'),
         uniqueKey: `${orgUser.organization.id}-${index}-${Date.now()}` // Ensure uniqueness
       }))
       
-      organizations.value = orgs
+      // Sort organizations by creation date (newest first) before setting
+      organizations.value = orgs.sort((a, b) => {
+        const dateA = new Date(a.created_at || 0)
+        const dateB = new Date(b.created_at || 0)
+        return dateB - dateA
+      })
       
       // Cache organizations in localStorage for quick access on page refresh
       localStorage.setItem('cachedOrganizations', JSON.stringify(orgs))

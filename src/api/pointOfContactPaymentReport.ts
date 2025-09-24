@@ -34,17 +34,16 @@ export interface MappedPaymentData {
   selected?: boolean
 }
 
-export const fetchPointOfContactPaymentReport = async (organizationUserId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactPaymentReportData[]> => {
+export const fetchPointOfContactPaymentReport = async (organizationId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactPaymentReportData[]> => {
   try {
     const graphqlClient = await client()
     
-    const payload = {
-      org_user_id: organizationUserId,
-      ...filters
-    }
-    
-    const response = await graphqlClient.PointOfContactPaymentReport({
-      object: payload
+    const response = await graphqlClient.PaymentsQuery({
+      org_id: organizationId,
+      city: filters?.city || '',
+      delivered_date: filters?.delivered_date || '',
+      ordered_date: filters?.ordered_date || '',
+      point_of_contact: ''
     })
 
     return response.pointOfContactPaymentReport?.data || []
@@ -57,14 +56,14 @@ export const fetchPointOfContactPaymentReport = async (organizationUserId: strin
 export const mapPaymentData = (data: PointOfContactPaymentReportData[]): MappedPaymentData[] => {
   return data.map((item, index) => ({
     id: item.customer_id || `payment-${index}`,
-    customerName: `${item.first_name || ''} ${item.last_name || ''}`.trim() || item.customer_name || 'N/A',
+    customerName: item.customer_name || 'N/A',
     customerId: item.customer_id || 'N/A',
     creditLimit: item.credit_limit || '0',
     outstandingAmount: item.outstanding_amount || '0',
     overdueAmount: item.overdue_amount || '0',
-    phoneNumber: item.phone_number || 'N/A',
+    phoneNumber: 'N/A',
     allowedCreditBreach: item.allowed_credit_breach || 'N',
-    paymentTerms: item.payment_terms || 0,
+    paymentTerms: 0,
     selected: false
   }))
 }

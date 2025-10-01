@@ -1,16 +1,22 @@
 import client from './APIClient'
-import type { FilterPayload } from '@/composables/useFilters'
 
-export interface OrderDate {
+interface LocalFilterPayload {
+  city?: string
+  delivered_date?: string
+  ordered_date?: string
+  point_of_contact?: string
+}
+
+export interface InvoiceOrderDate {
   value: string;
 }
 
 export interface PointOfContactInvoiceReportData {
   erp_order_code?: string | null
   invoice?: string | null
-  delivered_date?: string | OrderDate | null
+  delivered_date?: string | InvoiceOrderDate | null
   app_order_code?: string | null
-  order_date?: string | OrderDate | null
+  order_date?: string | InvoiceOrderDate | null
   order_qty?: number | null
   order_delivered_qty?: number | null
   order_amount?: number | string | null
@@ -21,7 +27,7 @@ export interface PointOfContactInvoiceReportData {
   phone_number?: string | null
 }
 
-export const fetchPointOfContactInvoiceReport = async (organizationId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactInvoiceReportData[]> => {
+export const fetchPointOfContactInvoiceReport = async (organizationId: string, filters?: Partial<LocalFilterPayload>): Promise<PointOfContactInvoiceReportData[]> => {
   try {
     const graphqlClient = await client()
     

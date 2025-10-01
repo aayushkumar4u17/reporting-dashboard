@@ -1,15 +1,21 @@
 import client from './APIClient'
-import type { FilterPayload } from '@/composables/useFilters'
+
+interface LocalFilterPayload {
+  city?: string
+  delivered_date?: string
+  ordered_date?: string
+  point_of_contact?: string
+}
 
 export interface PointOfContactPaymentReportData {
   allowed_credit_breach?: string | null
-  credit_limit?: string | null
+  credit_limit?: string | number | null
   customer_id?: string | null
   customer_name?: string | null
   first_name?: string | null
   last_name?: string | null
-  outstanding_amount?: string | null
-  overdue_amount?: string | null
+  outstanding_amount?: string | number | null
+  overdue_amount?: string | number | null
   payment_terms?: number | null
   phone_number?: string | null
 }
@@ -34,7 +40,7 @@ export interface MappedPaymentData {
   selected?: boolean
 }
 
-export const fetchPointOfContactPaymentReport = async (organizationId: string, filters?: Partial<FilterPayload>): Promise<PointOfContactPaymentReportData[]> => {
+export const fetchPointOfContactPaymentReport = async (organizationId: string, filters?: Partial<LocalFilterPayload>): Promise<PointOfContactPaymentReportData[]> => {
   try {
     const graphqlClient = await client()
     
@@ -58,9 +64,9 @@ export const mapPaymentData = (data: PointOfContactPaymentReportData[]): MappedP
     id: item.customer_id || `payment-${index}`,
     customerName: item.customer_name || 'N/A',
     customerId: item.customer_id || 'N/A',
-    creditLimit: item.credit_limit || '0',
-    outstandingAmount: item.outstanding_amount || '0',
-    overdueAmount: item.overdue_amount || '0',
+    creditLimit: String(item.credit_limit || '0'),
+    outstandingAmount: String(item.outstanding_amount || '0'),
+    overdueAmount: String(item.overdue_amount || '0'),
     phoneNumber: 'N/A',
     allowedCreditBreach: item.allowed_credit_breach || 'N',
     paymentTerms: 0,
@@ -69,9 +75,9 @@ export const mapPaymentData = (data: PointOfContactPaymentReportData[]): MappedP
 }
 
 export const calculateSummary = (data: PointOfContactPaymentReportData[]): PaymentSummary => {
-  const totalCreditLimit = data.reduce((sum, item) => sum + parseFloat(item.credit_limit || '0'), 0)
-  const totalOutstanding = data.reduce((sum, item) => sum + parseFloat(item.outstanding_amount || '0'), 0)
-  const totalOverdue = data.reduce((sum, item) => sum + parseFloat(item.overdue_amount || '0'), 0)
+  const totalCreditLimit = data.reduce((sum, item) => sum + parseFloat(String(item.credit_limit || '0')), 0)
+  const totalOutstanding = data.reduce((sum, item) => sum + parseFloat(String(item.outstanding_amount || '0')), 0)
+  const totalOverdue = data.reduce((sum, item) => sum + parseFloat(String(item.overdue_amount || '0')), 0)
   const availableBalance = totalCreditLimit - totalOutstanding
 
   return {

@@ -293,6 +293,46 @@ body, html {
   transition: all 0.3s ease;
   padding: 1rem;
   border-radius: 12px;
+  position: relative;
+}
+
+.user-card.selected {
+  background: rgba(0, 200, 81, 0.15) !important;
+  border: 2px solid #00C851 !important;
+  box-shadow: 0 4px 15px rgba(0, 200, 81, 0.2) !important;
+}
+
+.user-card.selected:hover {
+  background: rgba(0, 200, 81, 0.2) !important;
+  transform: translateY(-5px) !important;
+}
+
+.selected-tick {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #00C851;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 200, 81, 0.4);
+  z-index: 10;
+  animation: tickAppear 0.3s ease;
+}
+
+@keyframes tickAppear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .user-card:hover {

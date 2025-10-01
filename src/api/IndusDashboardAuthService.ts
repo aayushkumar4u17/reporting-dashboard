@@ -18,7 +18,7 @@ export interface OrganizationUser {
   is_active: boolean;
   is_owner: boolean;
   organization_id: string;
-  organization_user_type?: string;
+  organization_user_type?: string | null;
   organization: {
     id: string;
     name?: string | null;

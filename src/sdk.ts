@@ -296,6 +296,18 @@ export type FetchCustomerOrderItemSlotsByIdOutput = {
   start_time?: Maybe<Scalars['timetz']>;
 };
 
+export type FetchInvoicesPdfInput = {
+  invoices: Array<InvoiceItem>;
+};
+
+export type FetchInvoicesPdfOutput = {
+  __typename?: 'FetchInvoicesPdfOutput';
+  code: Scalars['Int'];
+  data: Array<InvoicePdfResult>;
+  error?: Maybe<Scalars['String']>;
+  message: Scalars['String'];
+};
+
 export type FileInput = {
   fileUrl: Scalars['String'];
 };
@@ -378,6 +390,19 @@ export type Int_Comparison_Exp = {
   _lte?: InputMaybe<Scalars['Int']>;
   _neq?: InputMaybe<Scalars['Int']>;
   _nin?: InputMaybe<Array<Scalars['Int']>>;
+};
+
+export type InvoiceItem = {
+  isPickup?: InputMaybe<Scalars['Boolean']>;
+  sales_invoice_erp_code: Scalars['String'];
+};
+
+export type InvoicePdfResult = {
+  __typename?: 'InvoicePdfResult';
+  data?: Maybe<Scalars['String']>;
+  error?: Maybe<Scalars['String']>;
+  sales_invoice_erp_code: Scalars['String'];
+  success: Scalars['Boolean'];
 };
 
 export type PayThroughWalletInput = {
@@ -498,6 +523,28 @@ export type PointOfContactInvoiceReportInput = {
 export type PointOfContactInvoiceReportOutput = {
   __typename?: 'PointOfContactInvoiceReportOutput';
   data: Array<PointOfContactInvoiceReportData>;
+};
+
+export type PointOfContactPageReportInput = {
+  city?: InputMaybe<Scalars['String']>;
+  organization_id: Scalars['uuid'];
+  state?: InputMaybe<Scalars['String']>;
+};
+
+export type PointOfContactPageReportOutput = {
+  __typename?: 'PointOfContactPageReportOutput';
+  data: Array<PointOfContactPageUser>;
+};
+
+export type PointOfContactPageUser = {
+  __typename?: 'PointOfContactPageUser';
+  address_line1?: Maybe<Scalars['String']>;
+  city_name?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  first_name?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
+  phone_number?: Maybe<Scalars['String']>;
+  state_name?: Maybe<Scalars['String']>;
 };
 
 export type PointOfContactPaymentReportData = {
@@ -24858,6 +24905,17 @@ export type FetchOrderStatsForDriverV2Output = {
   data: Scalars['jsonb'];
 };
 
+export type FetchOrderStatsForDriverV3Input = {
+  driver_vehicle_id: Scalars['String'];
+  end_date: Scalars['timestamp'];
+  start_date: Scalars['timestamp'];
+};
+
+export type FetchOrderStatsForDriverV3Output = {
+  __typename?: 'fetchOrderStatsForDriverV3Output';
+  data: Scalars['jsonb'];
+};
+
 export type FetchOrgAddressIdForUserOutput = {
   __typename?: 'fetchOrgAddressIdForUserOutput';
   data?: Maybe<Scalars['jsonb']>;
@@ -25142,6 +25200,15 @@ export type FetchTasksOrderQtyByVehicleIdInput = {
 
 export type FetchTasksOrderQtyByVehicleIdOutput = {
   __typename?: 'fetchTasksOrderQtyByVehicleIdOutput';
+  data?: Maybe<Scalars['jsonb']>;
+};
+
+export type FetchTechnicianDataByErpCodesInput = {
+  erp_codes: Array<Scalars['String']>;
+};
+
+export type FetchTechnicianDataByErpCodesOutput = {
+  __typename?: 'fetchTechnicianDataByErpCodesOutput';
   data?: Maybe<Scalars['jsonb']>;
 };
 
@@ -38545,10 +38612,12 @@ export type Mutation_Root = {
   fetchCustomerAssetDashboradData?: Maybe<CustomerAssetDataOutput>;
   fetchCustomerOrderDashboradData?: Maybe<CustomerOrderDataOutput>;
   fetchCustomerOrderItemSlotsById?: Maybe<FetchCustomerOrderItemSlotsByIdOutput>;
+  fetchInvoicesPdf: FetchInvoicesPdfOutput;
   fetchIssueList?: Maybe<FetchIssueListOutput>;
   fetchOrderStatsForDriver?: Maybe<FetchOrderStatsForDriverOutput>;
   fetchOrderStatsForDriverV1?: Maybe<FetchOrderStatsForDriverV1Output>;
   fetchOrderStatsForDriverV2?: Maybe<FetchOrderStatsForDriverV2Output>;
+  fetchOrderStatsForDriverV3?: Maybe<FetchOrderStatsForDriverV3Output>;
   /** This will fetch all pending invoice for postpaid customer */
   fetchPostpaidInvoice: PostpaidInvoiceOutput;
   fetchRoDocs: FetchRoDocsOuput;
@@ -44242,6 +44311,12 @@ export type Mutation_RootFetchCustomerOrderItemSlotsByIdArgs = {
 
 
 /** mutation root */
+export type Mutation_RootFetchInvoicesPdfArgs = {
+  object: FetchInvoicesPdfInput;
+};
+
+
+/** mutation root */
 export type Mutation_RootFetchIssueListArgs = {
   object: FetchIssueListInput;
 };
@@ -44262,6 +44337,12 @@ export type Mutation_RootFetchOrderStatsForDriverV1Args = {
 /** mutation root */
 export type Mutation_RootFetchOrderStatsForDriverV2Args = {
   object: FetchOrderStatsForDriverV2Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootFetchOrderStatsForDriverV3Args = {
+  object: FetchOrderStatsForDriverV3Input;
 };
 
 
@@ -89728,6 +89809,7 @@ export type Query_Root = {
   fetchSupplierVehicleForTowerBussinessReport?: Maybe<FetchSupplierVehicleForTowerBussinessReportOutput>;
   fetchTaskValueForCustomerAsset?: Maybe<FetchTaskValueForCustomerAssetOutput>;
   fetchTasksOrderQtyByVehicleId?: Maybe<FetchTasksOrderQtyByVehicleIdOutput>;
+  fetchTechnicianDataByErpCodes?: Maybe<FetchTechnicianDataByErpCodesOutput>;
   fetchThirdPartyDataForPartner?: Maybe<FetchThirdPartyDataForPartnerOutput>;
   fetchTrucksByCity?: Maybe<FetchTrucksByCityOutput>;
   fetchUserDetails?: Maybe<UserDetailsOutput>;
@@ -90413,6 +90495,7 @@ export type Query_Root = {
   pointOfContactDashboardReschedule?: Maybe<PointOfContactDashboardRescheduleOutput>;
   pointOfContactDetailedReport?: Maybe<PointOfContactDetailedReportOutput>;
   pointOfContactInvoiceReport?: Maybe<PointOfContactInvoiceReportOutput>;
+  pointOfContactPageReport?: Maybe<PointOfContactPageReportOutput>;
   pointOfContactPaymentReport?: Maybe<PointOfContactPaymentReportOutput>;
   /** fetch data from the table: "product" */
   product: Array<Product>;
@@ -92932,6 +93015,11 @@ export type Query_RootFetchTaskValueForCustomerAssetArgs = {
 
 export type Query_RootFetchTasksOrderQtyByVehicleIdArgs = {
   object?: InputMaybe<FetchTasksOrderQtyByVehicleIdInput>;
+};
+
+
+export type Query_RootFetchTechnicianDataByErpCodesArgs = {
+  object: FetchTechnicianDataByErpCodesInput;
 };
 
 
@@ -95611,6 +95699,11 @@ export type Query_RootPointOfContactDetailedReportArgs = {
 
 export type Query_RootPointOfContactInvoiceReportArgs = {
   object: PointOfContactInvoiceReportInput;
+};
+
+
+export type Query_RootPointOfContactPageReportArgs = {
+  object: PointOfContactPageReportInput;
 };
 
 
@@ -130162,6 +130255,15 @@ export type InvoicesQueryQueryVariables = Exact<{
 
 export type InvoicesQueryQuery = { __typename?: 'query_root', pointOfContactInvoiceReport?: { __typename?: 'PointOfContactInvoiceReportOutput', data: Array<{ __typename?: 'PointOfContactInvoiceReportData', app_order_code?: string | null, city?: string | null, delivered_date?: string | null, erp_order_code?: string | null, first_name?: string | null, invoice?: string | null, order_amount?: number | null, last_name?: string | null, order_date?: string | null, order_delivered_qty?: number | null, order_qty?: number | null, phone_number?: string | null, shipping_address?: string | null }> } | null };
 
+export type PointOfContactPageQueryQueryVariables = Exact<{
+  organization_id: Scalars['uuid'];
+  city?: InputMaybe<Scalars['String']>;
+  state?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type PointOfContactPageQueryQuery = { __typename?: 'query_root', pointOfContactPageReport?: { __typename?: 'PointOfContactPageReportOutput', data: Array<{ __typename?: 'PointOfContactPageUser', address_line1?: string | null, city_name?: string | null, email?: string | null, first_name?: string | null, last_name?: string | null, phone_number?: string | null, state_name?: string | null }> } | null };
+
 export type PaymentsQueryQueryVariables = Exact<{
   org_id: Scalars['String'];
   city: Scalars['String'];
@@ -130285,6 +130387,23 @@ export const InvoicesQueryDocument = gql`
   }
 }
     `;
+export const PointOfContactPageQueryDocument = gql`
+    query PointOfContactPageQuery($organization_id: uuid!, $city: String, $state: String) {
+  pointOfContactPageReport(
+    object: {organization_id: $organization_id, city: $city, state: $state}
+  ) {
+    data {
+      address_line1
+      city_name
+      email
+      first_name
+      last_name
+      phone_number
+      state_name
+    }
+  }
+}
+    `;
 export const PaymentsQueryDocument = gql`
     query PaymentsQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
   pointOfContactPaymentReport(
@@ -130349,6 +130468,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     InvoicesQuery(variables: InvoicesQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<InvoicesQueryQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<InvoicesQueryQuery>(InvoicesQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'InvoicesQuery', 'query');
+    },
+    PointOfContactPageQuery(variables: PointOfContactPageQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PointOfContactPageQueryQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PointOfContactPageQueryQuery>(PointOfContactPageQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PointOfContactPageQuery', 'query');
     },
     PaymentsQuery(variables: PaymentsQueryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PaymentsQueryQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PaymentsQueryQuery>(PaymentsQueryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'PaymentsQuery', 'query');

@@ -57,12 +57,18 @@
           v-for="org in filteredOrganizations" 
           :key="org.uniqueKey || `${org.id}-${org.name}`"
           class="user-card"
+          :class="{ 'selected': isSelectedOrganization(org.id) }"
           @click="selectOrganization(org)"
         >
           <div class="user-avatar" :style="{ background: org.color }">
             <span class="user-initial">{{ getInitials(org.name) }}</span>
           </div>
           <p class="user-name">{{ org.name }}</p>
+          <div v-if="isSelectedOrganization(org.id)" class="selected-tick">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
         </div>
       </div>
       
@@ -86,11 +92,13 @@ import client from '@/api/APIClient'
 import { canAccessIndusDashboard } from '@/utils/auth'
 import { useUserStore } from '@/stores'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
+import { useOrganizationStore } from '@/stores/organization'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const pointOfContactStore = usePointOfContactStore()
+const organizationStore = useOrganizationStore()
 const organizations = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -128,6 +136,15 @@ const getColorForOrg = (name) => {
 const getInitials = (name) => {
   if (!name) return 'O'
   return name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()
+}
+
+// Check if organization is currently selected
+const isSelectedOrganization = (orgId) => {
+  // Initialize organization store if needed
+  organizationStore.initialize()
+  const selectedOrg = organizationStore.selectedOrganization || JSON.parse(localStorage.getItem('selectedOrganization') || 'null')
+  console.log('Checking selected org:', { orgId, selectedOrg, match: selectedOrg?.id === orgId })
+  return selectedOrg?.id === orgId
 }
 
 // Clear search query

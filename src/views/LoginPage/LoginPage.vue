@@ -157,9 +157,8 @@ import TermsPopup from '@/components/layout/TermsPopup.vue'
 // Import Firebase Auth actions
 import { useAuthStore } from '@/stores'
 import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/api/auth'
-import { startTimer, formatTime } from '@/api/auth'
-import { validatePhoneNumber } from '@/api/general'
-import { auth } from '@/config/firebase'
+import { startTimer } from '@/api/auth'
+// Removed unused imports: formatTime, validatePhoneNumber, auth
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -1,7 +1,8 @@
 import client from './APIClient'
-import type { FilterPayload } from '@/composables/useFilters'
+// Removed unused import
+// import type { FilterPayload } from '@/composables/useFilters'
 
-export interface OrderDate {
+export interface DetailedOrderDate {
   value: string;
 }
 
@@ -17,7 +18,7 @@ export interface PointOfContactDetailedReportData {
   first_name?: string | null
   last_name?: string | null
   order_amount?: number | null
-  order_date?: string | OrderDate | null
+  order_date?: string | DetailedOrderDate | null
   order_delivered_qty?: number | null
   order_qty?: number | null
   phone_number?: string | null

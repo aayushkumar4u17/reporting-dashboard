@@ -104,7 +104,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
           callback: (response: any) => {
             console.log('reCAPTCHA solved:', !!response);
           },
-          "error-callback": (error: any) => {
+          "error-callback": (_error: any) => {
             console.error('reCAPTCHA error callback:', { hasError: true });
           },
         }
@@ -121,7 +121,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
       
     } catch (otpError) {
-      console.error('Failed to send OTP:', { code: otpError?.code, message: 'OTP sending failed' });
+      console.error('Failed to send OTP:', { code: (otpError as any)?.code, message: 'OTP sending failed' });
       
       // Clean up verifier on error
       try {

@@ -3,167 +3,47 @@
 
     
     <div class="payments-container">
-      <!-- Filter Section -->
-    <div class="filter-section" :class="{ 'animate-slide-down': isLoaded }">
-      <div class="filter-row">
-        <div class="filter-group">
-          <label>Order Date</label>
-          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label>Delivery Date</label>
-          <DatePicker v-model="deliveredDate" placeholder="Select Delivery Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label>City</label>
-          <select v-model="selectedCity" class="filter-select">
-            <option value="">Select City</option>
-            <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
-          </select>
-        </div>
-        
-        <div class="filter-group">
-          <label>Point of Contact</label>
-          <select v-model="selectedPOC" class="filter-select">
-            <option value="">Select POC</option>
-            <option v-for="poc in availablePOCs" :key="poc" :value="poc">{{ poc }}</option>
-          </select>
-        </div>
-        
-        <div class="filter-actions">
-          <AnimatedButton @click="applyFilters" variant="primary" size="small">
-            Apply Filter
-          </AnimatedButton>
-          <AnimatedButton @click="clearAllFilters" variant="clear" size="small">
-            Clear All Filters
-          </AnimatedButton>
-        </div>
-        
-        <!-- Download Section -->
-        <div class="download-section">
-          <AnimatedButton @click="downloadPayments" variant="danger" size="small">
-            <span>PDF</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-          </AnimatedButton>
-        </div>
-      </div>
-    </div>
+      <!-- Filter Component -->
+      <FilterBar
+        :filters="['orderDateRange', 'deliveryDateRange']"
+        v-model="filterValues"
+        @apply="handleApplyFilters"
+        @clear="handleClearFilters"
+        :loading="loading"
+      />
 
     <!-- Summary Cards -->
-    <div class="summary-section" :class="{ 'animate-fade-in-up': isLoaded }">
-      <div class="summary-cards">
-        <div class="summary-card">
-          <div class="card-header">Credit Limit</div>
-          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.creditLimit }}</div>
-          <SkeletonLoader v-else width="60%" height="24px" />
-        </div>
-        
-        <div class="summary-card">
-          <div class="card-header">Available Balance</div>
-          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.availableBalance }}</div>
-          <SkeletonLoader v-else width="60%" height="24px" />
-        </div>
-        
-        <div class="summary-card">
-          <div class="card-header">Total Outstanding</div>
-          <div v-if="!summaryLoading" class="card-value green">{{ summaryData.totalOutstanding }}</div>
-          <SkeletonLoader v-else width="60%" height="24px" />
-        </div>
-        
-        <div class="summary-card">
-          <div class="card-header">Total Overdue</div>
-          <div v-if="!summaryLoading" class="card-value red">{{ summaryData.totalOverdue }}</div>
-          <SkeletonLoader v-else width="60%" height="24px" />
-        </div>
-        
-        <div class="action-buttons">
-          <div class="summary-card action-card">
-            <AnimatedButton variant="success" size="small" style="width: 100%;">
-              Pay Outstanding
-            </AnimatedButton>
-          </div>
-          
-          <div class="summary-card action-card">
-            <AnimatedButton variant="warning" size="small" style="width: 100%;">
-              Pay Overdue
-            </AnimatedButton>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SummaryCards
+      :cards="summaryCards"
+      :actions="summaryActions"
+      :show-actions="true"
+      :loading="summaryLoading"
+      @action-click="handleSummaryAction"
+    />
 
     <!-- Table Section -->
-    <div class="table-container" :class="{ 'animate-fade-in-up': isLoaded }">
-      <table class="payments-table">
-        <thead>
-          <tr>
-            <th class="checkbox-column">
-              <input type="checkbox" v-model="selectAll" @change="toggleAllSelection">
-            </th>
-            <th>Customer ID</th>
-            <th>Customer Name</th>
-            <th>Credit Limit</th>
-            <th>Outstanding Amount</th>
-            <th>Overdue Amount</th>
-            <th>Payment Terms</th>
-            <!-- <th>Phone Number</th> -->
-            <th>Credit Breach</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Skeleton loading rows -->
-          <tr v-if="loading" v-for="i in 5" :key="i" class="skeleton-row">
-            <td>
-              <SkeletonLoader width="16px" height="16px" />
-            </td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td><SkeletonLoader width="80%" height="16px" /></td>
-            <td>
-              <SkeletonLoader width="80%" height="24px" />
-            </td>
-          </tr>
-          
-          <!-- Actual data rows -->
-          <tr v-for="payment in payments" :key="payment.id" :class="{ 'selected': payment.selected }">
-            <td class="checkbox-column">
-              <input type="checkbox" v-model="payment.selected">
-            </td>
-            <td>{{ payment.customerId }}</td>
-            <td>{{ payment.customerName }}</td>
-            <td>{{ formatCurrency(payment.creditLimit) }}</td>
-            <td>{{ formatCurrency(payment.outstandingAmount) }}</td>
-            <td>{{ formatCurrency(payment.overdueAmount) }}</td>
-            <td>{{ payment.paymentTerms }} days</td>
-            <td>{{ payment.phoneNumber }}</td>
-            <td>
-              <span :class="['status-badge', payment.allowedCreditBreach === 'Y' ? 'status-allowed' : 'status-not-allowed']">
-                {{ payment.allowedCreditBreach === 'Y' ? 'Allowed' : 'Not Allowed' }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <!-- No data message -->
-      <div v-if="!loading && payments.length === 0" class="no-data-message">
-        No data found
-      </div>
-    </div>
+    <DataTable
+      :columns="paymentColumns"
+      :data="payments"
+      :loading="loading"
+      :show-checkbox="true"
+      @selection-change="handleSelectionChange"
+    >
+      <template #cell-creditLimit="{ value }">
+        {{ formatCurrency(value) }}
+      </template>
+      <template #cell-outstandingAmount="{ value }">
+        {{ formatCurrency(value) }}
+      </template>
+      <template #cell-overdueAmount="{ value }">
+        {{ formatCurrency(value) }}
+      </template>
+      <template #cell-allowedCreditBreach="{ value }">
+        <span :class="['status-badge', value === 'Y' ? 'status-allowed' : 'status-not-allowed']">
+          {{ value === 'Y' ? 'Allowed' : 'Not Allowed' }}
+        </span>
+      </template>
+    </DataTable>
     </div>
 
     <!-- No Data Popup -->
@@ -180,12 +60,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import FilterBar from '@/components/ui/FilterBar.vue'
+import DataTable from '@/components/ui/DataTable.vue'
+import SummaryCards from '@/components/ui/SummaryCards.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
-import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
-import DatePicker from '@/components/layout/DatePicker.vue'
 import { useFilters } from '@/composables/useFilters'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
+import { useOrganization } from '@/composables/useOrganization'
 import { fetchPointOfContactPaymentReport, mapPaymentData, calculateSummary } from '@/api/pointOfContactPaymentReport'
 import { generatePaymentsPDF } from '@/utils/pdfGenerator'
 
@@ -197,19 +79,51 @@ const showNoDataPopup = ref(false)
 
 // Point of Contact Store
 const pointOfContactStore = usePointOfContactStore()
+const { getOrganizationId, watchOrganizationChange } = useOrganization()
+
+// Watch for organization changes
+let unwatchOrganization = null
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
-const orderedDate = ref('')
-const deliveredDate = ref('')
-const selectedCity = ref('')
-const selectedPOC = ref('')
+const filterValues = ref({
+  orderDateFrom: '',
+  orderDateTo: '',
+  deliveryDateFrom: '',
+  deliveryDateTo: '',
+  city: '',
+  poc: ''
+})
 
 // Reactive data
 const selectAll = ref(false)
 const payments = ref([])
 const availableCities = ref([])
 const availablePOCs = ref([])
+
+// Table columns configuration
+const paymentColumns = [
+  { key: 'customerId', label: 'Customer ID' },
+  { key: 'customerName', label: 'Customer Name' },
+  { key: 'creditLimit', label: 'Credit Limit', type: 'currency' },
+  { key: 'outstandingAmount', label: 'Outstanding Amount', type: 'currency' },
+  { key: 'overdueAmount', label: 'Overdue Amount', type: 'currency' },
+  { key: 'allowedCreditBreach', label: 'Credit Breach', type: 'status' }
+]
+
+// Summary cards configuration
+const summaryCards = computed(() => [
+  { key: 'creditLimit', label: 'Credit Limit', value: summaryData.value.creditLimit, valueClass: 'green' },
+  { key: 'availableBalance', label: 'Available Balance', value: summaryData.value.availableBalance, valueClass: 'green' },
+  { key: 'totalOutstanding', label: 'Total Outstanding', value: summaryData.value.totalOutstanding, valueClass: 'green' },
+  { key: 'totalOverdue', label: 'Total Overdue', value: summaryData.value.totalOverdue, valueClass: 'red' }
+])
+
+// Summary actions configuration
+const summaryActions = [
+  { key: 'payOutstanding', label: 'Pay Outstanding', variant: 'success' },
+  { key: 'payOverdue', label: 'Pay Overdue', variant: 'warning' }
+]
 
 // Summary data with initial values set to 0
 const summaryData = ref({
@@ -224,20 +138,15 @@ const loadData = async () => {
     loading.value = true
     summaryLoading.value = true
     
-    let organizationUserId = pointOfContactStore.selectedUserId
+    const organizationId = getOrganizationId()
     
-    // If store is empty, try to refresh from localStorage
-    if (!organizationUserId) {
-      pointOfContactStore.refreshFromStorage()
-      organizationUserId = pointOfContactStore.selectedUserId
+    if (!organizationId) {
+      console.warn('No organization selected')
+      return
     }
     
-    if (!organizationUserId) {
-      throw new Error('No organization selected. Please go back and select an organization.')
-    }
-    
-    const filterPayload = buildFilterPayload(organizationUserId)
-    const rawData = await fetchPointOfContactPaymentReport(organizationUserId, filterPayload)
+    const filterPayload = buildFilterPayload(organizationId)
+    const rawData = await fetchPointOfContactPaymentReport(organizationId, filterPayload)
     
     payments.value = mapPaymentData(rawData)
     summaryData.value = calculateSummary(rawData)
@@ -258,24 +167,53 @@ const loadData = async () => {
 }
 
 // Methods
-const applyFilters = () => {
-  // Update filters object with current values
-  filters.value.orderedDate = orderedDate.value
-  filters.value.deliveredDate = deliveredDate.value
-  filters.value.selectedCity = selectedCity.value
-  filters.value.selectedPOC = selectedPOC.value
+const handleApplyFilters = (appliedFilters) => {
+  // Update filters object with applied values
+  if (appliedFilters.orderDateFrom) {
+    filters.value.orderedDateFrom = appliedFilters.orderDateFrom
+    filters.value.orderedDateTo = appliedFilters.orderDateTo || appliedFilters.orderDateFrom
+    filters.value.deliveredDateFrom = ''
+    filters.value.deliveredDateTo = ''
+  } else if (appliedFilters.deliveryDateFrom) {
+    filters.value.deliveredDateFrom = appliedFilters.deliveryDateFrom
+    filters.value.deliveredDateTo = appliedFilters.deliveryDateTo || appliedFilters.deliveryDateFrom
+    filters.value.orderedDateFrom = ''
+    filters.value.orderedDateTo = ''
+  }
+  filters.value.selectedCity = appliedFilters.city
+  filters.value.selectedPOC = appliedFilters.poc
   // Apply current filter values
   loadData()
 }
 
-const clearAllFilters = () => {
-  orderedDate.value = ''
-  deliveredDate.value = ''
-  selectedCity.value = ''
-  selectedPOC.value = ''
+const handleClearFilters = () => {
+  filterValues.value = {
+    orderDateFrom: '',
+    orderDateTo: '',
+    deliveryDateFrom: '',
+    deliveryDateTo: '',
+    city: '',
+    poc: ''
+  }
   clearFilters()
   // Clear all filter values and reload data
   loadData()
+}
+
+const handleSelectionChange = (selectedItems) => {
+  // Handle selection change if needed
+  console.log('Selected items:', selectedItems)
+}
+
+const handleSummaryAction = (actionKey) => {
+  switch (actionKey) {
+    case 'payOutstanding':
+      console.log('Pay Outstanding clicked')
+      break
+    case 'payOverdue':
+      console.log('Pay Overdue clicked')
+      break
+  }
 }
 
 const toggleAllSelection = () => {
@@ -322,6 +260,22 @@ onMounted(() => {
   }, 100)
   
   loadData()
+  
+  // Watch for organization changes and reload data
+  unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
+    if (newOrgId && newOrgId !== oldOrgId) {
+      loading.value = true
+      summaryLoading.value = true
+      loadData()
+    }
+  })
+})
+
+// Cleanup watcher on unmount
+onUnmounted(() => {
+  if (unwatchOrganization) {
+    unwatchOrganization()
+  }
 })
 </script>
 

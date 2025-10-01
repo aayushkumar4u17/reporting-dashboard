@@ -199,6 +199,9 @@ watch(() => props.modelValue, (newValue) => {
   backdrop-filter: blur(5px);
   color: #333;
   min-width: 120px;
+  width: 130px;
+  height: 40px;
+  box-sizing: border-box;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
@@ -220,6 +223,9 @@ watch(() => props.modelValue, (newValue) => {
   flex: 1;
   color: #333;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .date-value:empty::before {

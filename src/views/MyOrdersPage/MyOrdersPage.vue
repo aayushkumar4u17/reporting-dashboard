@@ -1,127 +1,42 @@
 <template>
   <div class="my-orders-page">
     <div class="orders-container">
-      <!-- Filter Bar -->
-      <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
-        <div class="filter-group">
-          <label class="filter-label">Delivery Date</label>
-          <DatePicker v-model="deliveryDate" placeholder="Select Delivery Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">Order Date</label>
-          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">City</label>
-          <select v-model="selectedCity" class="filter-select">
-            <option value="">Select City</option>
-            <option v-for="city in uniqueCities" :key="city" :value="city">
-              {{ city }}
-            </option>
-          </select>
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">Point of Contact</label>
-          <select v-model="selectedPOC" class="filter-select">
-            <option value="">Select POC</option>
-            <option v-for="poc in uniquePOCs" :key="poc" :value="poc">
-              {{ poc }}
-            </option>
-          </select>
-        </div>
-        
-        <div class="filter-actions">
-          <AnimatedButton @click="applyFilters" variant="primary" size="small">
-            Apply Filter
-          </AnimatedButton>
-          <AnimatedButton @click="clearAllFilters" variant="clear" size="small">
-            Clear All Filters
-          </AnimatedButton>
-        </div>
-      </div>
+      <!-- Filter Component -->
+      <FilterBar
+        :filters="['deliveryDateRange', 'orderDateRange', 'city', 'poc']"
+        v-model="filterValues"
+        :city-options="uniqueCities"
+        :poc-options="uniquePOCs"
+        @apply="handleApplyFilters"
+        @clear="handleClearFilters"
+        :loading="loading"
+      />
 
       <!-- Orders Table -->
-      <div class="table-container" :class="{ 'animate-fade-in-up': isLoaded }">
-        <table class="orders-table">
-          <thead>
-            <tr class="table-header">
-              <th class="header-cell checkbox-column">
-                <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="header-checkbox" />
-              </th>
-              <!-- <th class="header-cell">Check BN</th> -->
-              <th class="header-cell">Asp Order No</th>
-              <th class="header-cell">Sales Order Code</th>
-              <th class="header-cell">Order Date</th>
-              <th class="header-cell">Delivery Date</th>
-              <th class="header-cell">Delivery Time</th>
-              <th class="header-cell">Order Quantity</th>
-              <th class="header-cell">City</th>
-              <th class="header-cell">POC Name</th>
-              <th class="header-cell">POC Contact</th>
-              <th class="header-cell">Delivery Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Skeleton loading rows -->
-            <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
-              <td class="table-cell checkbox-column">
-                <SkeletonLoader width="16px" height="16px" />
-              </td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-            </tr>
-            
-            <!-- Actual data rows -->
-            <tr v-for="order in filteredOrders" :key="order.id" class="table-row">
-              <td class="table-cell checkbox-column">
-                <input type="checkbox" v-model="order.selected" class="row-checkbox" />
-              </td>
-              <!-- <td class="table-cell">{{ order.checkBN }}</td> -->
-              <td class="table-cell">{{ order.aspOrderNo }}</td>
-              <td class="table-cell">{{ order.salesOrderCode }}</td>
-              <td class="table-cell">{{ order.orderedDate }}</td>
-              <td class="table-cell">{{ order.deliveryDate }}</td>
-              <td class="table-cell">{{ order.deliveryTimeSlot }}</td>
-              <td class="table-cell">{{ order.orderedQuantity }}</td>
-              <td class="table-cell delivery-location">{{ order.deliveryLocation }}</td>
-              <td class="table-cell">{{ order.pocName }}</td>
-              <td class="table-cell">{{ order.pocContact }}</td>
-              <td class="table-cell">
-                <span class="status-badge" :class="getStatusClass(order.deliveryStatus)">
-                  {{ order.deliveryStatus }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <!-- No data message -->
-        <div v-if="!loading && filteredOrders.length === 0" class="no-data-message">
-          No data found
-        </div>
-      </div>
+      <DataTable
+        :columns="orderColumns"
+        :data="filteredOrders"
+        :loading="loading"
+        :pagination="true"
+        :items-per-page="10"
+      >
+        <template #cell-deliveryStatus="{ value }">
+          <span class="status-badge" :class="getStatusClass(value)">
+            {{ value }}
+          </span>
+        </template>
+      </DataTable>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import AnimatedButton from '@/components/layout/AnimatedButton.vue'
-import DatePicker from '@/components/layout/DatePicker.vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import FilterBar from '@/components/ui/FilterBar.vue'
+import DataTable from '@/components/ui/DataTable.vue'
 import { fetchPointOfContactDetailedReport } from '@/api/pointOfContactDetailedReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
+import { useOrganization } from '@/composables/useOrganization'
 import { useFilters } from '@/composables/useFilters'
 
 // Animation state
@@ -137,21 +52,46 @@ const getCurrentDate = () => {
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
 const currentDate = getCurrentDate()
-const orderedDate = ref(currentDate)
-const deliveryDate = ref(currentDate)
-const selectedCity = ref('')
-const selectedPOC = ref('')
-const selectAll = ref(false)
+
+
+const filterValues = ref({
+  orderDateFrom: '',
+  orderDateTo: '',
+  deliveryDateFrom: '',
+  deliveryDateTo: '',
+  city: '',
+  poc: '',
+  search: ''
+})
 
 // Applied filter states
-const appliedOrderedDate = ref('')
-const appliedDeliveryDate = ref('')
-const appliedCity = ref('')
-const appliedPOC = ref('')
+const appliedFilters = ref({
+  orderDateFrom: '',
+  orderDateTo: '',
+  deliveryDateFrom: '',
+  deliveryDateTo: '',
+  city: '',
+  poc: '',
+  search: ''
+})
 
 // Orders data
 const orders = ref([])
 const allOrdersData = ref([]) // Store initial data for filter options
+
+// Table columns configuration
+const orderColumns = [
+  { key: 'aspOrderNo', label: 'App Order No' },
+  { key: 'salesOrderCode', label: 'Sales Order Code' },
+  { key: 'orderedDate', label: 'Order Date' },
+  { key: 'deliveryDate', label: 'Delivery Date' },
+  { key: 'deliveryTimeSlot', label: 'Delivery Time' },
+  { key: 'orderedQuantity', label: 'Order Quantity' },
+  { key: 'deliveryLocation', label: 'City' },
+  { key: 'pocName', label: 'POC Name' },
+  { key: 'pocContact', label: 'POC Contact' },
+  { key: 'deliveryStatus', label: 'Delivery Status', type: 'status' }
+]
 
 // Computed properties for filter options (from current page data)
 const uniqueCities = computed(() => {
@@ -168,66 +108,88 @@ const uniquePOCs = computed(() => {
 const filteredOrders = computed(() => {
   let filtered = orders.value
   
-  if (appliedPOC.value) {
-    filtered = filtered.filter(order => order.pocName === appliedPOC.value)
+  if (appliedFilters.value.poc) {
+    filtered = filtered.filter(order => order.pocName === appliedFilters.value.poc)
+  }
+  
+  if (appliedFilters.value.search) {
+    const searchTerm = appliedFilters.value.search.toLowerCase()
+    filtered = filtered.filter(order => 
+      order.aspOrderNo.toLowerCase().includes(searchTerm) ||
+      order.salesOrderCode.toLowerCase().includes(searchTerm) ||
+      order.pocName.toLowerCase().includes(searchTerm) ||
+      order.deliveryLocation.toLowerCase().includes(searchTerm)
+    )
   }
   
   return filtered
 })
 
-const applyFilters = () => {
-  // Ensure dates have values (use current date if empty)
-  const currentDate = getCurrentDate()
-  const orderDateValue = orderedDate.value || currentDate
-  const deliveryDateValue = deliveryDate.value || currentDate
-  
+const handleApplyFilters = (newFilters) => {
   // Apply current filter values
-  appliedOrderedDate.value = orderDateValue
-  appliedDeliveryDate.value = deliveryDateValue
-  appliedCity.value = selectedCity.value
-  appliedPOC.value = selectedPOC.value
+  appliedFilters.value = {
+    orderDateFrom: newFilters.orderDateFrom || '',
+    orderDateTo: newFilters.orderDateTo || '',
+    deliveryDateFrom: newFilters.deliveryDateFrom || '',
+    deliveryDateTo: newFilters.deliveryDateTo || '',
+    city: newFilters.city || '',
+    poc: newFilters.poc || '',
+    search: newFilters.search || ''
+  }
   
-  // Check if only POC filter is applied (frontend filter)
-  const onlyPOCFilter = appliedPOC.value && !orderDateValue && !deliveryDateValue && !appliedCity.value
+  // Check if only POC or search filter is applied (frontend filters)
+  const hasDateFilters = appliedFilters.value.orderDateFrom || appliedFilters.value.deliveryDateFrom
+  const onlyFrontendFilters = (appliedFilters.value.poc || appliedFilters.value.search) && 
+    !hasDateFilters && !appliedFilters.value.city
   
-  if (onlyPOCFilter) {
-    // Use frontend filtering for POC only
+  if (onlyFrontendFilters) {
     return
   }
   
-  // Clear existing data first
   orders.value = []
   loading.value = true
   
-  // Update filters object with applied values
-  filters.value.orderedDateFrom = orderDateValue
-  filters.value.deliveredDateFrom = deliveryDateValue
-  filters.value.selectedCity = appliedCity.value
-  filters.value.selectedPOC = appliedPOC.value
+  // Use order date range if provided, otherwise delivery date range
+  if (appliedFilters.value.orderDateFrom) {
+    filters.value.orderedDateFrom = appliedFilters.value.orderDateFrom
+    filters.value.orderedDateTo = appliedFilters.value.orderDateTo || appliedFilters.value.orderDateFrom
+    filters.value.deliveredDateFrom = ''
+    filters.value.deliveredDateTo = ''
+  } else if (appliedFilters.value.deliveryDateFrom) {
+    filters.value.deliveredDateFrom = appliedFilters.value.deliveryDateFrom
+    filters.value.deliveredDateTo = appliedFilters.value.deliveryDateTo || appliedFilters.value.deliveryDateFrom
+    filters.value.orderedDateFrom = ''
+    filters.value.orderedDateTo = ''
+  }
   
-  // Load filtered data (exclude POC from API call)
+  filters.value.selectedCity = appliedFilters.value.city
   loadFilteredData()
 }
 
-const clearAllFilters = () => {
-  const currentDate = getCurrentDate()
-  orderedDate.value = currentDate
-  deliveryDate.value = currentDate
-  selectedCity.value = ''
-  selectedPOC.value = ''
-  appliedOrderedDate.value = ''
-  appliedDeliveryDate.value = ''
-  appliedCity.value = ''
-  appliedPOC.value = ''
+const handleClearFilters = () => {
+  filterValues.value = {
+    orderDateFrom: '',
+    orderDateTo: '',
+    deliveryDateFrom: '',
+    deliveryDateTo: '',
+    city: '',
+    poc: '',
+    search: ''
+  }
+  appliedFilters.value = {
+    orderDateFrom: '',
+    orderDateTo: '',
+    deliveryDateFrom: '',
+    deliveryDateTo: '',
+    city: '',
+    poc: '',
+    search: ''
+  }
   clearFilters()
   loadData()
 }
 
-const toggleSelectAll = () => {
-  orders.value.forEach(order => {
-    order.selected = selectAll.value
-  })
-}
+
 
 const getStatusClass = (status) => {
   switch (status) {
@@ -243,6 +205,10 @@ const getStatusClass = (status) => {
 }
 
 const pointOfContactStore = usePointOfContactStore()
+const { getOrganizationId, watchOrganizationChange } = useOrganization()
+
+// Watch for organization changes
+let unwatchOrganization = null
 
 const mapOrderData = (reportData) => {
   return reportData.map((item, index) => {
@@ -254,13 +220,21 @@ const mapOrderData = (reportData) => {
       orderDate = item.order_date
     }
     
+    // Extract delivery date value if it exists
+    let deliveryDate = ''
+    if (item.actual_delivery_date && typeof item.actual_delivery_date === 'object' && item.actual_delivery_date.value) {
+      deliveryDate = item.actual_delivery_date.value
+    } else if (typeof item.actual_delivery_date === 'string') {
+      deliveryDate = item.actual_delivery_date
+    }
+    
     return {
       id: index + 1,
       checkBN: item.erp_order_code || '',
       aspOrderNo: item.app_order_code || '',
       salesOrderCode: item.erp_order_code || '',
       orderedDate: orderDate,
-      deliveryDate: item.actual_delivery_date || '',
+      deliveryDate: deliveryDate,
       deliveryTimeSlot: item.delivery_slot || '',
       orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
       deliveryLocation: item.city || '',
@@ -268,7 +242,7 @@ const mapOrderData = (reportData) => {
       pocContact: item.phone_number || '',
       deliveryStatus: item.backend_order_status || '',
       city: item.city || '',
-      selected: false,
+
       shippingAddress: item.shipping_address || ''
     }
   })
@@ -276,14 +250,12 @@ const mapOrderData = (reportData) => {
 
 const loadInitialData = async () => {
   try {
-    let userId = pointOfContactStore.selectedUserId
+    const organizationId = getOrganizationId()
     
-    if (!userId) {
-      pointOfContactStore.refreshFromStorage()
-      userId = pointOfContactStore.selectedUserId
+    if (!organizationId) {
+      console.warn('No organization selected')
+      return
     }
-    
-    if (!userId) return
     
     // Use current date as default for initial load
     const currentDate = getCurrentDate()
@@ -294,7 +266,7 @@ const loadInitialData = async () => {
       point_of_contact: ''
     }
     
-    const reportData = await fetchPointOfContactDetailedReport(userId, filterParams)
+    const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
     allOrdersData.value = mapOrderData(reportData)
     orders.value = [...allOrdersData.value]
   } catch (error) {
@@ -307,24 +279,19 @@ const loadInitialData = async () => {
 const loadFilteredData = async () => {
   try {
     loading.value = true
-    let userId = pointOfContactStore.selectedUserId
+    const organizationId = getOrganizationId()
     
-    if (!userId) return
+    if (!organizationId) return
     
-    // Ensure dates have values - use current date if empty
-    const currentDate = getCurrentDate()
-    const orderDate = appliedOrderedDate.value || orderedDate.value || currentDate
-    const deliveryDate = appliedDeliveryDate.value || deliveryDate.value || currentDate
-    
-    // Create filter object with applied values (exclude POC for frontend filtering)
+    // Create filter object with applied values (exclude POC and search for frontend filtering)
     const filterParams = {
-      city: appliedCity.value || '',
-      ordered_date: orderDate,
-      delivered_date: deliveryDate,
+      city: appliedFilters.value.city || '',
+      ordered_date: appliedFilters.value.orderDateFrom || '',
+      delivered_date: appliedFilters.value.deliveryDateFrom || '',
       point_of_contact: ''
     }
     
-    const reportData = await fetchPointOfContactDetailedReport(userId, filterParams)
+    const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
     orders.value = mapOrderData(reportData)
   } catch (error) {
     console.error('Error loading filtered data:', error)
@@ -345,6 +312,21 @@ onMounted(() => {
   
   // Load initial data for filter options and table
   loadInitialData()
+  
+  // Watch for organization changes and reload data
+  unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
+    if (newOrgId && newOrgId !== oldOrgId) {
+      loading.value = true
+      loadInitialData()
+    }
+  })
+})
+
+// Cleanup watcher on unmount
+onUnmounted(() => {
+  if (unwatchOrganization) {
+    unwatchOrganization()
+  }
 })
 </script>
 

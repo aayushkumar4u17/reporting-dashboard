@@ -1,10 +1,12 @@
 .payments-page {
   width: 100%;
-  height: calc(100vh - 64px);
+  min-height: calc(100vh - 70px);
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 .payments-page::before {
@@ -21,11 +23,10 @@
 
 .payments-container {
   width: 100%;
-  height: 100%;
   padding: 1.5rem;
   position: relative;
   z-index: 1;
-  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Filter Section */
@@ -91,7 +92,7 @@
 
 .filter-select:focus {
   outline: none;
-  border-color: #00C851;
+  border-color: #0a0b0a;
   box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
   transform: translateY(-2px);
 }
@@ -122,7 +123,7 @@
   opacity: 0;
   transform: translateY(20px);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
 }
 
 .table-container.animate-fade-in-up {
@@ -171,11 +172,44 @@
   padding: 0.6rem 0.2rem;
 }
 
+/* Modern Checkbox Styles */
 .payments-table input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #00C851;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
   vertical-align: middle;
+}
+
+.payments-table input[type="checkbox"]:hover {
+  border-color: #00C851;
+  transform: scale(1.05);
+}
+
+.payments-table input[type="checkbox"]:checked {
+  background: #00C851;
+  border-color: #00C851;
+}
+
+.payments-table input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.payments-table input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
 }
 
 .payments-table tbody tr:hover {
@@ -322,6 +356,15 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .payments-page {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .payments-container {
+    padding: 1rem;
+  }
+
   .filter-row {
     flex-direction: column;
     align-items: flex-start;
@@ -358,6 +401,10 @@
 }
 
 @media (max-width: 480px) {
+  .payments-container {
+    padding: 0.75rem;
+  }
+  
   .filter-section {
     padding: 0.75rem;
   }

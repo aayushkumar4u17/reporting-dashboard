@@ -32,7 +32,7 @@ const app = createApp(App)
 const pinia = createPinia()
 
 // Global error handler
-app.config.errorHandler = (err, instance, info) => {
+app.config.errorHandler = (_err, _instance, info) => {
   console.error('Global error:', { message: 'Application error occurred', info })
 }
 

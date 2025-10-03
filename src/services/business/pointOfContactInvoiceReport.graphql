@@ -1,5 +1,5 @@
-query InvoicesQuery($org_id: String!, $city: String!, $delivered_date: String!, $ordered_date: String!, $point_of_contact: String!) {
-  pointOfContactInvoiceReport(object: {org_id: $org_id, city: $city, delivered_date: $delivered_date, ordered_date: $ordered_date, point_of_contact: $point_of_contact}) {
+query InvoicesQuery($org_id: String!, $city: String!, $delivery_date_from: String!, $delivery_date_to: String!, $order_date_from: String!, $order_date_to: String!, $point_of_contact: String!) {
+  pointOfContactInvoiceReport(object: {org_id: $org_id, city: $city, delivery_date_from: $delivery_date_from, delivery_date_to: $delivery_date_to, order_date_from: $order_date_from, order_date_to: $order_date_to, point_of_contact: $point_of_contact}) {
     data {
       app_order_code
       city
@@ -7,8 +7,8 @@ query InvoicesQuery($org_id: String!, $city: String!, $delivered_date: String!, 
       erp_order_code
       first_name
       invoice
-      order_amount
       last_name
+      order_amount
       order_date
       order_delivered_qty
       order_qty

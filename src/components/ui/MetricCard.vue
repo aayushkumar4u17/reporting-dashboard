@@ -151,9 +151,9 @@ onMounted(() => {
 .metric-card:hover {
   transform: translateY(-6px);
   box-shadow: 
-    0 12px 32px rgba(0, 200, 81, 0.15),
+    0 12px 32px rgba(107, 114, 128, 0.15),
     0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 200, 81, 0.25);
+  border-color: rgba(107, 114, 128, 0.25);
 }
 
 .metric-header {
@@ -243,7 +243,7 @@ onMounted(() => {
 }
 
 .metric-item:hover {
-  background: linear-gradient(135deg, rgba(0, 200, 81, 0.12) 0%, rgba(0, 200, 81, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.12) 0%, rgba(107, 114, 128, 0.08) 100%);
   transform: translateY(-2px);
 }
 
@@ -265,7 +265,7 @@ onMounted(() => {
 }
 
 .metric-item:hover .metric-value {
-  color: #00C851;
+  color: #6b7280;
 }
 
 @media (max-width: 768px) {

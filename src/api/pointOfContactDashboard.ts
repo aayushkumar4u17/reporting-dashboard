@@ -22,9 +22,11 @@ export const fetchPointOfContactDashboard = async (organizationId: string, filte
     // Execute the combined query with new parameter structure
     const response = await graphqlClient.DashboardQuery({
       org_id: organizationId,
-      delivered_date: filters?.delivery_date_from || '',
       city: filters?.cities?.[0] || '',
-      ordered_date: filters?.order_date_from || '',
+      delivery_date_to: filters?.delivery_date_to || '',
+      delivery_date_from: filters?.delivery_date_from || '',
+      order_date_from: filters?.order_date_from || '',
+      order_date_to: filters?.order_date_to || '',
       point_of_contact: filters?.point_of_contact?.[0] || ''
     })
 

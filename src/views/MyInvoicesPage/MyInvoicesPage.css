@@ -76,7 +76,7 @@
 
 .filter-select {
   padding: 0.6rem;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   font-size: 0.85rem;
   background: rgba(255, 255, 255, 0.8);
@@ -88,15 +88,15 @@
 }
 
 .filter-select:hover {
-  border-color: rgba(0, 200, 81, 0.6);
+  border-color: rgba(0, 0, 0, 0.6);
   background: rgba(255, 255, 255, 0.95);
   transform: translateY(-1px);
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -111,7 +111,7 @@
   display: flex;
   gap: 1.5rem;
   align-items: center;
-  border: 1px solid rgba(0, 200, 81, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.1);
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -230,14 +230,14 @@
 
 .header-checkbox:hover,
 .row-checkbox:hover {
-  border-color: #00C851;
+  border-color: #6366f1;
   transform: scale(1.05);
 }
 
 .header-checkbox:checked,
 .row-checkbox:checked {
-  background: #00C851;
-  border-color: #00C851;
+  background: #6366f1;
+  border-color: #6366f1;
 }
 
 .header-checkbox:checked::after,
@@ -255,7 +255,7 @@
 .header-checkbox:focus,
 .row-checkbox:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 /* Skeleton Loader Styles */

@@ -192,7 +192,7 @@ watch(() => props.modelValue, (newValue) => {
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   font-size: 0.85rem;
   background: rgba(255, 255, 255, 0.8);
@@ -207,15 +207,15 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .date-input:hover {
-  border-color: rgba(0, 200, 81, 0.6);
+  border-color: rgba(0, 0, 0, 0.6);
   background: rgba(255, 255, 255, 0.95);
   transform: translateY(-1px);
 }
 
 .date-input:focus-within {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -235,13 +235,13 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .calendar-icon {
-  color: #00C851;
+  color: #000000;
   margin-left: 8px;
   transition: all 0.3s ease;
 }
 
 .date-input:hover .calendar-icon {
-  color: #00A844;
+  color: #333333;
   transform: scale(1.1);
 }
 

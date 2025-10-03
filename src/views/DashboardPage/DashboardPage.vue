@@ -3,10 +3,10 @@
     <div class="dashboard-container" :class="{ 'fade-in': isLoaded }">
       <!-- Filter Bar -->
       <FilterBar
-        :filters="['deliveryDateRange', 'orderDateRange', 'city', 'poc']"
+        :filters="['dateRanges', 'city', 'poc']"
         v-model="filterValues"
-        :city-options="[]"
-        :poc-options="[]"
+        :city-options="cityOptions"
+        :poc-options="pocOptions"
         @apply="handleApplyFilters"
         @clear="handleClearFilters"
         :loading="loading"
@@ -223,6 +223,7 @@ import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'
 import { fetchPointOfContactDashboard } from '@/api/pointOfContactDashboard'
 import { useFilters } from '@/composables/useFilters'
+import { usePOCFilters } from '@/composables/usePOCFilters'
 
 const router = useRouter()
 
@@ -281,6 +282,7 @@ const refreshDashboard = () => {
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
+const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
 const filterValues = ref({
   deliveryDateFrom: '',
   deliveryDateTo: '',
@@ -393,14 +395,23 @@ const fetchDashboardData = async () => {
     // Use current filter values or defaults
     const currentDate = getCurrentDate()
     
-    // Set default dates if no filters are applied
-    if (!filters.value.orderedDateFrom && !filters.value.deliveredDateFrom) {
-      filters.value.orderedDateFrom = currentDate
-      filters.value.orderedDateTo = currentDate
+    // Create a temporary filter object with defaults without mutating reactive state
+    const tempFilters = { ...filters.value }
+    if (!tempFilters.orderedDateFrom && !tempFilters.deliveredDateFrom) {
+      tempFilters.orderedDateFrom = currentDate
+      tempFilters.orderedDateTo = currentDate
     }
     
-    // Build filter payload
-    const filterPayload = buildFilterPayload(organizationId)
+    // Build filter payload using temp filters
+    const filterPayload = {
+      org_user_id: [organizationId],
+      ...(tempFilters.orderedDateFrom && { order_date_from: tempFilters.orderedDateFrom }),
+      ...(tempFilters.orderedDateTo && { order_date_to: tempFilters.orderedDateTo }),
+      ...(tempFilters.deliveredDateFrom && { delivery_date_from: tempFilters.deliveredDateFrom }),
+      ...(tempFilters.deliveredDateTo && { delivery_date_to: tempFilters.deliveredDateTo }),
+      ...(tempFilters.selectedCity && { cities: [tempFilters.selectedCity], city: tempFilters.selectedCity }),
+      ...(tempFilters.selectedPOC && { point_of_contact: [tempFilters.selectedPOC] })
+    }
     
     const data = await fetchPointOfContactDashboard(organizationId, filterPayload)
     
@@ -480,10 +491,15 @@ onMounted(() => {
   
   fetchDashboardData()
   
+  // Load POC filter data
+  loadPOCFilterData()
+  
   // Watch for organization changes and reload data
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
-    if (newOrgId && newOrgId !== oldOrgId) {
+    if (newOrgId && oldOrgId && newOrgId !== oldOrgId) {
       console.log('Organization changed, reloading dashboard data')
+      clearPOCData()
+      loadPOCFilterData()
       fetchDashboardData()
     }
   })

@@ -81,7 +81,7 @@ onMounted(() => {
 .summary-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 200, 81, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: 12px;
   padding: 1.25rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -95,8 +95,8 @@ onMounted(() => {
 
 .summary-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 200, 81, 0.12);
-  border-color: rgba(0, 200, 81, 0.25);
+  box-shadow: 0 8px 32px rgba(107, 114, 128, 0.12);
+  border-color: rgba(107, 114, 128, 0.25);
 }
 
 .card-header {

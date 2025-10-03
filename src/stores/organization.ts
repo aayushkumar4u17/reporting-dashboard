@@ -14,7 +14,7 @@ export const useOrganizationStore = defineStore('organization', () => {
 
   // Computed property to get organization ID
   const organizationId = computed(() => {
-    return selectedOrganization.value?.id || getStoredOrganizationId()
+    return selectedOrganization.value?.id || ''
   })
 
   // Helper function to get organization from localStorage
@@ -55,7 +55,9 @@ export const useOrganizationStore = defineStore('organization', () => {
 
   // Initialize from localStorage
   const initialize = () => {
-    refreshFromStorage()
+    if (!selectedOrganization.value) {
+      refreshFromStorage()
+    }
   }
 
   return {

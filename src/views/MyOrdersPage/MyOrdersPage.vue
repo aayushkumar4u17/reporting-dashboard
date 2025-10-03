@@ -3,10 +3,10 @@
     <div class="orders-container">
       <!-- Filter Component -->
       <FilterBar
-        :filters="['deliveryDateRange', 'orderDateRange', 'city', 'poc']"
+        :filters="['dateRanges', 'city', 'poc']"
         v-model="filterValues"
-        :city-options="uniqueCities"
-        :poc-options="uniquePOCs"
+        :city-options="cityOptions"
+        :poc-options="pocOptions"
         @apply="handleApplyFilters"
         @clear="handleClearFilters"
         :loading="loading"
@@ -38,6 +38,7 @@ import { fetchPointOfContactDetailedReport } from '@/api/pointOfContactDetailedR
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'
 import { useFilters } from '@/composables/useFilters'
+import { usePOCFilters } from '@/composables/usePOCFilters'
 
 // Animation state
 const isLoaded = ref(false)
@@ -51,6 +52,7 @@ const getCurrentDate = () => {
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
+const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
 const currentDate = getCurrentDate()
 
 
@@ -92,17 +94,6 @@ const orderColumns = [
   { key: 'pocContact', label: 'POC Contact' },
   { key: 'deliveryStatus', label: 'Delivery Status', type: 'status' }
 ]
-
-// Computed properties for filter options (from current page data)
-const uniqueCities = computed(() => {
-  const cities = orders.value.map(order => order.deliveryLocation).filter(city => city && city.trim())
-  return [...new Set(cities)].sort()
-})
-
-const uniquePOCs = computed(() => {
-  const pocs = orders.value.map(order => order.pocName).filter(poc => poc && poc.trim())
-  return [...new Set(pocs)].sort()
-})
 
 // Frontend filtering with applied filters
 const filteredOrders = computed(() => {
@@ -166,7 +157,7 @@ const handleApplyFilters = (newFilters) => {
   loadFilteredData()
 }
 
-const handleClearFilters = () => {
+const handleClearFilters = async () => {
   filterValues.value = {
     orderDateFrom: '',
     orderDateTo: '',
@@ -185,8 +176,13 @@ const handleClearFilters = () => {
     poc: '',
     search: ''
   }
+  
+  // Clear existing data and show loading
+  orders.value = []
+  loading.value = true
+  
   clearFilters()
-  loadData()
+  await loadData()
 }
 
 
@@ -242,7 +238,6 @@ const mapOrderData = (reportData) => {
       pocContact: item.phone_number || '',
       deliveryStatus: item.backend_order_status || '',
       city: item.city || '',
-
       shippingAddress: item.shipping_address || ''
     }
   })
@@ -261,8 +256,10 @@ const loadInitialData = async () => {
     const currentDate = getCurrentDate()
     const filterParams = {
       city: '',
-      ordered_date: currentDate,
-      delivered_date: currentDate,
+      order_date_from: currentDate,
+      order_date_to: currentDate,
+      delivery_date_from: '',
+      delivery_date_to: '',
       point_of_contact: ''
     }
     
@@ -286,8 +283,10 @@ const loadFilteredData = async () => {
     // Create filter object with applied values (exclude POC and search for frontend filtering)
     const filterParams = {
       city: appliedFilters.value.city || '',
-      ordered_date: appliedFilters.value.orderDateFrom || '',
-      delivered_date: appliedFilters.value.deliveryDateFrom || '',
+      order_date_from: appliedFilters.value.orderDateFrom || '',
+      order_date_to: appliedFilters.value.orderDateTo || appliedFilters.value.orderDateFrom || '',
+      delivery_date_from: appliedFilters.value.deliveryDateFrom || '',
+      delivery_date_to: appliedFilters.value.deliveryDateTo || appliedFilters.value.deliveryDateFrom || '',
       point_of_contact: ''
     }
     
@@ -300,8 +299,8 @@ const loadFilteredData = async () => {
   }
 }
 
-const loadData = () => {
-  loadInitialData()
+const loadData = async () => {
+  await loadInitialData()
 }
 
 // Initialize animations on component mount
@@ -310,17 +309,24 @@ onMounted(() => {
     isLoaded.value = true
   }, 100)
   
-  // Load initial data for filter options and table
-  loadInitialData()
+  // Load POC filter data
+  loadPOCFilterData()
+  
+  // Load initial data immediately
+  loadData()
   
   // Watch for organization changes and reload data
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
       loading.value = true
-      loadInitialData()
+      clearPOCData()
+      loadPOCFilterData()
+      loadData()
     }
   })
 })
+
+
 
 // Cleanup watcher on unmount
 onUnmounted(() => {

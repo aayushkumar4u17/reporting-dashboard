@@ -128,6 +128,7 @@ const handleClearFilters = async () => {
   // Clear existing data immediately
   locations.value = []
   
+  // Refresh data
   await loadInitialData()
 }
 

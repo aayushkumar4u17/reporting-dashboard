@@ -3,10 +3,10 @@
     <div class="invoices-container">
       <!-- Filter Component -->
       <FilterBar
-        :filters="['orderDateRange', 'deliveryDateRange', 'city', 'poc']"
+        :filters="['dateRanges', 'city', 'poc']"
         v-model="filterValues"
-        :city-options="availableCities"
-        :poc-options="availablePOCs"
+        :city-options="cityOptions"
+        :poc-options="pocOptions"
         @apply="handleApplyFilters"
         @clear="handleClearFilters"
         :loading="loading"
@@ -80,6 +80,7 @@ import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
 import { useOrganization } from '@/composables/useOrganization'
 import { downloadInvoices as downloadInvoicesPdf } from '@/api/salesInvoicePdf'
+import { usePOCFilters } from '@/composables/usePOCFilters'
 
 // Animation state
 const isLoaded = ref(false)
@@ -91,6 +92,7 @@ const downloadingBulk = ref(false)
 
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
+const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
 const selectAll = ref(false)
 
 const filterValues = ref({
@@ -116,8 +118,6 @@ const appliedFilters = ref({
 
 // Invoices data
 const invoices = ref([])
-const availableCities = ref([])
-const availablePOCs = ref([])
 
 // Table columns configuration
 const invoiceColumns = [
@@ -384,12 +384,6 @@ const loadData = async () => {
       }
     })
     
-    // Extract unique cities and POCs from the data
-    const cities = [...new Set(reportData.map(item => item.city).filter(Boolean))]
-    const pocs = [...new Set(reportData.map(item => `${item.first_name || ''} ${item.last_name || ''}`.trim()).filter(Boolean))]
-    
-    availableCities.value = cities.sort()
-    availablePOCs.value = pocs.sort()
   } catch (error) {
     console.error('Error loading invoices:', error)
   } finally {
@@ -408,6 +402,9 @@ onMounted(() => {
     isLoaded.value = true
   }, 100)
   
+  // Load POC filter data
+  loadPOCFilterData()
+  
   // Load initial data
   loadData()
   
@@ -415,6 +412,8 @@ onMounted(() => {
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
       loading.value = true
+      clearPOCData()
+      loadPOCFilterData()
       loadData()
     }
   })

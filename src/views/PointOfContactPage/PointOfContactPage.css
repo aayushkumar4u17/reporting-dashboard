@@ -38,13 +38,14 @@
 
 
 .email-link, .phone-link {
-  color: #00C851;
+  color: #000000;
   text-decoration: none;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .email-link:hover, .phone-link:hover {
-  color: #00A844;
+  color: #00C851;
   text-decoration: underline;
 }
 

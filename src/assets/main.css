@@ -26,7 +26,7 @@ html, body {
 
 a {
   text-decoration: none;
-  color: #00C851;
+  color: #6366f1;
   transition: 0.3s;
 }
 
@@ -58,13 +58,13 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00C851, #00A844);
+  background: linear-gradient(180deg, #6366f1, #4f46e5);
   border-radius: 4px;
   transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #00A844, #008833);
+  background: linear-gradient(180deg, #4f46e5, #4338ca);
 }
 
 /* Smooth transitions for all elements */

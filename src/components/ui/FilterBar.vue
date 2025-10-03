@@ -10,7 +10,19 @@
       <DatePicker v-model="localFilters.orderDate" placeholder="Select Order Date" />
     </div>
 
-    <template v-if="filters.includes('deliveryDateRange')">
+    <template v-if="filters.includes('dateRanges')">
+      <div class="filter-group">
+        <label class="filter-label">Delivery Date Range</label>
+        <DateRangePicker v-model="localFilters.deliveryDateRange" placeholder="Select Delivery Date Range" @update:modelValue="onDeliveryDateChange" />
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Order Date Range</label>
+        <DateRangePicker v-model="localFilters.orderDateRange" placeholder="Select Order Date Range" @update:modelValue="onOrderDateChange" />
+      </div>
+    </template>
+
+    <!-- Legacy support for existing filters -->
+    <template v-if="filters.includes('deliveryDateRange') && !filters.includes('dateRange')">
       <div class="filter-group">
         <label class="filter-label">Delivery Date From</label>
         <DatePicker v-model="localFilters.deliveryDateFrom" placeholder="From Date" />
@@ -21,7 +33,7 @@
       </div>
     </template>
 
-    <template v-if="filters.includes('orderDateRange')">
+    <template v-if="filters.includes('orderDateRange') && !filters.includes('dateRange')">
       <div class="filter-group">
         <label class="filter-label">Order Date From</label>
         <DatePicker v-model="localFilters.orderDateFrom" placeholder="From Date" />
@@ -34,26 +46,29 @@
 
     <div class="filter-group" v-if="filters.includes('state')">
       <label class="filter-label">State</label>
-      <select v-model="localFilters.state" class="filter-select">
-        <option value="">Select State</option>
-        <option v-for="state in stateOptions" :key="state" :value="state">{{ state }}</option>
-      </select>
+      <CustomDropdown 
+        v-model="localFilters.state" 
+        :options="stateOptions"
+        placeholder="Select State"
+      />
     </div>
 
     <div class="filter-group" v-if="filters.includes('city')">
       <label class="filter-label">City</label>
-      <select v-model="localFilters.city" class="filter-select">
-        <option value="">Select City</option>
-        <option v-for="city in cityOptions" :key="city" :value="city">{{ city }}</option>
-      </select>
+      <CustomDropdown 
+        v-model="localFilters.city" 
+        :options="cityOptions"
+        placeholder="Select City"
+      />
     </div>
 
     <div class="filter-group" v-if="filters.includes('poc')">
       <label class="filter-label">POC</label>
-      <select v-model="localFilters.poc" class="filter-select">
-        <option value="">Select POC</option>
-        <option v-for="poc in pocOptions" :key="poc" :value="poc">{{ poc }}</option>
-      </select>
+      <CustomDropdown 
+        v-model="localFilters.poc" 
+        :options="pocOptions"
+        placeholder="Select POC"
+      />
     </div>
 
     <div class="filter-group" v-if="filters.includes('search')">
@@ -81,7 +96,9 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import DatePicker from '@/components/layout/DatePicker.vue'
+import DateRangePicker from '@/components/layout/DateRangePicker.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
+import CustomDropdown from '@/components/ui/CustomDropdown.vue'
 
 const props = defineProps({
   filters: {
@@ -120,6 +137,8 @@ const localFilters = ref({
   deliveryDateTo: '',
   orderDateFrom: '',
   orderDateTo: '',
+  orderDateRange: { from: '', to: '' },
+  deliveryDateRange: { from: '', to: '' },
   state: '',
   city: '',
   poc: '',
@@ -143,7 +162,28 @@ watch(localFilters, (newValue) => {
 }, { deep: true })
 
 const applyFilters = () => {
-  emit('apply', localFilters.value)
+  // Convert date range objects to individual date fields for backend compatibility
+  const filtersToEmit = { 
+    ...localFilters.value,
+    orderDateFrom: localFilters.value.orderDateRange.from,
+    orderDateTo: localFilters.value.orderDateRange.to,
+    deliveryDateFrom: localFilters.value.deliveryDateRange.from,
+    deliveryDateTo: localFilters.value.deliveryDateRange.to
+  }
+  
+  emit('apply', filtersToEmit)
+}
+
+const onDeliveryDateChange = (value) => {
+  if (value && (value.from || value.to)) {
+    localFilters.value.orderDateRange = { from: '', to: '' }
+  }
+}
+
+const onOrderDateChange = (value) => {
+  if (value && (value.from || value.to)) {
+    localFilters.value.deliveryDateRange = { from: '', to: '' }
+  }
 }
 
 const clearFilters = () => {
@@ -154,6 +194,8 @@ const clearFilters = () => {
     deliveryDateTo: '',
     orderDateFrom: '',
     orderDateTo: '',
+    orderDateRange: { from: '', to: '' },
+    deliveryDateRange: { from: '', to: '' },
     state: '',
     city: '',
     poc: '',
@@ -198,8 +240,14 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   min-width: 130px;
-  width: 130px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.filter-group:has(.date-range-picker) {
+  min-width: 200px;
+  width: 200px;
 }
 
 .filter-label {
@@ -211,26 +259,34 @@ onMounted(() => {
 
 .filter-select, .filter-input {
   padding: 0.6rem;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.95);
   color: #333;
   width: 130px;
   height: 40px;
   box-sizing: border-box;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .filter-input {
   cursor: text;
+  background-image: none;
+  padding-right: 0.6rem;
 }
 
 .filter-select:hover, .filter-input:hover {
-  border-color: rgba(0, 200, 81, 0.6);
-  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.6);
   transform: translateY(-1px);
 }
 
@@ -238,7 +294,7 @@ onMounted(() => {
   outline: none;
   border-color: #00C851;
   box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
-  transform: translateY(-2px);
+  z-index: 100;
 }
 
 .filter-actions {

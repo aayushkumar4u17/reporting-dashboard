@@ -207,19 +207,19 @@
 }
 
 .agreement-label.checked {
-  color: #00C851;
-  background: rgba(0, 200, 81, 0.1);
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
 }
 
 .agreement-checkbox {
   width: 18px;
   height: 18px;
-  accent-color: #00C851;
+  accent-color: #6366f1;
   margin-top: 2px;
 }
 
 .terms-link {
-  color: #00C851;
+  color: #6366f1;
   text-decoration: underline;
   cursor: pointer;
   font-weight: 500;
@@ -227,7 +227,7 @@
 }
 
 .terms-link:hover {
-  color: #00A03C;
+  color: #4f46e5;
 }
 
 /* OTP Section Styles */
@@ -282,8 +282,8 @@
 
 .otp-input:focus {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 

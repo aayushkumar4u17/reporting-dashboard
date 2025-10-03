@@ -124,8 +124,8 @@
 .action-card:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 1);
-  border-color: rgba(0, 200, 81, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 200, 81, 0.15);
+  border-color: rgba(107, 114, 128, 0.3);
+  box-shadow: 0 8px 32px rgba(107, 114, 128, 0.15);
 }
 
 .action-icon {
@@ -160,7 +160,7 @@
 .filter-bar {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 200, 81, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -184,7 +184,7 @@
 }
 
 .status-active {
-  color: #00C851;
+  color: #6366f1;
   font-weight: 700;
 }
 
@@ -207,7 +207,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(0, 200, 81, 0.05));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
 }
 
 .metric-icon.orders-planned {
@@ -280,9 +280,9 @@
 }
 
 .metric-item:hover {
-  background: linear-gradient(135deg, rgba(0, 200, 81, 0.12) 0%, rgba(0, 200, 81, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.12) 0%, rgba(107, 114, 128, 0.08) 100%);
   transform: translateY(-2px);
-  border-color: rgba(0, 200, 81, 0.2);
+  border-color: rgba(107, 114, 128, 0.2);
 }
 
 .metric-label {
@@ -303,7 +303,7 @@
 }
 
 .metric-item:hover .metric-value {
-  color: #00C851;
+  color: #6b7280;
 }
 
 /* Loading and error states */

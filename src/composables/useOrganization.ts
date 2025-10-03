@@ -5,16 +5,14 @@ export const useOrganization = () => {
   const organizationStore = useOrganizationStore()
 
   // Initialize store from localStorage if not already done
-  if (!organizationStore.selectedOrganization) {
-    organizationStore.initialize()
-  }
+  organizationStore.initialize()
 
   // Computed property for organization ID
   const organizationId = computed(() => organizationStore.organizationId)
 
   // Get organization ID for API calls
   const getOrganizationId = (): string => {
-    return organizationStore.organizationId
+    return organizationStore.organizationId || organizationStore.getStoredOrganizationId()
   }
 
   // Check if organization is selected

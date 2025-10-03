@@ -27,8 +27,10 @@ export interface PointOfContactDetailedReportData {
 
 interface FilterParams {
   city?: string
-  delivered_date?: string
-  ordered_date?: string
+  delivery_date_from?: string
+  delivery_date_to?: string
+  order_date_from?: string
+  order_date_to?: string
   point_of_contact?: string
 }
 
@@ -39,8 +41,10 @@ export const fetchPointOfContactDetailedReport = async (organizationId: string, 
     const response = await graphqlClient.OrdersQuery({
       org_id: organizationId,
       city: filters?.city || '',
-      delivered_date: filters?.delivered_date || '',
-      ordered_date: filters?.ordered_date || '',
+      delivery_date_from: filters?.delivery_date_from || '',
+      delivery_date_to: filters?.delivery_date_to || '',
+      order_date_from: filters?.order_date_from || '',
+      order_date_to: filters?.order_date_to || '',
       point_of_contact: filters?.point_of_contact || ''
     })
 

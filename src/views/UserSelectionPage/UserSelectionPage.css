@@ -147,7 +147,7 @@ body, html {
   font-weight: 700;
   margin-bottom: 1rem;
   margin-top: 0;
-  background: linear-gradient(135deg, #00C851, #00A844);
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -185,7 +185,7 @@ body, html {
 }
 
 .search-input-wrapper:focus-within {
-  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.2);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
   background: white;
 }
 
@@ -297,13 +297,13 @@ body, html {
 }
 
 .user-card.selected {
-  background: rgba(0, 200, 81, 0.15) !important;
-  border: 2px solid #00C851 !important;
-  box-shadow: 0 4px 15px rgba(0, 200, 81, 0.2) !important;
+  background: rgba(99, 102, 241, 0.15) !important;
+  border: 2px solid #6366f1 !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2) !important;
 }
 
 .user-card.selected:hover {
-  background: rgba(0, 200, 81, 0.2) !important;
+  background: rgba(99, 102, 241, 0.2) !important;
   transform: translateY(-5px) !important;
 }
 
@@ -311,7 +311,7 @@ body, html {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: #00C851;
+  background: #6366f1;
   color: white;
   border-radius: 50%;
   width: 28px;
@@ -319,7 +319,7 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 200, 81, 0.4);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
   z-index: 10;
   animation: tickAppear 0.3s ease;
 }
@@ -340,7 +340,7 @@ body, html {
 }
 
 .user-card.edit-mode:hover {
-  background: rgba(0, 200, 81, 0.1);
+  background: rgba(99, 102, 241, 0.1);
 }
 
 .user-avatar {
@@ -369,8 +369,8 @@ body, html {
 }
 
 .add-avatar {
-  background: rgba(0, 200, 81, 0.1) !important;
-  border: 3px dashed rgba(0, 200, 81, 0.3);
+  background: rgba(99, 102, 241, 0.1) !important;
+  border: 3px dashed rgba(99, 102, 241, 0.3);
 }
 
 .add-icon {
@@ -457,7 +457,7 @@ body, html {
 }
 
 .retry-btn {
-  background: #00C851;
+  background: #6366f1;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -468,7 +468,7 @@ body, html {
 }
 
 .retry-btn:hover {
-  background: #00b247;
+  background: #4f46e5;
 }
 
 /* Skeleton Loader Styles */

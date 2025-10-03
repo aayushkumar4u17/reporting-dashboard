@@ -121,7 +121,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
       
     } catch (otpError) {
-      console.error('Failed to send OTP:', { code: (otpError as any)?.code, message: 'OTP sending failed' });
+      console.error('Failed to send OTP:', { code: (otpError as any)?.code, hasError: true });
       
       // Clean up verifier on error
       try {
@@ -148,7 +148,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     }, 2000);
 
   } catch (err: any) {
-    console.error('sendOTP error:', { code: err?.code, message: 'OTP process failed' });
+    console.error('sendOTP error:', { code: err?.code, hasError: true });
     
     authStore.toggleOTPVerificationModal && authStore.toggleOTPVerificationModal(false);
 

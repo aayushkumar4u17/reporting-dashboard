@@ -1,4 +1,5 @@
 import './assets/main.css'
+import '@/config'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -25,9 +26,6 @@ try {
   throw error
 }
 
-// Initialize Firebase first
-import '@/config'
-
 const app = createApp(App)
 const pinia = createPinia()
 
@@ -43,8 +41,7 @@ app.use(pinia)
 app.use(router)
 app.use(components)
 
-// Initialize auth state before mounting for better page refresh handling
+// Initialize auth state before mounting
 initializeAuthState().catch(console.error).finally(() => {
-  // Mount app after auth state is initialized
   app.mount('#app')
 })

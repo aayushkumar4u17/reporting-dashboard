@@ -1,57 +1,55 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { useErrorHandler } from "@/composables/useErrorHandler";
-import Navbar from "@/components/layout/Navbar.vue";
-import ErrorNotification from "@/components/ErrorNotification.vue";
-import AuthGuard from "@/components/AuthGuard.vue";
+import { useRouter } from "vue-router"
+import { useErrorHandler } from "@/composables/useErrorHandler"
+import Navbar from "@/components/layout/Navbar.vue"
+import ErrorNotification from "@/components/ErrorNotification.vue"
+import AuthGuard from "@/components/AuthGuard.vue"
 
-const router = useRouter();
-const { errorState, hideError, handleRetry } = useErrorHandler();
+const router = useRouter()
+const { errorState, hideError, handleRetry } = useErrorHandler()
 
-const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"];
+const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
 </script>
 
 <template>
-	<main>
-		<template v-if="router.currentRoute.value.fullPath === '/login'">
-			<router-view></router-view>
-		</template>
-		<AuthGuard v-else>
-			<Navbar
-				v-if="
-					router.currentRoute.value.fullPath !== '/login' &&
-					router.currentRoute.value.fullPath !== '/' &&
-					router.currentRoute.value.fullPath !== '/select-user'
-				" />
-			<div
-				v-if="router.currentRoute.value.fullPath === '/select-user'"
-				class="fullscreen-content">
-				<router-view></router-view>
-			</div>
-			<div
-				v-else
-				class="content-wrapper"
-				:class="
-					routesWithoutXPadding.includes(
-						router.currentRoute.value.fullPath,
-					)
-						? 'with-sidebar'
-						: 'without-sidebar'
-				">
-				<router-view></router-view>
-			</div>
-		</AuthGuard>
-		
-		<ErrorNotification
-			:show="errorState.show"
-			:title="errorState.title"
-			:message="errorState.message"
-			:details="errorState.details"
-			:show-retry="errorState.showRetry"
-			@close="hideError"
-			@retry="handleRetry"
-		/>
-	</main>
+  <main>
+    <template v-if="router.currentRoute.value.fullPath === '/login'">
+      <router-view />
+    </template>
+    <AuthGuard v-else>
+      <Navbar
+        v-if="
+          router.currentRoute.value.fullPath !== '/login' &&
+          router.currentRoute.value.fullPath !== '/' &&
+          router.currentRoute.value.fullPath !== '/select-user'
+        " />
+      <div
+        v-if="router.currentRoute.value.fullPath === '/select-user'"
+        class="fullscreen-content">
+        <router-view />
+      </div>
+      <div
+        v-else
+        class="content-wrapper"
+        :class="
+          routesWithoutXPadding.includes(router.currentRoute.value.fullPath)
+            ? 'with-sidebar'
+            : 'without-sidebar'
+        ">
+        <router-view />
+      </div>
+    </AuthGuard>
+    
+    <ErrorNotification
+      :show="errorState.show"
+      :title="errorState.title"
+      :message="errorState.message"
+      :details="errorState.details"
+      :show-retry="errorState.showRetry"
+      @close="hideError"
+      @retry="handleRetry"
+    />
+  </main>
 </template>
 
 <style scoped>

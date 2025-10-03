@@ -154,11 +154,8 @@ import ErrorPopup from '@/components/layout/ErrorPopup.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import TermsPopup from '@/components/layout/TermsPopup.vue'
 
-// Import Firebase Auth actions
 import { useAuthStore } from '@/stores'
-import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/api/auth'
-import { startTimer } from '@/api/auth'
-// Removed unused imports: formatTime, validatePhoneNumber, auth
+import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction, startTimer } from '@/api/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -227,7 +224,7 @@ onMounted(() => {
     }
   }, 1000);
   
-  // Remove automatic redirect check to prevent navigation loops
+
 })
 
 onUnmounted(() => {
@@ -392,8 +389,7 @@ const resendOTPHandler = async () => {
       
       otpCode.value = ''
       startResendTimer()
-      // Note: We don't call startTimer() here as it's for the main OTP expiry (30 minutes)
-      // The resend timer is separate (30 seconds)
+
       
     } catch (error: unknown) {
       // Parse error for better user feedback

@@ -17,7 +17,7 @@
       <div v-for="item in items" :key="item.label" class="metric-item">
         <span class="metric-label">{{ item.label }}</span>
         <span v-if="!loading" class="metric-value">{{ item.value }}</span>
-        <SkeletonLoader v-else height="1.5rem" width="3rem" />
+        <ModernLoader v-else height="1.5rem" width="3rem" :variant="variant" />
       </div>
     </div>
     <div v-if="trend && trend.value !== '0%'" class="metric-trend" :class="`trend-${trend.type}`">
@@ -39,7 +39,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
+import ModernLoader from '@/components/ui/ModernLoader.vue'
 
 const props = defineProps({
   title: {

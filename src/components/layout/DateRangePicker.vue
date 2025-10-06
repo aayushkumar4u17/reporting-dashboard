@@ -151,8 +151,8 @@ const selectDate = (dateObj) => {
     } else {
       emit('update:modelValue', { from: props.modelValue.from, to: formattedDate })
     }
-    showCalendar.value = false
     selectingStart.value = true
+    showCalendar.value = false
   }
 }
 
@@ -255,8 +255,7 @@ onUnmounted(() => {
   color: #333;
   font-weight: 500;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .calendar-icon {

@@ -19,233 +19,309 @@
   background: radial-gradient(circle at 20% 80%, rgba(0, 200, 81, 0.05) 0%, transparent 50%),
               radial-gradient(circle at 80% 20%, rgba(0, 200, 81, 0.03) 0%, transparent 50%);
   pointer-events: none;
+  z-index: 0;
 }
 
 .payments-container {
   width: 100%;
-  padding: 1.5rem;
+  max-width: none;
+  padding: 2rem;
   position: relative;
   z-index: 1;
   box-sizing: border-box;
+  margin: 0;
 }
 
-/* Filter Section */
-.filter-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(0, 200, 81, 0.1);
-  position: relative;
-  z-index: 10;
+/* Dashboard Header */
+.dashboard-header {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
   opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(20px);
+  animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
 }
 
-.filter-section.animate-slide-down {
-  opacity: 1;
-  transform: translateY(0);
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.filter-row {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 130px;
-}
-
-.filter-group label {
-  font-size: 0.9rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.filter-select {
-  padding: 0.6rem;
-  border: 2px solid rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
-  color: #333;
-  min-width: 120px;
+/* Wallet Card */
+.wallet-card.premium-wallet {
+  position: relative;
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #00C851 0%, #00A844 100%);
+  box-shadow: 0 4px 20px rgba(0, 200, 81, 0.3);
+  border: 1px solid rgba(0, 200, 81, 0.15);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
 }
 
-.filter-select:hover {
-  border-color: rgba(0, 0, 0, 0.6);
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #0a0b0a;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+.wallet-card.premium-wallet:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 200, 81, 0.4);
 }
 
-.filter-actions {
+.wallet-chip-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.wallet-brand {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.brand-accent {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.brand-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.wallet-amount-large {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0.75rem 0;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 10px;
   align-items: center;
 }
 
-.download-section {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  margin-left: auto;
+.wallet-actions button {
+  background: #fff;
+  color: #00A844;
+  border: 2px solid #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-/* Table Section */
-.table-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  position: relative;
-  z-index: 1;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0;
-  transform: translateY(20px);
-  overflow-x: auto;
-  overflow-y: visible;
+.wallet-actions button:hover {
+  background: #fbbf24;
+  color: #fff;
+  border-color: #fbbf24;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
-.table-container.animate-fade-in-up {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-
-
-.payments-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8rem;
-}
-
-.payments-table th {
-  background: #f8f9fa;
-  padding: 0.6rem 0.4rem;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 1px solid #dee2e6;
-  color: #495057;
-  white-space: nowrap;
+.wallet-hint {
+  color: rgba(255,255,255,0.8);
   font-size: 0.75rem;
 }
 
-.payments-table th.checkbox-column {
-  text-align: center;
-  width: 40px;
-  padding: 0.6rem 0.2rem;
+/* Overview Cards */
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
-.payments-table td {
-  padding: 0.6rem 0.4rem;
-  border-bottom: 1px solid #dee2e6;
-  color: #495057;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.7rem;
+.overview-card.premium-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 200, 81, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.payments-table td.checkbox-column {
-  text-align: center;
-  width: 40px;
-  padding: 0.6rem 0.2rem;
+.overview-card.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(107, 114, 128, 0.15);
+  border-color: rgba(107, 114, 128, 0.3);
 }
 
-/* Modern Checkbox Styles */
-.payments-table input[type="checkbox"] {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  background: #fff;
-  cursor: pointer;
-  position: relative;
+.card-icon {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.overview-card .oc-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.overview-card .oc-subtitle {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.overview-card .oc-value {
+  margin-top: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Bank Details */
+.bank-details-card.premium-bank {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 200, 81, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  vertical-align: middle;
 }
 
-.payments-table input[type="checkbox"]:hover {
-  border-color: #6366f1;
-  transform: scale(1.05);
+.bank-details-card.premium-bank:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(107, 114, 128, 0.15);
+  border-color: rgba(107, 114, 128, 0.3);
 }
 
-.payments-table input[type="checkbox"]:checked {
-  background: #6366f1;
-  border-color: #6366f1;
+.bank-header {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #333;
 }
 
-.payments-table input[type="checkbox"]:checked::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
+.bank-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.payments-table input[type="checkbox"]:focus {
+.bank-row {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+.bank-row .label {
+  font-weight: 500;
+  color: #666;
+}
+
+.bank-details-card .masked {
+  color: #00C851;
+  font-weight: 600;
+}
+
+/* Table Topbar */
+.table-topbar.premium-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 200, 81, 0.1);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+}
+
+.tabs.premium-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tab.premium-tab {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.tab.premium-tab:hover {
+  background: rgba(0, 200, 81, 0.1);
+  color: #00C851;
+}
+
+.tab.premium-tab.active {
+  background: rgba(0, 200, 81, 0.1);
+  color: #00C851;
+  font-weight: 600;
+}
+
+.topbar-right {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input.premium-search {
+  height: 38px;
+  border-radius: 8px;
+  padding: 0 1rem;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: #fff;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  min-width: 200px;
 }
 
-.payments-table tbody tr:hover {
-  background-color: #f8f9fa;
+.search-input.premium-search:focus {
+  border-color: #00C851;
+  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
 }
 
-.payments-table tbody tr.selected {
-  background-color: #e3f2fd;
+.search-input.premium-search::placeholder {
+  color: #9ca3af;
 }
 
+/* Table Wrapper */
+.premium-table-wrapper {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 200, 81, 0.15);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.7s forwards;
+}
+
+/* Status Badges */
 .status-badge {
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
   text-transform: capitalize;
-}
-
-.status-paid {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-unpaid {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.status-overdue {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-default {
-  background: #e2e3e5;
-  color: #383d41;
 }
 
 .status-allowed {
@@ -258,145 +334,66 @@
   color: #721c24;
 }
 
-/* Summary Section */
-.summary-section {
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 5;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.summary-section.animate-fade-in-up {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.summary-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.summary-card.action-card {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.summary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3);
-}
-
-.summary-card.action-card:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.card-header {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.card-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.card-value.green {
-  color: #00C851;
-}
-
-.card-value.red {
-  color: #dc3545;
-}
-
-/* Skeleton Loader Styles */
-.skeleton-row td {
-  padding: 0.6rem 0.4rem;
-}
-
-.skeleton-row .skeleton-loader {
-  border-radius: 4px;
-}
-
-/* No Data Message Styles */
-.no-data-message {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 12px; /* Adjust spacing between buttons */
-}
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .payments-page {
-    width: 100%;
-    overflow-x: hidden;
+/* Responsive */
+@media (max-width: 1100px) {
+  .dashboard-header {
+    grid-template-columns: 1fr;
   }
-  
+  .overview-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
   .payments-container {
     padding: 1rem;
   }
-
-  .filter-row {
+  
+  .dashboard-header {
+    gap: 1rem;
+  }
+  
+  .table-topbar.premium-topbar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    padding: 1rem;
+    gap: 0.75rem;
   }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .filter-actions {
-    width: 100%;
+  
+  .tabs.premium-tabs {
     justify-content: center;
   }
-
-  .download-section {
-    margin-top: 1rem;
+  
+  .topbar-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
   }
+  
+  .search-input.premium-search {
+    width: 100%;
+  }
+  
+  .overview-cards {
+    gap: 0.75rem;
+  }
+  
+  .overview-card.premium-card {
+    padding: 1rem;
+  }
+  
+  .wallet-card.premium-wallet {
+    padding: 1.25rem;
+  }
+  
+  .bank-details-card.premium-bank {
+    padding: 1rem;
+  }
+}
 
-  .summary-cards {
+@media (max-width: 600px) {
+  .overview-cards {
     grid-template-columns: 1fr;
-  }
-  
-  .payments-table th,
-  .payments-table td {
-    padding: 0.5rem 0.25rem;
-    font-size: 0.7rem;
-  }
-  
-  .payments-table th.checkbox-column,
-  .payments-table td.checkbox-column {
-    padding: 0.5rem 0.25rem;
-    vertical-align: middle;
   }
 }
 
@@ -405,52 +402,19 @@
     padding: 0.75rem;
   }
   
-  .filter-section {
-    padding: 0.75rem;
+  .dashboard-header {
+    gap: 0.75rem;
   }
-
-  .filter-group label {
-    font-size: 0.8rem;
+  
+  .wallet-amount-large {
+    font-size: 1.5rem;
   }
-
-  .filter-select {
-    padding: 0.5rem;
-    font-size: 0.8rem;
-  }
-
-  .filter-actions {
-    gap: 0.5rem;
-  }
-
-  .download-section {
-    gap: 8px;
-  }
-
-  .summary-cards {
-    gap: 12px;
-  }
-
-  .summary-card {
-    padding: 0.75rem;
-  }
-
-  .card-header {
-    font-size: 0.7rem;
-  }
-
-  .card-value {
+  
+  .overview-card .oc-value {
     font-size: 1rem;
   }
   
-  .payments-table th,
-  .payments-table td {
-    padding: 0.4rem 0.2rem;
-    font-size: 0.65rem;
-  }
-  
-  .payments-table th.checkbox-column,
-  .payments-table td.checkbox-column {
-    padding: 0.4rem 0.2rem;
-    vertical-align: middle;
+  .table-topbar.premium-topbar {
+    padding: 0.75rem;
   }
 }

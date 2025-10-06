@@ -36,7 +36,7 @@ export interface FilterPayload {
   delivery_date_to?: string
   cities?: string[]
   city?: string
-  point_of_contact?: string[]
+  point_of_contact?: string
   state?: string
   payment_due_date?: string
 }
@@ -90,7 +90,7 @@ export const useFilters = () => {
       payload.city = filters.value.selectedCity
     }
     if (filters.value.selectedPOC) {
-      payload.point_of_contact = [filters.value.selectedPOC]
+      payload.point_of_contact = filters.value.selectedPOC
     }
     if (filters.value.selectedState) {
       payload.state = filters.value.selectedState

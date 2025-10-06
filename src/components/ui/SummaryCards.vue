@@ -4,7 +4,7 @@
       <div v-for="card in cards" :key="card.key" class="summary-card" :class="card.class">
         <div class="card-header">{{ card.label }}</div>
         <div v-if="!loading" class="card-value" :class="card.valueClass">{{ card.value }}</div>
-        <SkeletonLoader v-else width="60%" height="24px" />
+        <ModernLoader v-else width="60%" height="24px" />
       </div>
       
       <div v-if="showActions" class="action-buttons">
@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
+import ModernLoader from '@/components/ui/ModernLoader.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 
 const props = defineProps({

@@ -78,12 +78,17 @@ export const usePOCFilters = () => {
         organization_id: organizationId
       })
 
+      console.log('POC filter data response:', response)
+
       // Map response to our data structure
       pocData.value = response.contacts.map(contact => ({
         pocName: contact.full_name,
         city: contact.city,
         state: contact.state
       }))
+
+      console.log('Processed POC data:', pocData.value.length, 'contacts')
+      console.log('POC options will be:', pocOptions.value)
 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load POC data'

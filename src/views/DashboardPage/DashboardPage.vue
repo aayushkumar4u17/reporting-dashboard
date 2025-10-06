@@ -410,7 +410,7 @@ const fetchDashboardData = async () => {
       ...(tempFilters.deliveredDateFrom && { delivery_date_from: tempFilters.deliveredDateFrom }),
       ...(tempFilters.deliveredDateTo && { delivery_date_to: tempFilters.deliveredDateTo }),
       ...(tempFilters.selectedCity && { cities: [tempFilters.selectedCity], city: tempFilters.selectedCity }),
-      ...(tempFilters.selectedPOC && { point_of_contact: [tempFilters.selectedPOC] })
+      ...(tempFilters.selectedPOC && { point_of_contact: tempFilters.selectedPOC })
     }
     
     const data = await fetchPointOfContactDashboard(organizationId, filterPayload)

@@ -437,7 +437,7 @@ onUnmounted(() => {
 
 .tagline {
   font-size: 0.75rem;
-  color: #666;
+  /* color: #666; */
   margin-top: -2px;
 }
 
@@ -445,45 +445,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-}
-
-.notification {
-  position: relative;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.notification:hover {
-  background-color: rgba(0, 200, 81, 0.1);
-  transform: translateY(-2px);
-}
-
-.bell-icon {
-  font-size: 1.2rem;
-  color: #666;
-  transition: color 0.3s ease;
-}
-
-.notification:hover .bell-icon {
-  color: #00C851;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  background: #ff4444;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
@@ -501,35 +462,29 @@ onUnmounted(() => {
 .user-section {
   display: flex;
   align-items: center;
-  /* gap: 0.2rem; */
+  gap: 0.2rem;
 }
 
 .avatar-container {
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(107, 114, 128, 0.05);
-  border: 1px solid rgba(107, 114, 128, 0.1);
 }
 
 .avatar-container:hover {
-  background: rgba(107, 114, 128, 0.15);
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2);
-  border-color: rgba(107, 114, 128, 0.2);
 }
 
 .user-profile {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.5rem 0.75rem;
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  background: rgba(107, 114, 128, 0.05);
-  border: 1px solid rgba(107, 114, 128, 0.1);
+  /* background: rgba(107, 114, 128, 0.05); */
+  /* border: 1px solid rgba(107, 114, 128, 0.1); */
 }
 
 .user-profile:hover {
@@ -543,12 +498,12 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #6b7280;
+  /* background: #1bbb4b; */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+  /* box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2); */
 }
 
 .avatar-initials {
@@ -623,7 +578,7 @@ onUnmounted(() => {
   color: #333;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  margin-left: 0.5rem;
+  text-align: center;
 }
 
 .username.loading {
@@ -638,7 +593,7 @@ onUnmounted(() => {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 250px;
+  width: 20px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   padding: 0;
@@ -1078,7 +1033,7 @@ onUnmounted(() => {
   justify-content: center;
   margin-bottom: 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); */
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 

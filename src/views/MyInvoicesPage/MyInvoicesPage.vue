@@ -39,7 +39,7 @@
       <DataTable
         :columns="invoiceColumns"
         :data="filteredInvoices"
-        :loading="loading"
+        :loading="loading || filterLoading"
         :show-checkbox="true"
         :pagination="true"
         :items-per-page="10"
@@ -54,6 +54,66 @@
           </div>
         </template>
       </DataTable>
+
+      <!-- Quick Actions Panel -->
+      <div class="quick-actions-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="actions-grid">
+          <button class="action-card" @click="navigateToPointOfContact">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="action-content">
+              <div class="action-title">Point of Contact</div>
+              <div class="action-subtitle">View contact details</div>
+            </div>
+          </button>
+          
+          <button class="action-card" @click="navigateToOrders">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+            </div>
+            <div class="action-content">
+              <div class="action-title">View All Orders</div>
+              <div class="action-subtitle">Manage and track orders</div>
+            </div>
+          </button>
+          
+          <button class="action-card" @click="navigateToPayments">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <div class="action-content">
+              <div class="action-title">Payment Status</div>
+              <div class="action-subtitle">Track payment history</div>
+            </div>
+          </button>
+          
+          <button class="action-card" @click="navigateToDashboard">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+              </svg>
+            </div>
+            <div class="action-content">
+              <div class="action-title">Dashboard</div>
+              <div class="action-subtitle">View analytics overview</div>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Error Popup -->
@@ -81,10 +141,12 @@ import { useFilters } from '@/composables/useFilters'
 import { useOrganization } from '@/composables/useOrganization'
 import { downloadInvoices as downloadInvoicesPdf } from '@/api/salesInvoicePdf'
 import { usePOCFilters } from '@/composables/usePOCFilters'
+import { useRouter } from 'vue-router'
 
 // Animation state
 const isLoaded = ref(false)
 const loading = ref(true)
+const filterLoading = ref(false)
 const showNoDataPopup = ref(false)
 const errorMessage = ref('')
 const downloadingInvoice = ref(null)
@@ -93,6 +155,24 @@ const downloadingBulk = ref(false)
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
 const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
+const router = useRouter()
+
+// Navigation functions
+const navigateToPointOfContact = () => {
+  router.push('/point-of-contact')
+}
+
+const navigateToOrders = () => {
+  router.push('/my-orders')
+}
+
+const navigateToPayments = () => {
+  router.push('/payments')
+}
+
+const navigateToDashboard = () => {
+  router.push('/dashboard')
+}
 const selectAll = ref(false)
 
 const filterValues = ref({
@@ -135,13 +215,10 @@ const invoiceColumns = [
   { key: 'downloadAction', label: 'Download Invoice' }
 ]
 
-// Computed property for filtered invoices
+// Computed property for filtered invoices (only search filter applied on frontend)
 const filteredInvoices = computed(() => {
   return invoices.value.filter(invoice => {
-    const cityMatch = !appliedFilters.value.city || invoice.city === appliedFilters.value.city
-    const pocMatch = !appliedFilters.value.poc || invoice.pocName.includes(appliedFilters.value.poc)
-    
-    // Search filter
+    // Search filter (frontend only)
     const searchMatch = !appliedFilters.value.search || 
       invoice.aspOrderCode.toLowerCase().includes(appliedFilters.value.search.toLowerCase()) ||
       invoice.salesInvoiceNumber.toLowerCase().includes(appliedFilters.value.search.toLowerCase()) ||
@@ -149,11 +226,13 @@ const filteredInvoices = computed(() => {
       invoice.pocName.toLowerCase().includes(appliedFilters.value.search.toLowerCase()) ||
       invoice.deliveryLocation.toLowerCase().includes(appliedFilters.value.search.toLowerCase())
     
-    return cityMatch && pocMatch && searchMatch
+    return searchMatch
   })
 })
 
-const handleApplyFilters = (newFilters) => {
+const handleApplyFilters = async (newFilters) => {
+  filterLoading.value = true
+  
   // Apply current filter values
   appliedFilters.value = {
     orderDateFrom: newFilters.orderDateFrom || '',
@@ -165,12 +244,14 @@ const handleApplyFilters = (newFilters) => {
     search: newFilters.search || ''
   }
   
-  // Check if only frontend filters are applied (city, poc, search)
-  const hasDateFilters = appliedFilters.value.orderDateFrom || appliedFilters.value.deliveryDateFrom
-  const onlyFrontendFilters = (appliedFilters.value.city || appliedFilters.value.poc || appliedFilters.value.search) && !hasDateFilters
+  // Check if only search filter is applied (frontend only)
+  const hasBackendFilters = appliedFilters.value.orderDateFrom || appliedFilters.value.deliveryDateFrom || 
+    appliedFilters.value.city || appliedFilters.value.poc
+  const onlySearchFilter = appliedFilters.value.search && !hasBackendFilters
   
-  if (onlyFrontendFilters) {
-    return
+  if (onlySearchFilter) {
+    filterLoading.value = false
+    return // Only search filter, no need to reload data
   }
   
   // Use order date range if provided, otherwise delivery date range
@@ -186,10 +267,16 @@ const handleApplyFilters = (newFilters) => {
     filters.value.orderedDateTo = ''
   }
   
-  loadData()
+  filters.value.selectedCity = appliedFilters.value.city
+  filters.value.selectedPOC = appliedFilters.value.poc
+  
+  await loadData()
+  filterLoading.value = false
 }
 
-const handleClearFilters = () => {
+const handleClearFilters = async () => {
+  filterLoading.value = true
+  
   filterValues.value = {
     orderDateFrom: '',
     orderDateTo: '',
@@ -209,7 +296,8 @@ const handleClearFilters = () => {
     search: ''
   }
   clearFilters()
-  loadData()
+  await loadData()
+  filterLoading.value = false
 }
 
 const handleSelectionChange = (selectedItems) => {
@@ -314,8 +402,10 @@ const loadData = async () => {
     
     // Build filter payload with organization ID
     const filterPayload = buildFilterPayload(organizationId)
+    console.log('Loading invoices with filters:', filterPayload)
     
     const reportData = await fetchPointOfContactInvoiceReport(organizationId, filterPayload)
+    console.log('Loaded invoices data:', reportData.length, 'records')
     // Sort by latest date first (order date or delivery date)
     const sortedData = reportData.sort((a, b) => {
       const getDate = (item) => {
@@ -397,16 +487,16 @@ const closeErrorPopup = () => {
 }
 
 // Initialize animations on component mount
-onMounted(() => {
+onMounted(async () => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
   
-  // Load POC filter data
-  loadPOCFilterData()
+  // Load initial data first
+  await loadData()
   
-  // Load initial data
-  loadData()
+  // Load POC filter data for dropdowns
+  loadPOCFilterData()
   
   // Watch for organization changes and reload data
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {

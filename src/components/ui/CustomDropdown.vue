@@ -12,7 +12,11 @@
     </div>
     
     <div v-if="isOpen" class="dropdown-menu">
+      <div v-if="!options || options.length === 0" class="dropdown-no-data">
+        No data
+      </div>
       <div 
+        v-else
         v-for="option in options" 
         :key="option"
         class="dropdown-option"
@@ -146,5 +150,13 @@ onUnmounted(() => {
 .dropdown-option.selected {
   background-color: rgba(0, 200, 81, 0.2);
   color: #00C851;
+}
+
+.dropdown-no-data {
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  color: #999;
+  text-align: center;
+  font-style: italic;
 }
 </style>

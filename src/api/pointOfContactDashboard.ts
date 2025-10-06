@@ -27,7 +27,7 @@ export const fetchPointOfContactDashboard = async (organizationId: string, filte
       delivery_date_from: filters?.delivery_date_from || '',
       order_date_from: filters?.order_date_from || '',
       order_date_to: filters?.order_date_to || '',
-      point_of_contact: filters?.point_of_contact?.[0] || ''
+      point_of_contact: filters?.point_of_contact || ''
     })
 
     const dashboardData = response.pointOfContactDashboard?.data?.[0]

@@ -12,12 +12,12 @@
 
     <template v-if="filters.includes('dateRanges')">
       <div class="filter-group">
-        <label class="filter-label">Delivery Date Range</label>
-        <DateRangePicker v-model="localFilters.deliveryDateRange" placeholder="Select Delivery Date Range" @update:modelValue="onDeliveryDateChange" />
+        <label class="filter-label">Delivery Date</label>
+        <DateRangePicker v-model="localFilters.deliveryDateRange" placeholder="Select Delivery Date" @update:modelValue="onDeliveryDateChange" />
       </div>
       <div class="filter-group">
-        <label class="filter-label">Order Date Range</label>
-        <DateRangePicker v-model="localFilters.orderDateRange" placeholder="Select Order Date Range" @update:modelValue="onOrderDateChange" />
+        <label class="filter-label">Order Date</label>
+        <DateRangePicker v-model="localFilters.orderDateRange" placeholder="Select Order Date" @update:modelValue="onOrderDateChange" />
       </div>
     </template>
 
@@ -83,10 +83,10 @@
 
     <div class="filter-actions">
       <slot name="actions"></slot>
-      <AnimatedButton @click="applyFilters" variant="primary" size="small" :loading="loading">
+      <AnimatedButton @click="applyFilters" variant="primary" size="small" :loading="loading || isApplying">
         Apply Filter
       </AnimatedButton>
-      <AnimatedButton @click="clearFilters" variant="clear" size="small">
+      <AnimatedButton @click="clearFilters" variant="clear" size="small" :loading="isClearing">
         Clear All
       </AnimatedButton>
     </div>
@@ -130,6 +130,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'apply', 'clear'])
 
 const isLoaded = ref(false)
+const isApplying = ref(false)
+const isClearing = ref(false)
 const localFilters = ref({
   deliveryDate: '',
   orderDate: '',
@@ -161,7 +163,9 @@ watch(localFilters, (newValue) => {
   }
 }, { deep: true })
 
-const applyFilters = () => {
+const applyFilters = async () => {
+  isApplying.value = true
+  
   // Convert date range objects to individual date fields for backend compatibility
   const filtersToEmit = { 
     ...localFilters.value,
@@ -172,6 +176,11 @@ const applyFilters = () => {
   }
   
   emit('apply', filtersToEmit)
+  
+  // Reset loading state after a short delay to show the loading effect
+  setTimeout(() => {
+    isApplying.value = false
+  }, 500)
 }
 
 const onDeliveryDateChange = (value) => {
@@ -186,7 +195,9 @@ const onOrderDateChange = (value) => {
   }
 }
 
-const clearFilters = () => {
+const clearFilters = async () => {
+  isClearing.value = true
+  
   localFilters.value = {
     deliveryDate: '',
     orderDate: '',
@@ -202,6 +213,11 @@ const clearFilters = () => {
     search: ''
   }
   emit('clear')
+  
+  // Reset loading state after a short delay to show the loading effect
+  setTimeout(() => {
+    isClearing.value = false
+  }, 500)
 }
 
 onMounted(() => {
@@ -246,8 +262,8 @@ onMounted(() => {
 }
 
 .filter-group:has(.date-range-picker) {
-  min-width: 200px;
-  width: 200px;
+  min-width: 220px;
+  width: 220px;
 }
 
 .filter-label {

@@ -51,44 +51,44 @@ const handleClick = (event) => {
   position: relative;
   width: 36px;
   height: 36px;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-glass);
   backdrop-filter: blur(5px);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-light);
 }
 
 .modern-download-btn:hover:not(.disabled):not(.loading) {
-  border-color: rgba(0, 200, 81, 0.6);
-  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.15);
+  box-shadow: 0 4px 12px var(--accent-light);
 }
 
 .modern-download-btn:active:not(.disabled):not(.loading) {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 200, 81, 0.1);
+  box-shadow: 0 2px 6px var(--accent-light);
 }
 
 .modern-download-btn:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .modern-download-btn.loading {
   cursor: wait;
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: var(--border-color);
 }
 
 .modern-download-btn.disabled {
-  background: #e9ecef;
-  border-color: #e9ecef;
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -104,7 +104,7 @@ const handleClick = (event) => {
 .download-icon {
   width: 16px;
   height: 16px;
-  stroke: #6366f1;
+  stroke: var(--accent-primary);
   stroke-width: 2;
   fill: none;
   transition: transform 0.3s ease;
@@ -112,10 +112,11 @@ const handleClick = (event) => {
 
 .modern-download-btn:hover:not(.disabled):not(.loading) .download-icon {
   transform: translateY(1px);
+  stroke: var(--text-inverse);
 }
 
 .modern-download-btn.disabled .download-icon {
-  stroke: #6c757d;
+  stroke: var(--text-tertiary);
 }
 
 .spinner {
@@ -127,7 +128,7 @@ const handleClick = (event) => {
 .spinner-icon {
   width: 16px;
   height: 16px;
-  stroke: #6366f1;
+  stroke: var(--accent-primary);
   stroke-width: 2;
   fill: none;
   animation: spin 1s linear infinite;

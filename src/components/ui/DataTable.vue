@@ -1,52 +1,54 @@
 <template>
   <div class="table-container" :class="{ 'animate-fade-in-up': isLoaded }">
-    <table class="data-table">
-      <thead>
-        <tr class="table-header">
-          <th v-if="showCheckbox" class="checkbox-column">
-            <input type="checkbox" v-model="selectAll" @change="toggleAllSelection">
-          </th>
-          <th v-for="column in columns" :key="column.key" class="header-cell">
-            {{ column.label }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Skeleton loading rows -->
-        <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
-          <td v-if="showCheckbox" class="table-cell">
-            <SkeletonLoader width="16px" height="16px" />
-          </td>
-          <td v-for="column in columns" :key="column.key" class="table-cell">
-            <SkeletonLoader width="80%" height="16px" />
-          </td>
-        </tr>
-        
-        <!-- Actual data rows -->
-        <tr v-for="(item, index) in paginatedData" :key="item.id || index" 
-            class="table-row" 
-            :class="{ 'selected': item.selected }">
-          <td v-if="showCheckbox" class="checkbox-column">
-            <input type="checkbox" v-model="item.selected" @change="onItemSelectionChange">
-          </td>
-          <td v-for="column in columns" :key="column.key" 
-              class="table-cell" 
-              :class="{ 'center-cell': column.key === 'downloadAction' }"
-              :title="item[column.key]">
-            <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]">
-              <span v-if="column.type === 'status'" 
-                    :class="['status-badge', getStatusClass(item[column.key])]">
-                {{ item[column.key] }}
-              </span>
-              <span v-else-if="column.type === 'currency'">
-                {{ formatCurrency(item[column.key]) }}
-              </span>
-              <span v-else>{{ item[column.key] }}</span>
-            </slot>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr class="table-header">
+            <th v-if="showCheckbox" class="checkbox-column">
+              <input type="checkbox" v-model="selectAll" @change="toggleAllSelection">
+            </th>
+            <th v-for="column in columns" :key="column.key" class="header-cell">
+              {{ column.label }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Skeleton loading rows -->
+          <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
+            <td v-if="showCheckbox" class="table-cell">
+              <SkeletonLoader width="16px" height="16px" />
+            </td>
+            <td v-for="column in columns" :key="column.key" class="table-cell">
+              <SkeletonLoader width="80%" height="16px" />
+            </td>
+          </tr>
+          
+          <!-- Actual data rows -->
+          <tr v-for="(item, index) in paginatedData" :key="item.id || index" 
+              class="table-row" 
+              :class="{ 'selected': item.selected }">
+            <td v-if="showCheckbox" class="checkbox-column">
+              <input type="checkbox" v-model="item.selected" @change="onItemSelectionChange">
+            </td>
+            <td v-for="column in columns" :key="column.key" 
+                class="table-cell" 
+                :class="{ 'center-cell': column.key === 'downloadAction' }"
+                :title="item[column.key]">
+              <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]">
+                <span v-if="column.type === 'status'" 
+                      :class="['status-badge', getStatusClass(item[column.key])]">
+                  {{ item[column.key] }}
+                </span>
+                <span v-else-if="column.type === 'currency'">
+                  {{ formatCurrency(item[column.key]) }}
+                </span>
+                <span v-else>{{ item[column.key] }}</span>
+              </slot>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     
     <!-- No data message -->
     <div v-if="!loading && data.length === 0" class="no-data-message">
@@ -96,7 +98,8 @@ const props = defineProps({
   itemsPerPage: {
     type: Number,
     default: 10
-  }
+  },
+
 })
 
 const emit = defineEmits(['selection-change'])
@@ -116,6 +119,8 @@ const paginatedData = computed(() => {
   const end = start + props.itemsPerPage
   return props.data.slice(start, end)
 })
+
+
 
 // Watch for changes in data selection to update selectAll state
 watch(() => props.data.map(item => item.selected), () => {
@@ -194,13 +199,11 @@ onMounted(() => {
 
 <style scoped>
 .table-container {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  overflow-x: auto;
-  overflow-y: visible;
+  border: 1px solid var(--border-color);
+  /* border-radius: 16px; */
+  /* box-shadow: 0 8px 32px var(--shadow-color), 0 0 0 1px var(--border-light); */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   transform: translateY(20px);
@@ -208,6 +211,10 @@ onMounted(() => {
   z-index: 1;
   width: 100%;
   max-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .table-container.animate-fade-in-up {
@@ -215,23 +222,32 @@ onMounted(() => {
   transform: translateY(0);
 }
 
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+  min-width: 1000px;
 }
 
 .table-header {
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
 }
 
 .header-cell {
-  padding: 1rem 0.5rem;
+  padding: 1rem 0.75rem;
   text-align: left;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e9ecef;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-medium);
   font-size: 0.9rem;
   white-space: nowrap;
+  min-width: 120px;
 }
 
 .checkbox-column {
@@ -240,25 +256,28 @@ onMounted(() => {
 }
 
 .table-row {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border-medium);
   transition: background-color 0.2s ease;
 }
 
 .table-row:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-hover);
 }
 
 .table-row.selected {
-  background-color: rgba(99, 102, 241, 0.05);
+  background-color: var(--accent-light);
 }
 
 .table-cell {
-  padding: 1rem 0.5rem;
-  color: #333;
+  padding: 1rem 0.75rem;
+  color: var(--text-primary);
   font-size: 0.85rem;
   vertical-align: middle;
   word-wrap: break-word;
   word-break: break-word;
+  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .center-cell {
@@ -275,58 +294,33 @@ onMounted(() => {
   min-width: 80px;
 }
 
-.status-delivered {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.status-in-transit {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.status-to-be-assigned {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.status-paid {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.status-unpaid {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.status-overdue {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
+.status-delivered,
+.status-paid,
 .status-allowed {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: var(--status-success);
+  color: var(--status-success-text);
+  border: 1px solid var(--status-success-text);
 }
 
+.status-in-transit,
+.status-unpaid {
+  background-color: var(--status-warning);
+  color: var(--status-warning-text);
+  border: 1px solid var(--status-warning-text);
+}
+
+.status-to-be-assigned,
+.status-overdue,
 .status-not-allowed {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error);
+  color: var(--status-error-text);
+  border: 1px solid var(--status-error-text);
 }
 
 .status-default {
-  background-color: #e2e3e5;
-  color: #383d41;
-  border: 1px solid #d6d8db;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-medium);
 }
 
 .skeleton-row .table-cell {
@@ -336,7 +330,7 @@ onMounted(() => {
 .no-data-message {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 1rem;
   font-weight: 500;
 }
@@ -346,15 +340,16 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-top: 1px solid #e9ecef;
-  background: rgba(248, 249, 250, 0.8);
+  border-top: 1px solid var(--border-medium);
+  background: var(--bg-glass-secondary);
+  flex-shrink: 0;
 }
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  border: 1px solid #00C851;
-  background: white;
-  color: #00C851;
+  border: 1px solid var(--accent-primary);
+  background: var(--bg-primary);
+  color: var(--accent-primary);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -362,8 +357,8 @@ onMounted(() => {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #00C851;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
 }
 
 .pagination-btn:disabled {
@@ -373,7 +368,7 @@ onMounted(() => {
 
 .pagination-info {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 

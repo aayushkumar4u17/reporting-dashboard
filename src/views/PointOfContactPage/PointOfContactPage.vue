@@ -1,7 +1,7 @@
 <template>
   <div class="point-of-contact-page">
-    <div class="poc-container">
-      <!-- Filter Component -->
+    <div class="poc-container" :class="{ 'fade-in': isLoaded }">
+      <!-- Filter Bar -->
       <FilterBar
         :filters="['state', 'city', 'poc']"
         :state-options="uniqueStates"
@@ -12,88 +12,115 @@
         :loading="loading"
       />
 
-      <!-- Data Table -->
-      <DataTable
-        :columns="locationColumns"
-        :data="filteredLocations"
-        :loading="loading"
-        :pagination="true"
-        :items-per-page="10"
-      >
-        <template #cell-email="{ value }">
-          <a v-if="value && value !== 'Add +' && value !== '—'" :href="`mailto:${value}`" class="email-link">
-            {{ value }}
-          </a>
-          <span v-else class="empty-value">{{ value || '—' }}</span>
-        </template>
-        <template #cell-contactNumber="{ value }">
-          <a v-if="value && value !== '—'" :href="`tel:${value}`" class="phone-link">
-            {{ value }}
-          </a>
-          <span v-else class="empty-value">{{ value || '—' }}</span>
-        </template>
-      </DataTable>
+      <!-- Main Content -->
+      <div class="poc-content">
+        <!-- Data Table Section -->
+        <div class="table-section">
+          <h2 class="section-title">Point of Contact Details</h2>
+          <DataTable :value="loading ? skeletonData : filteredLocations" scrollable scrollHeight="550px" tableStyle="min-width: 50rem" class="fixed-height-table">
+            <template #empty>
+              <div style="text-align: center; font-weight: bold; padding: 2rem; color: var(--text-primary);">
+                No contacts found.
+              </div>
+            </template>
+            <Column field="pocName" header="POC Name">
+              <template #body="{ data }">
+                <SkeletonLoader v-if="loading" width="100px" height="16px" />
+                <span v-else>{{ data.pocName }}</span>
+              </template>
+            </Column>
+            <Column field="contactNumber" header="Contact Number">
+              <template #body="{ data }">
+                <SkeletonLoader v-if="loading" width="90px" height="16px" />
+                <template v-else>
+                  <a v-if="data.contactNumber && data.contactNumber !== '—'" :href="`tel:${data.contactNumber}`" class="phone-link">
+                    {{ data.contactNumber }}
+                  </a>
+                  <span v-else class="empty-value">{{ data.contactNumber || '—' }}</span>
+                </template>
+              </template>
+            </Column>
+            <Column field="email" header="Email ID">
+              <template #body="{ data }">
+                <SkeletonLoader v-if="loading" width="120px" height="16px" />
+                <template v-else>
+                  <a v-if="data.email && data.email !== 'Add +' && data.email !== '—'" :href="`mailto:${data.email}`" class="email-link">
+                    {{ data.email }}
+                  </a>
+                  <span v-else class="empty-value">{{ data.email || '—' }}</span>
+                </template>
+              </template>
+            </Column>
+            <Column field="name" header="My Locations">
+              <template #body="{ data }">
+                <SkeletonLoader v-if="loading" width="150px" height="16px" />
+                <span v-else>{{ data.name }}</span>
+              </template>
+            </Column>
+          </DataTable>
+        </div>
 
-      <!-- Quick Actions Panel -->
-      <div class="quick-actions-section">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="actions-grid">
-          <button class="action-card" @click="navigateToOrders">
-            <div class="action-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-              </svg>
-            </div>
-            <div class="action-content">
-              <div class="action-title">View All Orders</div>
-              <div class="action-subtitle">Manage and track orders</div>
-            </div>
-          </button>
-          
-          <button class="action-card" @click="navigateToInvoices">
-            <div class="action-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10,9 9,9 8,9"/>
-              </svg>
-            </div>
-            <div class="action-content">
-              <div class="action-title">Generate Reports</div>
-              <div class="action-subtitle">Download invoices & reports</div>
-            </div>
-          </button>
-          
-          <button class="action-card" @click="navigateToPayments">
-            <div class="action-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                <line x1="1" y1="10" x2="23" y2="10"/>
-              </svg>
-            </div>
-            <div class="action-content">
-              <div class="action-title">Payment Status</div>
-              <div class="action-subtitle">Track payment history</div>
-            </div>
-          </button>
-          
-          <button class="action-card" @click="navigateToDashboard">
-            <div class="action-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-              </svg>
-            </div>
-            <div class="action-content">
-              <div class="action-title">Dashboard</div>
-              <div class="action-subtitle">View analytics overview</div>
-            </div>
-          </button>
+        <!-- Quick Actions Panel -->
+        <div class="quick-actions-section">
+          <h2 class="section-title">Quick Actions</h2>
+          <div class="actions-grid">
+            <button class="action-card" @click="navigateToOrders">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">View All Orders</div>
+                <div class="action-subtitle">Manage and track orders</div>
+              </div>
+            </button>
+            
+            <button class="action-card" @click="navigateToInvoices">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10,9 9,9 8,9"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Generate Reports</div>
+                <div class="action-subtitle">Download invoices & reports</div>
+              </div>
+            </button>
+            
+            <button class="action-card" @click="navigateToPayments">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Payment Status</div>
+                <div class="action-subtitle">Track payment history</div>
+              </div>
+            </button>
+            
+            <button class="action-card" @click="navigateToDashboard">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Dashboard</div>
+                <div class="action-subtitle">View analytics overview</div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -103,7 +130,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import FilterBar from '@/components/ui/FilterBar.vue'
-import DataTable from '@/components/ui/DataTable.vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import { fetchPointOfContactReport } from '@/api/pointOfContact'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'
@@ -147,13 +176,10 @@ const locations = ref([])
 const allLocations = ref([])
 const initialData = ref([]) // Store initial data for filter options
 
-// Table columns configuration
-const locationColumns = [
-  { key: 'pocName', label: 'POC Name' },
-  { key: 'contactNumber', label: 'Contact Number' },
-  { key: 'email', label: 'Email ID' },
-  { key: 'name', label: 'My Locations' }
-]
+// Skeleton data for loading state
+const skeletonData = ref(Array(14).fill(null).map((_, index) => ({ id: index })))
+
+
 
 const pointOfContactStore = usePointOfContactStore()
 const { getOrganizationId, watchOrganizationChange } = useOrganization()

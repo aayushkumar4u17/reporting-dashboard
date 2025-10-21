@@ -24,6 +24,7 @@ export interface OrganizationUser {
     name?: string | null;
     is_active: boolean;
     created_at?: string;
+    brand_logo?: string | null;
   };
   user: {
     id: string;

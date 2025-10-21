@@ -60,7 +60,7 @@ const handleClick = (event: MouseEvent) => {
 <style scoped>
 .animated-btn {
   position: relative;
-  border: none;
+  border: 2px solid var(--border-medium);
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -72,7 +72,7 @@ const handleClick = (event: MouseEvent) => {
   gap: 0.5rem;
   text-decoration: none;
   outline: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px var(--shadow-light);
 }
 
 .animated-btn::before {
@@ -92,7 +92,7 @@ const handleClick = (event: MouseEvent) => {
 
 .animated-btn:hover:not(.btn-disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px var(--shadow-light);
 }
 
 .animated-btn:active:not(.btn-disabled) {
@@ -100,7 +100,7 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .animated-btn:focus {
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.3);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 /* Sizes */
@@ -123,74 +123,90 @@ const handleClick = (event: MouseEvent) => {
 
 /* Variants */
 .btn-primary {
-  background: linear-gradient(135deg, #00C851 0%, #00A844 100%);
-  color: white;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-primary:hover:not(.btn-disabled) {
-  background: linear-gradient(135deg, #00A844 0%, #008A3A 100%);
-  box-shadow: 0 2px 6px rgba(0, 200, 81, 0.15);
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 6px var(--accent-light);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #00C851;
-  border: 2px solid #00C851;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-secondary:hover:not(.btn-disabled) {
-  background: #00C851;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-success:hover:not(.btn-disabled) {
-  background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
-  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.15);
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 6px var(--accent-light);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  color: white;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-danger:hover:not(.btn-disabled) {
-  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  background: #dc3545;
+  color: var(--text-inverse);
+  border-color: #dc3545;
   box-shadow: 0 2px 6px rgba(220, 53, 69, 0.15);
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-  color: #212529;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-warning:hover:not(.btn-disabled) {
-  background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+  background: #ffc107;
+  color: var(--text-inverse);
+  border-color: #ffc107;
   box-shadow: 0 2px 6px rgba(255, 193, 7, 0.15);
 }
 
 .btn-clear {
-  background: linear-gradient(135deg, #00C851 0%, #00A844 100%);
-  color: white;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
 }
 
 .btn-clear:hover:not(.btn-disabled) {
-  background: linear-gradient(135deg, #00A844 0%, #008A3A 100%);
-  box-shadow: 0 2px 6px rgba(0, 200, 81, 0.15);
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 6px var(--accent-light);
 }
 
 /* States */
 .btn-disabled {
-  background: #e9ecef !important;
-  color: #6c757d !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-tertiary) !important;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
-  border-color: #e9ecef !important;
+  border-color: var(--border-medium) !important;
 }
 
 .btn-loading {

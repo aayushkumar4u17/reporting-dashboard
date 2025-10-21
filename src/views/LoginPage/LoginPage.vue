@@ -155,10 +155,14 @@ import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import TermsPopup from '@/components/layout/TermsPopup.vue'
 
 import { useAuthStore } from '@/stores'
+import { useThemeStore } from '@/stores/theme'
 import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction, startTimer } from '@/api/auth'
+import { otpRateLimiter, loginRateLimiter, formatTime } from '@/utils/rateLimiter'
+import ErrorHandler from '@/utils/errorHandler'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
 const phoneNumber = ref('')
 const isAgreed = ref(false)
@@ -206,6 +210,9 @@ const setupRecaptcha = () => {
 }
 
 onMounted(() => {
+  // Force light mode for login page
+  themeStore.setTheme('light')
+  
   // Show the page immediately
   isLoaded.value = true;
   
@@ -255,6 +262,26 @@ watch(
 
 const sendOTPHandler = async () => {
   if (isPhoneNumberValid.value && isAgreed.value) {
+    // Check rate limiting
+    if (otpRateLimiter.isBlocked()) {
+      const remainingTime = otpRateLimiter.getRemainingTime()
+      authStore.showErrorPopup({
+        title: 'Too Many Attempts',
+        message: `Please wait ${formatTime(remainingTime)} before trying again.`,
+        showRetry: false
+      })
+      return
+    }
+    
+    if (!otpRateLimiter.recordAttempt()) {
+      authStore.showErrorPopup({
+        title: 'Rate Limited',
+        message: 'Too many OTP requests. Please wait before trying again.',
+        showRetry: false
+      })
+      return
+    }
+    
     isLoading.value = true
     
     try {
@@ -278,19 +305,12 @@ const sendOTPHandler = async () => {
     } catch (error: unknown) {
       isLoading.value = false
       
-      if (error && typeof error === 'object' && 'message' in error && error.message === 'Unauthorized user') {
-        authStore.showErrorPopup({
-          title: 'Unauthorized Access',
-          message: 'Only organization owners can access the reporting dashboard',
-          showRetry: false
-        })
-      } else {
-        authStore.showErrorPopup({
-          title: 'Error Sending OTP',
-          message: 'Unable to send OTP. Please try again.',
-          showRetry: true
-        })
-      }
+      const safeError = ErrorHandler.handleError(error, { component: 'LoginPage', action: 'sendOTP' })
+      authStore.showErrorPopup({
+        title: safeError.severity === 'critical' ? 'Critical Error' : 'Error Sending OTP',
+        message: safeError.userMessage,
+        showRetry: safeError.shouldRetry
+      })
     }
   }
 }

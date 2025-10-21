@@ -3,6 +3,8 @@ import '@/config'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import PrimeVue from 'primevue/config'
+import Aura from '@primeuix/themes/aura'
 import App from './App.vue'
 import router from './router'
 import components from './components'
@@ -30,8 +32,18 @@ const app = createApp(App)
 const pinia = createPinia()
 
 // Global error handler
-app.config.errorHandler = (_err, _instance, info) => {
-  console.error('Global error:', { message: 'Application error occurred', info })
+app.config.errorHandler = (err, instance, info) => {
+  console.error('Global error:', {
+    error: err,
+    message: err?.message || 'Application error occurred',
+    info,
+    component: instance?.$?.type?.name || 'Unknown'
+  })
+  
+  // Don't let errors break the app completely
+  if (info === 'mounted hook' || info === 'updated hook') {
+    console.warn('Lifecycle hook error caught and handled')
+  }
 }
 
 // Register global components
@@ -40,6 +52,14 @@ app.component('ErrorBoundary', ErrorBoundary)
 app.use(pinia)
 app.use(router)
 app.use(components)
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+    options: {
+      darkModeSelector: '.dark-mode'
+    }
+  }
+})
 
 // Initialize auth state before mounting
 initializeAuthState().catch(console.error).finally(() => {

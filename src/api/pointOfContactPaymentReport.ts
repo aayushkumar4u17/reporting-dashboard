@@ -54,7 +54,6 @@ export const fetchPointOfContactPaymentReport = async (organizationId: string, f
 
     return response.pointOfContactPaymentReport?.data || []
   } catch (error) {
-    console.error('Error fetching point of contact payment report:', error)
     throw error
   }
 }

@@ -1,0 +1,8 @@
+mutation WalletEasebuzzTopup($object: WalletEasebuzzTopupInput!) {
+  walletEasebuzzTopup(object: $object) {
+    amount
+    client_secret
+    wallet_id
+    wallet_transaction_id
+  }
+}

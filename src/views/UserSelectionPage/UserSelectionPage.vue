@@ -60,8 +60,21 @@
           :class="{ 'selected': isSelectedOrganization(org.id) }"
           @click="selectOrganization(org)"
         >
-          <div class="user-avatar" :style="{ background: org.color }">
-            <span class="user-initial">{{ getInitials(org.name) }}</span>
+          <div class="user-avatar">
+            <img 
+              v-if="org.brand_logo" 
+              :src="org.brand_logo" 
+              :alt="org.name"
+              class="brand-logo"
+              @error="(e) => handleImageError(e, org)"
+            />
+            <div 
+              v-if="!org.brand_logo || org.showFallback" 
+              class="fallback-avatar" 
+              :style="{ background: org.color }"
+            >
+              <span class="user-initial">{{ getInitials(org.name) }}</span>
+            </div>
           </div>
           <p class="user-name">{{ org.name }}</p>
           <div v-if="isSelectedOrganization(org.id)" class="selected-tick">
@@ -91,12 +104,14 @@ import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
 import { canAccessIndusDashboard } from '@/utils/auth'
 import { useUserStore } from '@/stores'
+import { useThemeStore } from '@/stores/theme'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganizationStore } from '@/stores/organization'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 const pointOfContactStore = usePointOfContactStore()
 const organizationStore = useOrganizationStore()
 const organizations = ref([])
@@ -183,7 +198,7 @@ const selectOrganization = (org) => {
   // Store selected organization with avatar info
   const orgWithAvatar = {
     ...org,
-    avatar: org.color,
+    avatar: org.brand_logo || org.color,
     initials: getInitials(org.name)
   }
   localStorage.setItem('selectedOrganization', JSON.stringify(orgWithAvatar))
@@ -288,6 +303,8 @@ const fetchOrganizations = async () => {
         is_owner: orgUser.is_owner,
         organization_user_type: orgUser.organization_user_type, // Should be 'DELIVERY'
         created_at: orgUser.organization.created_at || orgUser.created_at, // Use organization creation date first
+        brand_logo: orgUser.organization.brand_logo,
+        showFallback: false,
         color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization'),
         uniqueKey: `${orgUser.organization.id}-${index}-${Date.now()}` // Ensure uniqueness
       }))
@@ -325,6 +342,13 @@ const fetchOrganizations = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Handle image loading errors
+const handleImageError = (event, org) => {
+  // Mark this organization to show fallback
+  org.showFallback = true
+  event.target.style.display = 'none'
 }
 
 // Retry fetching organizations
@@ -404,6 +428,9 @@ const waitForAuthState = () => {
 }
 
 onMounted(async () => {
+  // Force light mode for user selection page
+  themeStore.setTheme('light')
+  
   // Show initial loader for 1 second for smooth transition
   setTimeout(() => {
     showInitialLoader.value = false

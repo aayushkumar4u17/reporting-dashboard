@@ -83,12 +83,20 @@
 
     <div class="filter-actions">
       <slot name="actions"></slot>
-      <AnimatedButton @click="applyFilters" variant="primary" size="small" :loading="loading || isApplying">
-        Apply Filter
-      </AnimatedButton>
-      <AnimatedButton @click="clearFilters" variant="clear" size="small" :loading="isClearing">
-        Clear All
-      </AnimatedButton>
+      <button 
+        @click="applyFilters" 
+        class="apply-filter-btn" 
+        :disabled="loading"
+      >
+        {{ loading ? 'Applying...' : 'Apply Filter' }}
+      </button>
+      <button 
+        @click="clearFilters" 
+        class="clear-all-btn" 
+        :disabled="loading"
+      >
+        {{ loading ? 'Clearing...' : 'Clear All' }}
+      </button>
     </div>
   </div>
 </template>
@@ -130,8 +138,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'apply', 'clear'])
 
 const isLoaded = ref(false)
-const isApplying = ref(false)
-const isClearing = ref(false)
 const localFilters = ref({
   deliveryDate: '',
   orderDate: '',
@@ -151,36 +157,34 @@ const isUpdatingFromProps = ref(false)
 
 // Watch for prop changes
 watch(() => props.modelValue, (newValue) => {
-  isUpdatingFromProps.value = true
-  localFilters.value = { ...localFilters.value, ...newValue }
-  isUpdatingFromProps.value = false
+  if (newValue) {
+    isUpdatingFromProps.value = true
+    Object.assign(localFilters.value, newValue)
+    isUpdatingFromProps.value = false
+  }
 }, { immediate: true })
 
-// Watch for local changes
+// Watch for local changes with debounce
 watch(localFilters, (newValue) => {
   if (!isUpdatingFromProps.value) {
     emit('update:modelValue', newValue)
   }
-}, { deep: true })
+}, { deep: true, flush: 'post' })
 
-const applyFilters = async () => {
-  isApplying.value = true
-  
+const applyFilters = () => {
   // Convert date range objects to individual date fields for backend compatibility
   const filtersToEmit = { 
     ...localFilters.value,
-    orderDateFrom: localFilters.value.orderDateRange.from,
-    orderDateTo: localFilters.value.orderDateRange.to,
-    deliveryDateFrom: localFilters.value.deliveryDateRange.from,
-    deliveryDateTo: localFilters.value.deliveryDateRange.to
+    orderDateFrom: localFilters.value.orderDateRange.from || '',
+    orderDateTo: localFilters.value.orderDateRange.to || '',
+    deliveryDateFrom: localFilters.value.deliveryDateRange.from || '',
+    deliveryDateTo: localFilters.value.deliveryDateRange.to || '',
+    city: localFilters.value.city || '',
+    poc: localFilters.value.poc || '',
+    search: localFilters.value.search || ''
   }
   
   emit('apply', filtersToEmit)
-  
-  // Reset loading state after a short delay to show the loading effect
-  setTimeout(() => {
-    isApplying.value = false
-  }, 500)
 }
 
 const onDeliveryDateChange = (value) => {
@@ -195,9 +199,7 @@ const onOrderDateChange = (value) => {
   }
 }
 
-const clearFilters = async () => {
-  isClearing.value = true
-  
+const clearFilters = () => {
   localFilters.value = {
     deliveryDate: '',
     orderDate: '',
@@ -213,11 +215,6 @@ const clearFilters = async () => {
     search: ''
   }
   emit('clear')
-  
-  // Reset loading state after a short delay to show the loading effect
-  setTimeout(() => {
-    isClearing.value = false
-  }, 500)
 }
 
 onMounted(() => {
@@ -229,22 +226,25 @@ onMounted(() => {
 
 <style scoped>
 .filter-bar {
-  background: rgba(255, 255, 255, 0.95);
+  top: auto;
+  background: var(--bg-glass);
   backdrop-filter: blur(10px);
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  margin-bottom: 1.5rem;
+  padding: 1rem 2rem;
+  margin-left: -2rem;
+  margin-right: -2rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 4rem;
   align-items: flex-end;
-  border: 1px solid rgba(0, 200, 81, 0.1);
   position: relative;
   z-index: 10;
   opacity: 0;
   transform: translateY(-20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  /* border-radius: 12px; */
+  /* box-shadow: 0 8px 32px var(--shadow-color), 0 0 0 1px var(--border-light); */
 }
 
 .filter-bar.animate-slide-down {
@@ -256,7 +256,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   min-width: 130px;
-  flex-shrink: 0;
+  flex: 1;
   position: relative;
   z-index: 1;
 }
@@ -264,23 +264,24 @@ onMounted(() => {
 .filter-group:has(.date-range-picker) {
   min-width: 220px;
   width: 220px;
+  z-index: 100000;
 }
 
 .filter-label {
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 1rem;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .filter-select, .filter-input {
   padding: 0.6rem;
-  border: 2px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--border-medium);
   border-radius: 10px;
   font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.95);
-  color: #333;
-  width: 130px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  width: 100px;
   height: 40px;
   box-sizing: border-box;
   transition: all 0.3s ease;
@@ -301,15 +302,12 @@ onMounted(() => {
   padding-right: 0.6rem;
 }
 
-.filter-select:hover, .filter-input:hover {
-  border-color: rgba(0, 0, 0, 0.6);
-  transform: translateY(-1px);
-}
+
 
 .filter-select:focus, .filter-input:focus {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-light);
   z-index: 100;
 }
 
@@ -318,12 +316,77 @@ onMounted(() => {
   gap: 0.75rem;
   align-items: center;
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+.apply-filter-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 100px;
+  height: 40px;
+}
+
+.apply-filter-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.apply-filter-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.apply-filter-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clear-all-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-medium);
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 80px;
+  height: 40px;
+}
+
+.clear-all-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.clear-all-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.clear-all-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: 100vw;
   }
   
   .filter-group {
@@ -334,6 +397,32 @@ onMounted(() => {
     margin-left: 0;
     width: 100%;
     justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .apply-filter-btn,
+  .clear-all-btn {
+    flex: 1;
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-bar {
+    padding: 0.75rem;
+    margin: 0.75rem;
+    width: calc(100% - 1.5rem);
+    gap: 0.75rem;
+  }
+  
+  .filter-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .apply-filter-btn,
+  .clear-all-btn {
+    max-width: none;
   }
 }
 </style>

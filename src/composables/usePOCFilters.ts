@@ -60,12 +60,18 @@ export const usePOCFilters = () => {
   }
 
   // Load POC data for filter options
+  let isLoadingData = false
   const loadPOCFilterData = async (forceReload = false) => {
+    if (isLoadingData) {
+      return // Already loading
+    }
+    
     if (pocData.value.length > 0 && !forceReload) {
       return // Data already loaded
     }
 
     try {
+      isLoadingData = true
       loading.value = true
       error.value = null
 
@@ -78,8 +84,6 @@ export const usePOCFilters = () => {
         organization_id: organizationId
       })
 
-      console.log('POC filter data response:', response)
-
       // Map response to our data structure
       pocData.value = response.contacts.map(contact => ({
         pocName: contact.full_name,
@@ -87,14 +91,11 @@ export const usePOCFilters = () => {
         state: contact.state
       }))
 
-      console.log('Processed POC data:', pocData.value.length, 'contacts')
-      console.log('POC options will be:', pocOptions.value)
-
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load POC data'
-      console.error('Error loading POC filter data:', err)
     } finally {
       loading.value = false
+      isLoadingData = false
     }
   }
 
@@ -102,6 +103,7 @@ export const usePOCFilters = () => {
   const clearPOCData = () => {
     pocData.value = []
     error.value = null
+    isLoadingData = false
   }
 
   return {

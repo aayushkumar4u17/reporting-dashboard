@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import DashboardPage from '@/views/DashboardPage/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage/LoginPage.vue'
 import UserSelectionPage from '@/views/UserSelectionPage/UserSelectionPage.vue'
@@ -28,30 +30,30 @@ const router = createRouter({
     },
     {
       path: '/dashboard',
-      name: 'dashboard',
-      component: DashboardPage
-    },
-    {
+          name: 'dashboard',
+          component: DashboardPage
+        },
+        {
       path: '/point-of-contact',
-      name: 'point-of-contact',
-      component: PointOfContactPage
-    },
-    {
+          name: 'point-of-contact',
+          component: PointOfContactPage
+        },
+        {
       path: '/my-orders',
-      name: 'my-orders',
-      component: MyOrdersPage
-    },
-    {
+          name: 'my-orders',
+          component: MyOrdersPage
+        },
+        {
       path: '/my-invoices',
-      name: 'my-invoices',
-      component: MyInvoicesPage
-    },
-    {
+          name: 'my-invoices',
+          component: MyInvoicesPage
+        },
+        {
       path: '/payments',
-      name: 'payments',
-      component: PaymentsPage
-    }
-  ]
+          name: 'payments',
+          component: PaymentsPage
+        }
+      ]
 })
 
 let cachedAuthState: { isLoggedIn: boolean; timestamp: number } | null = null

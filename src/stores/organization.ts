@@ -25,7 +25,7 @@ export const useOrganizationStore = defineStore('organization', () => {
         return JSON.parse(stored)
       }
     } catch (error) {
-      console.error('Error parsing stored organization:', error)
+      // Handle error silently
     }
     return null
   }

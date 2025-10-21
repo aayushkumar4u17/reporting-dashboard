@@ -36,28 +36,36 @@ interface RawContact {
 }
 
 export const fetchPointOfContactReport = async (filters: POCFilters): Promise<POCResponse> => {
-  const graphqlClient = await client()
-  
-  const response = await graphqlClient.PointOfContactPageQuery({
-    organization_id: filters.organization_id,
-    city: filters.city || '',
-    state: filters.state || ''
-  })
-  
-  const rawContacts: RawContact[] = response.pointOfContactPageReport?.data || []
-  
-  // Process all contacts without removing duplicates
-  const sortedContacts = sortContacts(rawContacts)
-  const processedContacts = processContacts(sortedContacts)
-  
-  return {
-    summary: {
-      total_count: rawContacts.length,
-      unique_contacts: processedContacts.length,
-      states_covered: [...new Set(processedContacts.map(c => c.state))],
-      cities_covered: [...new Set(processedContacts.map(c => c.city))]
-    },
-    contacts: processedContacts
+  try {
+    const graphqlClient = await client()
+    
+    const queryParams: any = {
+      organization_id: filters.organization_id
+    }
+    
+    // Only add optional parameters if they have values
+    if (filters.city) queryParams.city = filters.city
+    if (filters.state) queryParams.state = filters.state
+    
+    const response = await graphqlClient.PointOfContactPageQuery(queryParams)
+    
+    const rawContacts: RawContact[] = response.pointOfContactPageReport?.data || []
+    
+    // Process all contacts without removing duplicates
+    const sortedContacts = sortContacts(rawContacts)
+    const processedContacts = processContacts(sortedContacts)
+    
+    return {
+      summary: {
+        total_count: rawContacts.length,
+        unique_contacts: processedContacts.length,
+        states_covered: [...new Set(processedContacts.map(c => c.state))],
+        cities_covered: [...new Set(processedContacts.map(c => c.city))]
+      },
+      contacts: processedContacts
+    }
+  } catch (error) {
+    throw error
   }
 }
 

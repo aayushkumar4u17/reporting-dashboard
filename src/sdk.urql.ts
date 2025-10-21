@@ -130349,7 +130349,14 @@ export type FetchUserOrganizationsQueryVariables = Exact<{
 
 export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
-export type DashboardQueryQueryVariables = Exact<{
+export type GetWalletDetailsQueryVariables = Exact<{
+  org_id: Scalars['uuid'];
+}>;
+
+
+export type GetWalletDetailsQuery = { __typename?: 'query_root', wallet: Array<{ __typename?: 'wallet', id: any, amount?: any | null, van_code?: string | null, van_number?: any | null, ifsc_code?: string | null, bank_name?: string | null, beneficiary_name?: string | null, blocked_amount?: any | null }> };
+
+export type PointOfContactDashboardQueryVariables = Exact<{
   org_id: Scalars['String'];
   city: Scalars['String'];
   delivery_date_to: Scalars['String'];
@@ -130360,7 +130367,20 @@ export type DashboardQueryQueryVariables = Exact<{
 }>;
 
 
-export type DashboardQueryQuery = { __typename?: 'query_root', pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, delivered_qty?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null }> } | null, pointOfContactDashboardReschedule?: { __typename?: 'PointOfContactDashboardRescheduleOutput', data: Array<{ __typename?: 'PointOfContactDashboardRescheduleData', rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null };
+export type PointOfContactDashboardQuery = { __typename?: 'query_root', pointOfContactDashboard?: { __typename?: 'PointOfContactDashboardOutput', data: Array<{ __typename?: 'PointOfContactDashboardData', cancelled_count?: number | null, cancelled_qty?: number | null, delivered_orders?: number | null, delivered_qty?: number | null, order_count?: number | null, ordered_qty?: number | null, planned_orders?: number | null, planned_qty?: number | null }> } | null };
+
+export type PointOfContactDashboardRescheduleQueryVariables = Exact<{
+  org_id: Scalars['String'];
+  city: Scalars['String'];
+  delivery_date_to: Scalars['String'];
+  delivery_date_from: Scalars['String'];
+  order_date_from: Scalars['String'];
+  order_date_to: Scalars['String'];
+  point_of_contact: Scalars['String'];
+}>;
+
+
+export type PointOfContactDashboardRescheduleQuery = { __typename?: 'query_root', pointOfContactDashboardReschedule?: { __typename?: 'PointOfContactDashboardRescheduleOutput', data: Array<{ __typename?: 'PointOfContactDashboardRescheduleData', rescheduled_count?: number | null, rescheduled_qty?: number | null }> } | null };
 
 export type OrdersQueryQueryVariables = Exact<{
   org_id: Scalars['String'];
@@ -130415,6 +130435,20 @@ export type ValidateIndusDashboardUserQueryVariables = Exact<{
 
 export type ValidateIndusDashboardUserQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
+export type WalletEasebuzzTopupMutationVariables = Exact<{
+  object: WalletEasebuzzTopupInput;
+}>;
+
+
+export type WalletEasebuzzTopupMutation = { __typename?: 'mutation_root', walletEasebuzzTopup?: { __typename?: 'WalletEasebuzzTopupOutput', amount?: any | null, client_secret?: string | null, wallet_id: any, wallet_transaction_id?: any | null } | null };
+
+export type WalletEasebuzzTopupVerifyMutationVariables = Exact<{
+  object: WalletEasebuzzTopupVerifyInput;
+}>;
+
+
+export type WalletEasebuzzTopupVerifyMutation = { __typename?: 'mutation_root', walletEasebuzzTopupVerify?: { __typename?: 'WalletEasebuzzTopupVerifyOutput', status: string, wallet_id?: any | null, wallet_transaction_id: any } | null };
+
 
 export const FetchUserOrganizationsDocument = gql`
     query fetchUserOrganizations($user_id: uuid!) {
@@ -130449,8 +130483,26 @@ export const FetchUserOrganizationsDocument = gql`
 export function useFetchUserOrganizationsQuery(options: Omit<Urql.UseQueryArgs<never, FetchUserOrganizationsQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<FetchUserOrganizationsQuery>({ query: FetchUserOrganizationsDocument, ...options });
 };
-export const DashboardQueryDocument = gql`
-    query DashboardQuery($org_id: String!, $city: String!, $delivery_date_to: String!, $delivery_date_from: String!, $order_date_from: String!, $order_date_to: String!, $point_of_contact: String!) {
+export const GetWalletDetailsDocument = gql`
+    query GetWalletDetails($org_id: uuid!) {
+  wallet(where: {organization_id: {_eq: $org_id}, is_active: {_eq: true}}) {
+    id
+    amount
+    van_code
+    van_number
+    ifsc_code
+    bank_name
+    beneficiary_name
+    blocked_amount
+  }
+}
+    `;
+
+export function useGetWalletDetailsQuery(options: Omit<Urql.UseQueryArgs<never, GetWalletDetailsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<GetWalletDetailsQuery>({ query: GetWalletDetailsDocument, ...options });
+};
+export const PointOfContactDashboardDocument = gql`
+    query PointOfContactDashboard($org_id: String!, $city: String!, $delivery_date_to: String!, $delivery_date_from: String!, $order_date_from: String!, $order_date_to: String!, $point_of_contact: String!) {
   pointOfContactDashboard(
     object: {org_id: $org_id, city: $city, delivery_date_to: $delivery_date_to, delivery_date_from: $delivery_date_from, order_date_from: $order_date_from, order_date_to: $order_date_to, point_of_contact: $point_of_contact}
   ) {
@@ -130465,6 +130517,14 @@ export const DashboardQueryDocument = gql`
       planned_qty
     }
   }
+}
+    `;
+
+export function usePointOfContactDashboardQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactDashboardQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactDashboardQuery>({ query: PointOfContactDashboardDocument, ...options });
+};
+export const PointOfContactDashboardRescheduleDocument = gql`
+    query PointOfContactDashboardReschedule($org_id: String!, $city: String!, $delivery_date_to: String!, $delivery_date_from: String!, $order_date_from: String!, $order_date_to: String!, $point_of_contact: String!) {
   pointOfContactDashboardReschedule(
     object: {org_id: $org_id, city: $city, delivery_date_from: $delivery_date_from, delivery_date_to: $delivery_date_to, order_date_from: $order_date_from, order_date_to: $order_date_to, point_of_contact: $point_of_contact}
   ) {
@@ -130476,8 +130536,8 @@ export const DashboardQueryDocument = gql`
 }
     `;
 
-export function useDashboardQueryQuery(options: Omit<Urql.UseQueryArgs<never, DashboardQueryQueryVariables>, 'query'> = {}) {
-  return Urql.useQuery<DashboardQueryQuery>({ query: DashboardQueryDocument, ...options });
+export function usePointOfContactDashboardRescheduleQuery(options: Omit<Urql.UseQueryArgs<never, PointOfContactDashboardRescheduleQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PointOfContactDashboardRescheduleQuery>({ query: PointOfContactDashboardRescheduleDocument, ...options });
 };
 export const OrdersQueryDocument = gql`
     query OrdersQuery($org_id: String!, $city: String!, $delivery_date_from: String!, $delivery_date_to: String!, $order_date_from: String!, $order_date_to: String!, $point_of_contact: String!) {
@@ -130609,4 +130669,31 @@ export const ValidateIndusDashboardUserDocument = gql`
 
 export function useValidateIndusDashboardUserQuery(options: Omit<Urql.UseQueryArgs<never, ValidateIndusDashboardUserQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<ValidateIndusDashboardUserQuery>({ query: ValidateIndusDashboardUserDocument, ...options });
+};
+export const WalletEasebuzzTopupDocument = gql`
+    mutation WalletEasebuzzTopup($object: WalletEasebuzzTopupInput!) {
+  walletEasebuzzTopup(object: $object) {
+    amount
+    client_secret
+    wallet_id
+    wallet_transaction_id
+  }
+}
+    `;
+
+export function useWalletEasebuzzTopupMutation() {
+  return Urql.useMutation<WalletEasebuzzTopupMutation, WalletEasebuzzTopupMutationVariables>(WalletEasebuzzTopupDocument);
+};
+export const WalletEasebuzzTopupVerifyDocument = gql`
+    mutation WalletEasebuzzTopupVerify($object: WalletEasebuzzTopupVerifyInput!) {
+  walletEasebuzzTopupVerify(object: $object) {
+    status
+    wallet_id
+    wallet_transaction_id
+  }
+}
+    `;
+
+export function useWalletEasebuzzTopupVerifyMutation() {
+  return Urql.useMutation<WalletEasebuzzTopupVerifyMutation, WalletEasebuzzTopupVerifyMutationVariables>(WalletEasebuzzTopupVerifyDocument);
 };

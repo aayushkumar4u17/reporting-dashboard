@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { GraphQLClient } from "graphql-request";
 import { getSdk, SdkFunctionWrapper } from "../sdk";
+import ErrorHandler from "../utils/errorHandler";
 
 let currentToken: string | null = null;
 
@@ -72,16 +73,20 @@ const withJWTRefresh: SdkFunctionWrapper = async <T>(
     const errorExtensionsCode =
       error?.response?.errors[0]?.extensions?.code;
     if (errorExtensionsCode === "invalid-jwt") {
-      currentToken = null;
-      const newToken = await getToken();
-      currentToken = newToken;
-
-      graphQLClient.setHeader("Authorization", `Bearer ${newToken}`);
-
-      const result = await action();
-      return result;
+      try {
+        currentToken = null;
+        const newToken = await getToken();
+        currentToken = newToken;
+        graphQLClient.setHeader("Authorization", `Bearer ${newToken}`);
+        const result = await action();
+        return result;
+      } catch (refreshError) {
+        const safeError = ErrorHandler.handleApiError(refreshError, { action: 'token_refresh' });
+        throw new Error(safeError.userMessage);
+      }
     } else {
-      throw error;
+      const safeError = ErrorHandler.handleApiError(error, { action: 'graphql_request' });
+      throw new Error(safeError.userMessage);
     }
   }
 };
@@ -94,9 +99,10 @@ const createClient = async (): Promise<ReturnType<typeof getSdk>> => {
   try {
     const token = await getToken();
     graphQLClient.setHeader("Authorization", `Bearer ${token}`);
-    return getSdk(graphQLClient, withJWTRefresh);
+    const sdk = getSdk(graphQLClient, withJWTRefresh);
+    return sdk;
   } catch (error) {
-    console.error("Error creating GraphQL client:", error);
+    const safeError = ErrorHandler.handleError(error, { action: 'create_client' });
     return getSdk(graphQLClient);
   }
 };

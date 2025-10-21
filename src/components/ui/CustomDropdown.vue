@@ -81,7 +81,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem;
-  border: 2px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid #ddd;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.95);
   cursor: pointer;
@@ -90,10 +90,7 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-.dropdown-trigger:hover {
-  border-color: rgba(0, 0, 0, 0.6);
-  transform: translateY(-1px);
-}
+
 
 .dropdown-trigger.active {
   border-color: #00C851;
@@ -143,9 +140,7 @@ onUnmounted(() => {
   transition: background-color 0.2s ease;
 }
 
-.dropdown-option:hover {
-  background-color: rgba(0, 200, 81, 0.1);
-}
+
 
 .dropdown-option.selected {
   background-color: rgba(0, 200, 81, 0.2);

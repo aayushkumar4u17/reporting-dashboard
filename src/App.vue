@@ -1,14 +1,22 @@
 <script setup>
+import { onMounted } from 'vue'
 import { useRouter } from "vue-router"
 import { useErrorHandler } from "@/composables/useErrorHandler"
+import { useThemeStore } from "@/stores/theme"
 import Navbar from "@/components/layout/Navbar.vue"
 import ErrorNotification from "@/components/ErrorNotification.vue"
 import AuthGuard from "@/components/AuthGuard.vue"
 
 const router = useRouter()
 const { errorState, hideError, handleRetry } = useErrorHandler()
+const themeStore = useThemeStore()
 
 const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
+
+// Initialize theme on app mount
+onMounted(() => {
+  themeStore.initializeTheme()
+})
 </script>
 
 <template>
@@ -55,9 +63,11 @@ const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", 
 <style scoped>
 main {
   height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .content-wrapper {
   height: 100vh;

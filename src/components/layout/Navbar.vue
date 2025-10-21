@@ -7,6 +7,9 @@
     </div>
     <div class="navbar-right">
       <div class="user-section">
+        <!-- Theme Toggle -->
+        <ThemeToggle />
+        
         <!-- Clickable Avatar -->
         <div class="avatar-container" @click="navigateToSelectUser" title="Switch Organization">
           <div class="avatar" :style="{ background: userProfile?.organizationAvatar || '#6b7280' }">
@@ -175,6 +178,7 @@ import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganizationStore } from '@/stores/organization'
+import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 
 const router = useRouter()
 const pointOfContactStore = usePointOfContactStore()
@@ -400,14 +404,13 @@ onUnmounted(() => {
 <style scoped>
 /* Header Styles */
 .navbar {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-glass);
   backdrop-filter: blur(16px);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(0, 200, 81, 0.15);
+  border-bottom: 1px solid var(--border-color);
   position: fixed;
   top: 0;
   left: 0;
@@ -462,7 +465,7 @@ onUnmounted(() => {
 .user-section {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.75rem;
 }
 
 .avatar-container {
@@ -483,15 +486,15 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  /* background: rgba(107, 114, 128, 0.05); */
-  /* border: 1px solid rgba(107, 114, 128, 0.1); */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
 }
 
 .user-profile:hover {
-  background: rgba(107, 114, 128, 0.1);
+  background: var(--bg-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15);
-  border-color: rgba(107, 114, 128, 0.2);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  border-color: var(--border-color);
 }
 
 .avatar {
@@ -517,14 +520,14 @@ onUnmounted(() => {
   position: absolute;
   top: 100%;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px var(--shadow-medium), 0 0 0 1px var(--border-light);
   padding: 1.25rem;
   min-width: 280px;
   z-index: 1001;
-  border: 1px solid rgba(107, 114, 128, 0.1);
+  border: 1px solid var(--border-light);
   opacity: 0;
   transform: translateY(-10px) scale(0.95);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -541,7 +544,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(107, 114, 128, 0.1);
+  border-bottom: 1px solid var(--border-light);
   transition: all 0.3s ease;
 }
 
@@ -550,7 +553,7 @@ onUnmounted(() => {
 }
 
 .popup-item:hover {
-  background: rgba(107, 114, 128, 0.05);
+  background: var(--bg-hover);
   margin: 0 -0.5rem;
   padding: 0.75rem 0.5rem;
   border-radius: 8px;
@@ -558,14 +561,14 @@ onUnmounted(() => {
 
 .popup-label {
   font-weight: 600;
-  color: #555;
+  color: var(--text-secondary);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .popup-value {
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
   text-align: right;
@@ -575,7 +578,7 @@ onUnmounted(() => {
 
 .username {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.9rem;
   transition: all 0.3s ease;
   text-align: center;
@@ -583,30 +586,15 @@ onUnmounted(() => {
 
 .username.loading {
   opacity: 0.7;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .user-profile:hover .username {
-  color: #374151;
+  color: var(--text-primary);
   transform: translateX(2px);
 }
 
-/* Sidebar Styles */
-.sidebar {
-  width: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  border-right: 1px solid rgba(0, 200, 81, 0.1);
-  position: fixed;
-  top: 70px;
-  left: 0;
-  height: calc(100vh - 70px);
-  z-index: 1000;
-}
+
 
 .nav-menu {
   flex: 1;
@@ -614,10 +602,10 @@ onUnmounted(() => {
 
 .nav-item {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(0, 200, 81, 0.05);
+  border-bottom: 1px solid var(--border-light);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #555;
+  color: var(--text-secondary);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -646,7 +634,7 @@ onUnmounted(() => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 200, 81, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
   transition: left 0.4s ease;
 }
 
@@ -655,17 +643,17 @@ onUnmounted(() => {
 }
 
 .nav-item:hover {
-  background: rgba(0, 200, 81, 0.05);
+  background: var(--bg-hover);
   transform: translateX(3px);
-  color: #00C851;
-  box-shadow: inset 3px 0 0 rgba(0, 200, 81, 0.3);
+  color: var(--accent-primary);
+  box-shadow: inset 3px 0 0 var(--accent-light);
 }
 
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(0, 200, 81, 0.1), rgba(0, 200, 81, 0.05));
-  color: #00C851;
+  background: linear-gradient(90deg, var(--accent-light), var(--bg-hover));
+  color: var(--accent-primary);
   transform: translateX(3px);
-  box-shadow: inset 3px 0 0 #00C851;
+  box-shadow: inset 3px 0 0 var(--accent-primary);
   font-weight: 600;
 }
 
@@ -676,7 +664,7 @@ onUnmounted(() => {
   top: 0;
   height: 100%;
   width: 2px;
-  background: linear-gradient(180deg, #00C851, #00A844);
+  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
   animation: slideDown 0.3s ease;
 }
 
@@ -723,7 +711,7 @@ onUnmounted(() => {
 .loading-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid #f3f3f3;
+  border: 2px solid var(--bg-secondary);
   border-top: 2px solid #dc3545;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -752,7 +740,7 @@ onUnmounted(() => {
   display: block;
   height: 3px;
   width: 100%;
-  background-color: #333;
+  background-color: var(--text-primary);
   border-radius: 2px;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-origin: center;
@@ -792,19 +780,18 @@ onUnmounted(() => {
 /* Enhanced Sidebar Transitions */
 .sidebar {
   width: 200px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   padding: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  border-right: 1px solid rgba(0, 200, 81, 0.1);
+  border-right: 1px solid var(--border-light);
   position: fixed;
-  top: 68px;
+  top: 70px;
   left: 0;
-  height: calc(100vh - 56px);
+  bottom: 0;
   z-index: 999;
-  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* Responsive Design */
@@ -828,7 +815,7 @@ onUnmounted(() => {
   .sidebar {
     transform: translateX(-100%);
     width: 260px;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15); */
   }
   
   .sidebar.mobile-open {
@@ -871,11 +858,11 @@ onUnmounted(() => {
 }
 
 .org-popup {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-glass);
   backdrop-filter: blur(16px);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(0, 200, 81, 0.1);
+  box-shadow: 0 20px 60px var(--shadow-medium), 0 0 0 1px var(--border-light);
+  border: 1px solid var(--border-color);
   width: 90%;
   max-width: 650px;
   max-height: 85vh;
@@ -889,16 +876,16 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1.75rem 2rem;
-  background: linear-gradient(135deg, rgba(0, 200, 81, 0.08), rgba(0, 200, 81, 0.04));
-  border-bottom: 1px solid rgba(0, 200, 81, 0.1);
+  background: linear-gradient(135deg, var(--accent-light), var(--bg-hover));
+  border-bottom: 1px solid var(--border-color);
 }
 
 .org-popup-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.4rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #00C851, #00A844);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -929,26 +916,27 @@ onUnmounted(() => {
 
 .org-search {
   padding: 1.5rem 2rem;
-  background: rgba(0, 200, 81, 0.02);
-  border-bottom: 1px solid rgba(0, 200, 81, 0.1);
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .org-search-input {
   width: 100%;
   padding: 0.875rem 1.25rem;
-  border: 2px solid rgba(0, 200, 81, 0.2);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   font-size: 0.95rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   backdrop-filter: blur(5px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .org-search-input:focus {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
-  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-light);
+  background: var(--bg-primary);
   transform: translateY(-1px);
 }
 
@@ -961,7 +949,7 @@ onUnmounted(() => {
 .org-loading, .org-error, .org-no-results {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .org-loading {
@@ -982,9 +970,9 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 1.5rem 1rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--bg-secondary);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 200, 81, 0.1);
+  border: 1px solid var(--border-light);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1009,10 +997,10 @@ onUnmounted(() => {
 }
 
 .org-card:hover {
-  border-color: #00C851;
+  border-color: var(--accent-primary);
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 200, 81, 0.2);
-  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px var(--accent-light);
+  background: var(--bg-primary);
 }
 
 .org-card.selecting {
@@ -1049,7 +1037,7 @@ onUnmounted(() => {
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   word-break: break-word;
   line-height: 1.3;
 }

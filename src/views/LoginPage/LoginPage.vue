@@ -51,7 +51,6 @@
             />
             I agree to the 
             <span class="terms-link" @click.stop="showTermsPopup = true">Terms of Service & Privacy Policy</span> 
-            
           </label>
         </div>
         

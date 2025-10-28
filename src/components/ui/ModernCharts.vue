@@ -112,14 +112,12 @@ const windowWidth = ref(window.innerWidth)
 
 const periods = [
   { value: 'weekly', label: 'Weekly' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'yearly', label: 'Yearly' }
+  { value: 'monthly', label: 'Monthly' }
 ]
 
 const chartTitle = computed(() => {
   switch (activePeriod.value) {
     case 'weekly': return 'Last 4 Weeks Orders'
-    case 'yearly': return 'Current Year Orders'
     default: return 'Last 4 Months Orders'
   }
 })
@@ -175,7 +173,32 @@ const pieChartOptions = computed(() => {
           color: textColor,
           padding: isMobile ? 8 : 12,
           font: { size: isMobile ? 10 : 12 },
-          boxWidth: isMobile ? 8 : 12
+          boxWidth: isMobile ? 8 : 12,
+          generateLabels: (chart: any) => {
+            const data = chart.data
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label: string, i: number) => {
+                const value = data.datasets[0].data[i]
+                return {
+                  text: `${label}: ${value}`,
+                  fillStyle: data.datasets[0].backgroundColor[i],
+                  strokeStyle: data.datasets[0].backgroundColor[i],
+                  lineWidth: 0,
+                  pointStyle: 'circle',
+                  hidden: false,
+                  index: i
+                }
+              })
+            }
+            return []
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            return `${context.label}: ${context.parsed} orders`
+          }
         }
       }
     }

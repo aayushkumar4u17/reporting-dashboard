@@ -366,9 +366,9 @@ const loadInitialData = async () => {
       point_of_contact: ''
     }
     
-    console.log('Loading orders with filters:', filterParams)
+
     const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
-    console.log('Loaded orders data:', reportData.length, 'records')
+
     
     allOrdersData.value = mapOrderData(reportData)
     orders.value = [...allOrdersData.value]
@@ -376,7 +376,7 @@ const loadInitialData = async () => {
     // Update POC filter data with actual data from orders
     updatePOCFilterOptions()
   } catch (error) {
-    console.error('Error loading initial data:', error)
+
   } finally {
     loading.value = false
   }
@@ -399,15 +399,15 @@ const loadFilteredData = async () => {
       point_of_contact: appliedFilters.value.poc || ''
     }
     
-    console.log('Applying filters:', appliedFilters.value)
-    console.log('Filter params for API:', filterParams)
+
+
     
     const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
-    console.log('Filtered data received:', reportData.length, 'records')
+
     
     orders.value = mapOrderData(reportData)
   } catch (error) {
-    console.error('Error loading filtered data:', error)
+
   } finally {
     loading.value = false
   }
@@ -421,7 +421,7 @@ const loadData = async () => {
 const updatePOCFilterOptions = () => {
   // Extract unique POC names from current orders data for debugging
   const pocNamesFromOrders = [...new Set(orders.value.map(order => order.pocName).filter(name => name && name.trim()))]
-  console.log('POC names from orders data:', pocNamesFromOrders)
+
   
   // This will be handled by the usePOCFilters composable
   // The composable already loads POC data from the API

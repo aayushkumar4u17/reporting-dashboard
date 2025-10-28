@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onErrorCaptured } from 'vue'
 import { useRouter } from "vue-router"
 import { useErrorHandler } from "@/composables/useErrorHandler"
 import { useThemeStore } from "@/stores/theme"
 import Navbar from "@/components/layout/Navbar.vue"
 import ErrorNotification from "@/components/ErrorNotification.vue"
 import AuthGuard from "@/components/AuthGuard.vue"
+import ErrorHandler from "@/utils/errorHandler"
 
 const router = useRouter()
 const { errorState, hideError, handleRetry } = useErrorHandler()
@@ -13,9 +14,34 @@ const themeStore = useThemeStore()
 
 const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
 
+// Global error capture to prevent cross-page contamination
+onErrorCaptured((error, instance, info) => {
+  const safeError = ErrorHandler.handleError(error, {
+    component: 'App',
+    action: `Vue Error: ${info}`
+  })
+  
+  console.error('Global Vue Error Captured:', {
+    message: safeError.message,
+    component: instance?.type?.name || 'Unknown',
+    info,
+    timestamp: new Date().toISOString()
+  })
+  
+  // Prevent error from propagating further
+  return false
+})
+
 // Initialize theme on app mount
 onMounted(() => {
-  themeStore.initializeTheme()
+  try {
+    themeStore.initializeTheme()
+  } catch (error) {
+    ErrorHandler.handleError(error, {
+      component: 'App',
+      action: 'initializeTheme'
+    })
+  }
 })
 </script>
 
@@ -62,19 +88,27 @@ onMounted(() => {
 
 <style scoped>
 main {
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Mobile scrolling fixes */
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  position: relative;
 }
 .content-wrapper {
-  height: 100vh;
+  min-height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #00C851 #f1f1f1;
+  /* Mobile scrolling fixes */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  position: relative;
 }
 
 .content-wrapper.with-sidebar {
@@ -105,11 +139,28 @@ main {
   .content-wrapper.with-sidebar {
     margin-left: 0;
     padding-top: 64px;
+    /* Mobile scrolling fixes */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
   }
   
   .content-wrapper.without-sidebar {
     padding-left: 1rem;
     padding-right: 1rem;
+    /* Mobile scrolling fixes */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Fix for mobile viewport height issues */
+  main {
+    min-height: 100dvh; /* Use dynamic viewport height on supported browsers */
+  }
+  
+  .content-wrapper {
+    min-height: 100dvh;
   }
 }
 </style>

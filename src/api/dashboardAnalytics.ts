@@ -35,7 +35,7 @@ export const fetchDashboardAnalytics = async (
         orgId: organizationId
       })
       
-      console.log('DashboardAnalytics response:', response)
+
 
       return response.dashboardAnalytics || {
         months: [],

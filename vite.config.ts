@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 4096,
     },
     server: {
-      port: 3000,
+      port: 3001,
       host: true,
       open: true,
       proxy: {

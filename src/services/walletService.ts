@@ -230,7 +230,7 @@ export const axisBankPaymentInput = async ({ amount, wallet_id, successCallbackU
 
 export const initializeAxisPayment = async (options: any) => {
   // Placeholder for Axis payment initialization
-  console.log('Axis payment options:', options)
+
   return Promise.resolve()
 }
 

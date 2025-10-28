@@ -84,7 +84,7 @@
         </div>
 
         <!-- Orders Table Section -->
-        <div class="table-section" style="margin-top: 1.5rem;">
+        <div class="table-section" style="margin-top: 0.5rem;">
           <h2 class="section-title">Order History</h2>
           <!-- Table Topbar -->
           <div class="table-topbar premium-topbar">
@@ -636,16 +636,16 @@ const loadInitialData = async () => {
       point_of_contact: ''
     }
     
-    console.log('Loading orders with filters:', filterParams)
+
     const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
-    console.log('Loaded orders data:', reportData.length, 'records')
+
     
     allOrdersData.value = mapOrderData(reportData)
     orders.value = [...allOrdersData.value]
     
     updatePOCFilterOptions()
   } catch (error) {
-    console.error('Error loading initial data:', error)
+
   } finally {
     loading.value = false
   }
@@ -667,15 +667,15 @@ const loadFilteredData = async () => {
       point_of_contact: appliedFilters.value.poc || ''
     }
     
-    console.log('Applying filters:', appliedFilters.value)
-    console.log('Filter params for API:', filterParams)
+
+
     
     const reportData = await fetchPointOfContactDetailedReport(organizationId, filterParams)
-    console.log('Filtered data received:', reportData.length, 'records')
+
     
     orders.value = mapOrderData(reportData)
   } catch (error) {
-    console.error('Error loading filtered data:', error)
+
   } finally {
     loading.value = false
   }
@@ -687,7 +687,7 @@ const loadData = async () => {
 
 const updatePOCFilterOptions = () => {
   const pocNamesFromOrders = [...new Set(orders.value.map(order => order.pocName).filter(name => name && name.trim()))]
-  console.log('POC names from orders data:', pocNamesFromOrders)
+
 }
 
 onMounted(async () => {
@@ -737,8 +737,6 @@ onUnmounted(() => {
 }
 
 .order-details-section {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
   opacity: 0;
   transform: translateY(20px);
   animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;

@@ -7,10 +7,13 @@ interface InvoiceInput {
 }
 
 interface InvoiceResponse {
-  data: string
-  error: string | null
-  sales_invoice_erp_code: string
-  success: boolean
+  failCount?: number
+  sales_invoice_erp_code?: string
+  singlePdf?: string
+  success?: boolean
+  successCount?: number
+  totalCount?: number
+  zipFile?: string
 }
 
 interface FetchInvoicesPdfResponse {
@@ -34,23 +37,26 @@ export const fetchInvoicesPdf = async (invoices: InvoiceInput[]): Promise<FetchI
     }
   })
   
-  const mutation = `
-    mutation MyMutation($object: FetchMultipleInvoiceInput!) {
+  const query = `
+    query FetchMultipleInvoicesPdf($object: FetchMultipleInvoiceInput!) {
       fetchMultipleInvoicesPdf(object: $object) {
         code
+        data {
+          failCount
+          sales_invoice_erp_code
+          singlePdf
+          success
+          successCount
+          totalCount
+          zipFile
+        }
         error
         message
-        data {
-          data
-          error
-          sales_invoice_erp_code
-          success
-        }
       }
     }
   `
   
-  const response = await client.request<GraphQLResponse>(mutation, { object: { invoices } })
+  const response = await client.request<GraphQLResponse>(query, { object: { invoices } })
   return response.fetchMultipleInvoicesPdf
 }
 
@@ -70,29 +76,101 @@ const downloadPdf = (base64Data: string, filename: string): void => {
   URL.revokeObjectURL(url)
 }
 
+const downloadZip = (base64Data: string, filename: string): void => {
+  const byteCharacters = atob(base64Data)
+  const byteArray = new Uint8Array(byteCharacters.length)
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteArray[i] = byteCharacters.charCodeAt(i)
+  }
+  
+  const blob = new Blob([byteArray], { type: 'application/zip' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const handleDownload = (data: InvoiceResponse, invoiceCount: number): void => {
+  if (invoiceCount === 1) {
+    if (data.singlePdf) {
+      downloadPdf(data.singlePdf, `Invoice_${data.sales_invoice_erp_code}.pdf`)
+    } else {
+      throw new Error('No PDF data found for single invoice')
+    }
+  } else {
+    if (data.zipFile) {
+      downloadZip(data.zipFile, `Invoices_${new Date().toISOString().split('T')[0]}.zip`)
+    } else {
+      throw new Error('No ZIP data found for multiple invoices')
+    }
+  }
+}
+
 export const downloadInvoices = async (invoices: InvoiceInput[]): Promise<void> => {
   try {
-    const response = await fetchInvoicesPdf(invoices)
+    if (invoices.length === 0) {
+      throw new Error('No invoices selected for download')
+    }
     
-    if (response.code === 200 && response.data) {
-      let successCount = 0
+    const response = await fetchInvoicesPdf(invoices)
+    console.log('Full response:', response)
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || 'Failed to fetch invoices')
+    }
+    
+    const responseData = response.data
+    console.log('Response data:', responseData)
+    console.log('Is array:', Array.isArray(responseData))
+    
+    // Check if data is an array (current response) or object (expected)
+    if (Array.isArray(responseData)) {
+      console.log('Processing array response, length:', responseData.length)
       
-      response.data.forEach(invoice => {
-        if (invoice.success && invoice.data) {
-          downloadPdf(invoice.data, `Invoice_${invoice.sales_invoice_erp_code}.pdf`)
-          successCount++
-        }
+      // Log each item to see what's available
+      responseData.forEach((item, index) => {
+        console.log(`Item ${index}:`, item)
+        console.log(`Item ${index} has zipFile:`, !!item.zipFile)
+        console.log(`Item ${index} has singlePdf:`, !!item.singlePdf)
       })
       
-      const failedCount = response.data.length - successCount
-      if (failedCount > 0) {
-        throw new Error(`${failedCount} invoice(s) failed to download`)
+      // Current array response - find the first item with actual data
+      const validItem = responseData.find(item => 
+        item.zipFile || item.singlePdf
+      )
+      
+      console.log('Valid item found:', validItem)
+      
+      if (!validItem) {
+        throw new Error('No valid download data found in response')
       }
+      
+      handleDownload(validItem, invoices.length)
     } else {
-      throw new Error(response.error || 'Failed to download invoices')
+      // Expected object response
+      console.log('Processing object response')
+      handleDownload(responseData, invoices.length)
     }
+    
   } catch (error) {
     console.error('Error downloading invoices:', error)
-    throw error
+    
+    const errorMessage = error.message || error.toString()
+    
+    if (errorMessage.includes('timeout') || errorMessage.includes('Response timeout')) {
+      throw new Error('Download is taking longer than expected. Please try again later.')
+    }
+    
+    if (errorMessage.includes('http exception') || errorMessage.includes('webhook')) {
+      throw new Error('Service temporarily unavailable. Please try again in a few minutes.')
+    }
+    
+    if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+      throw new Error('Network connection issue. Please check your internet and try again.')
+    }
+    
+    throw new Error('Unable to download invoices at the moment. Please try again later.')
   }
 }

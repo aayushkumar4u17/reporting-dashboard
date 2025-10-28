@@ -4,9 +4,6 @@
       <table class="data-table">
         <thead>
           <tr class="table-header">
-            <th v-if="showCheckbox" class="checkbox-column">
-              <input type="checkbox" v-model="selectAll" @change="toggleAllSelection">
-            </th>
             <th v-for="column in columns" :key="column.key" class="header-cell">
               {{ column.label }}
             </th>
@@ -15,9 +12,6 @@
         <tbody>
           <!-- Skeleton loading rows -->
           <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
-            <td v-if="showCheckbox" class="table-cell">
-              <SkeletonLoader width="16px" height="16px" />
-            </td>
             <td v-for="column in columns" :key="column.key" class="table-cell">
               <SkeletonLoader width="80%" height="16px" />
             </td>
@@ -25,11 +19,7 @@
           
           <!-- Actual data rows -->
           <tr v-for="(item, index) in paginatedData" :key="item.id || index" 
-              class="table-row" 
-              :class="{ 'selected': item.selected }">
-            <td v-if="showCheckbox" class="checkbox-column">
-              <input type="checkbox" v-model="item.selected" @change="onItemSelectionChange">
-            </td>
+              class="table-row">
             <td v-for="column in columns" :key="column.key" 
                 class="table-cell" 
                 :class="{ 'center-cell': column.key === 'downloadAction' }"
@@ -57,15 +47,52 @@
     
     <!-- Pagination -->
     <div v-if="pagination && !loading && data.length > 0" class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
-        Previous
-      </button>
-      <span class="pagination-info">
-        Page {{ currentPage }} of {{ totalPages }} ({{ data.length }} total)
-      </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">
-        Next
-      </button>
+      <div class="pagination-container">
+        <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn prev-btn">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+          <span>Previous</span>
+        </button>
+        
+        <div class="pagination-numbers">
+          <button 
+            v-for="page in visiblePages" 
+            :key="page"
+            @click="goToPage(page)"
+            :class="['page-number', { active: page === currentPage, ellipsis: page === '...' }]"
+            :disabled="page === '...'"
+          >
+            {{ page }}
+          </button>
+        </div>
+        
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn next-btn">
+          <span>Next</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9,18 15,12 9,6"></polyline>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="pagination-info">
+        <div class="info-section">
+          <span class="info-label">Showing</span>
+          <span class="info-range">{{ startItem }}-{{ endItem }}</span>
+          <span class="info-label">of</span>
+          <span class="info-total">{{ data.length }}</span>
+          <span class="info-label">entries</span>
+        </div>
+        <div class="items-per-page">
+          <label>Show:</label>
+          <select v-model="itemsPerPageLocal" @change="updateItemsPerPage" class="items-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -87,10 +114,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  showCheckbox: {
-    type: Boolean,
-    default: false
-  },
+
   pagination: {
     type: Boolean,
     default: false
@@ -98,42 +122,74 @@ const props = defineProps({
   itemsPerPage: {
     type: Number,
     default: 10
-  },
-
+  }
 })
 
-const emit = defineEmits(['selection-change'])
-
 const isLoaded = ref(false)
-const selectAll = ref(false)
 const currentPage = ref(1)
+const itemsPerPageLocal = ref(props.itemsPerPage)
 
 const totalPages = computed(() => {
   if (!props.pagination) return 1
-  return Math.ceil(props.data.length / props.itemsPerPage)
+  return Math.ceil(props.data.length / itemsPerPageLocal.value)
 })
 
 const paginatedData = computed(() => {
   if (!props.pagination) return props.data
-  const start = (currentPage.value - 1) * props.itemsPerPage
-  const end = start + props.itemsPerPage
+  const start = (currentPage.value - 1) * itemsPerPageLocal.value
+  const end = start + itemsPerPageLocal.value
   return props.data.slice(start, end)
+})
+
+const startItem = computed(() => {
+  if (props.data.length === 0) return 0
+  return (currentPage.value - 1) * itemsPerPageLocal.value + 1
+})
+
+const endItem = computed(() => {
+  const end = currentPage.value * itemsPerPageLocal.value
+  return Math.min(end, props.data.length)
+})
+
+const visiblePages = computed(() => {
+  const pages = []
+  const total = totalPages.value
+  const current = currentPage.value
+  
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) {
+      pages.push(i)
+    }
+  } else {
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i)
+      pages.push('...')
+      pages.push(total)
+    } else if (current >= total - 3) {
+      pages.push(1)
+      pages.push('...')
+      for (let i = total - 4; i <= total; i++) pages.push(i)
+    } else {
+      pages.push(1)
+      pages.push('...')
+      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+      pages.push('...')
+      pages.push(total)
+    }
+  }
+  
+  return pages
 })
 
 
 
-// Watch for changes in data selection to update selectAll state
-watch(() => props.data.map(item => item.selected), () => {
-  updateSelectAllState()
-}, { deep: true })
+// Watch for itemsPerPage prop changes
+watch(() => props.itemsPerPage, (newValue) => {
+  itemsPerPageLocal.value = newValue
+  currentPage.value = 1
+})
 
-const updateSelectAllState = () => {
-  if (props.data.length === 0) {
-    selectAll.value = false
-    return
-  }
-  selectAll.value = props.data.every(item => item.selected)
-}
+
 
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
@@ -153,17 +209,11 @@ const prevPage = () => {
   }
 }
 
-const toggleAllSelection = () => {
-  props.data.forEach(item => {
-    item.selected = selectAll.value
-  })
-  emit('selection-change', props.data.filter(item => item.selected))
+const updateItemsPerPage = () => {
+  currentPage.value = 1
 }
 
-const onItemSelectionChange = () => {
-  updateSelectAllState()
-  emit('selection-change', props.data.filter(item => item.selected))
-}
+
 
 const getStatusClass = (status) => {
   const statusMap = {
@@ -250,10 +300,7 @@ onMounted(() => {
   min-width: 120px;
 }
 
-.checkbox-column {
-  width: 40px;
-  text-align: center;
-}
+
 
 .table-row {
   border-bottom: 1px solid var(--border-medium);
@@ -264,9 +311,7 @@ onMounted(() => {
   background-color: var(--bg-hover);
 }
 
-.table-row.selected {
-  background-color: var(--accent-light);
-}
+
 
 .table-cell {
   padding: 1rem 0.75rem;
@@ -337,39 +382,211 @@ onMounted(() => {
 
 .pagination {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
   border-top: 1px solid var(--border-medium);
-  background: var(--bg-glass-secondary);
-  flex-shrink: 0;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pagination::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--accent-primary) 50%, 
+    transparent 100%);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .pagination-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--accent-primary);
-  background: var(--bg-primary);
-  color: var(--accent-primary);
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-light);
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 200, 81, 0.2);
+  position: relative;
+  overflow: hidden;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.pagination-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  transition: left 0.5s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--accent-primary);
-  color: var(--text-inverse);
+  transform: translateY(-2px);
+  background: var(--accent-secondary);
+  box-shadow: 0 8px 25px rgba(0, 200, 81, 0.3);
+}
+
+.pagination-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+  transition: all 0.1s ease;
 }
 
 .pagination-btn:disabled {
-  opacity: 0.5;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  border-color: var(--border-medium);
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.page-number {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.page-number:hover:not(.active):not(:disabled) {
+  background: var(--accent-light);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.2);
+}
+
+.page-number.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 15px rgba(0, 200, 81, 0.3);
+  transform: translateY(-1px);
+}
+
+.page-number.ellipsis {
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: default;
+  box-shadow: none;
+  border: none;
+  font-weight: 700;
 }
 
 .pagination-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-glass-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px var(--shadow-light);
+}
+
+.info-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.85rem;
+}
+
+.info-label {
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+.info-range, .info-total {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.items-per-page label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.items-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+.items-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.items-select:hover {
+  border-color: var(--accent-primary);
 }
 
 @media (max-width: 1200px) {
@@ -377,6 +594,35 @@ onMounted(() => {
   .table-cell {
     padding: 0.6rem 0.3rem;
     font-size: 0.75rem;
+  }
+  
+  .pagination {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  
+  .pagination-container {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.8rem;
+    min-width: 90px;
+  }
+  
+  .pagination-numbers {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .pagination-info {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
   }
 }
 
@@ -398,6 +644,30 @@ onMounted(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  
+  .pagination {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    min-width: 80px;
+  }
+  
+  .pagination-btn span {
+    display: none;
+  }
+  
+  .page-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  
+  .pagination-info {
+    font-size: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -409,6 +679,33 @@ onMounted(() => {
   
   .table-cell {
     max-width: 80px;
+  }
+  
+  .pagination {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .pagination-numbers {
+    gap: 0.25rem;
+  }
+  
+  .page-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.375rem;
+    min-width: auto;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .info-section {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
   }
 }
 </style>

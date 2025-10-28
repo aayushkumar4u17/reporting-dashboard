@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import DashboardPage from '@/views/DashboardPage/DashboardPage.vue'
+import DashboardPageWithErrorBoundary from '@/views/DashboardPage/DashboardPageWithErrorBoundary.vue'
 import LoginPage from '@/views/LoginPage/LoginPage.vue'
 import UserSelectionPage from '@/views/UserSelectionPage/UserSelectionPage.vue'
 import MyInvoicesPage from '@/views/MyInvoicesPage/MyInvoicesPage.vue'
 import MyOrdersPage from '@/views/MyOrdersPage/MyOrdersPage.vue'
 import PaymentsPage from '@/views/PaymentsPage/PaymentsPage.vue'
-import PointOfContactPage from '@/views/PointOfContactPage/PointOfContactPage.vue'
+import PointOfContactPageWithErrorBoundary from '@/views/PointOfContactPage/PointOfContactPageWithErrorBoundary.vue'
 import { canAccessIndusDashboard } from '@/utils/auth'
+import ErrorHandler from '@/utils/errorHandler'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,12 +32,12 @@ const router = createRouter({
     {
       path: '/dashboard',
           name: 'dashboard',
-          component: DashboardPage
+          component: DashboardPageWithErrorBoundary
         },
         {
       path: '/point-of-contact',
           name: 'point-of-contact',
-          component: PointOfContactPage
+          component: PointOfContactPageWithErrorBoundary
         },
         {
       path: '/my-orders',
@@ -96,43 +97,57 @@ const waitForAuthState = (): Promise<boolean> => {
   })
 }
 
-router.beforeEach(async (to, _from) => {
-  if (to.path === '/' || to.path === '/login') {
-    cachedAuthState = null
+router.beforeEach(async (to, from) => {
+  try {
+    // Clear component errors when navigating between pages
+    if (from.name && to.name !== from.name) {
+      ErrorHandler.clearComponentErrors(String(from.name))
+    }
+    
+    if (to.path === '/' || to.path === '/login') {
+      cachedAuthState = null
+      return true
+    }
+    
+    const now = Date.now()
+    let isLoggedIn: boolean
+
+    if (cachedAuthState && (now - cachedAuthState.timestamp) < AUTH_CACHE_DURATION) {
+      isLoggedIn = cachedAuthState.isLoggedIn
+    } else {
+      const hasFirebaseUser = await waitForAuthState()
+      
+      if (hasFirebaseUser) {
+        isLoggedIn = canAccessIndusDashboard()
+      } else {
+        const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true'
+        const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true'
+        isLoggedIn = hasReportingFlag && hasIndusFlag
+      }
+      
+      cachedAuthState = { isLoggedIn, timestamp: now }
+    }
+    
+    if (!isLoggedIn) {
+      return '/'
+    }
+    
+    if (to.path !== '/select-user') {
+      const selectedOrg = localStorage.getItem('selectedOrganization')
+      if (!selectedOrg) {
+        return '/select-user'
+      }
+    }
+    
+    return true
+  } catch (error) {
+    ErrorHandler.handleError(error, {
+      component: 'Router',
+      action: 'beforeEach navigation guard'
+    })
+    // Allow navigation to continue even if there's an error
     return true
   }
-  
-  const now = Date.now()
-  let isLoggedIn: boolean
-
-  if (cachedAuthState && (now - cachedAuthState.timestamp) < AUTH_CACHE_DURATION) {
-    isLoggedIn = cachedAuthState.isLoggedIn
-  } else {
-    const hasFirebaseUser = await waitForAuthState()
-    
-    if (hasFirebaseUser) {
-      isLoggedIn = canAccessIndusDashboard()
-    } else {
-      const hasReportingFlag = sessionStorage.getItem('isLoggedInReportingDashboard') === 'true'
-      const hasIndusFlag = sessionStorage.getItem('isLoggedInIndusDashboard') === 'true'
-      isLoggedIn = hasReportingFlag && hasIndusFlag
-    }
-    
-    cachedAuthState = { isLoggedIn, timestamp: now }
-  }
-  
-  if (!isLoggedIn) {
-    return '/'
-  }
-  
-  if (to.path !== '/select-user') {
-    const selectedOrg = localStorage.getItem('selectedOrganization')
-    if (!selectedOrg) {
-      return '/select-user'
-    }
-  }
-  
-  return true
 })
 
 export default router

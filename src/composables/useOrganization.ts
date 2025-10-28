@@ -60,7 +60,7 @@ export const useOrganization = () => {
       
       // Only trigger if values are actually different and both are truthy
       if (newVal !== oldVal && newVal && oldVal) {
-        console.log('Organization ID changed:', { oldVal, newVal })
+
         
         // Debounce the callback to prevent rapid successive calls
         debounceTimer = setTimeout(() => {

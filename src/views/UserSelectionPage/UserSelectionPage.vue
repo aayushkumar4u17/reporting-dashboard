@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
@@ -158,7 +158,7 @@ const isSelectedOrganization = (orgId) => {
   // Initialize organization store if needed
   organizationStore.initialize()
   const selectedOrg = organizationStore.selectedOrganization || JSON.parse(localStorage.getItem('selectedOrganization') || 'null')
-  console.log('Checking selected org:', { orgId, selectedOrg, match: selectedOrg?.id === orgId })
+
   return selectedOrg?.id === orgId
 }
 
@@ -172,6 +172,11 @@ const clearSearch = () => {
 const performSearch = () => {
   searchQuery.value = searchInput.value
 }
+
+// Watch searchInput for automatic search
+watch(searchInput, (newValue) => {
+  searchQuery.value = newValue
+})
 
 // Computed property for filtered and sorted organizations
 const filteredOrganizations = computed(() => {
@@ -362,7 +367,7 @@ const checkAuthAndFetch = async () => {
   try {
     // Check if user has proper access
     if (!canAccessIndusDashboard()) {
-      console.warn('User does not have Indus Dashboard access')
+  
       router.replace('/login')
       return
     }
@@ -374,14 +379,14 @@ const checkAuthAndFetch = async () => {
         organizations.value = JSON.parse(cached)
         loading.value = false
       } catch (e) {
-        console.error('Error parsing cached organizations:', e)
+
       }
     }
     
     // Fetch fresh data
     await fetchOrganizations()
   } catch (err) {
-    console.error('Error during auth check:', err)
+
     error.value = 'Authentication error. Please try logging in again.'
     loading.value = false
   }
@@ -404,7 +409,7 @@ const waitForAuthState = () => {
           return
         }
       } catch (error) {
-        console.log('Firebase not initialized yet, waiting...')
+
       }
       
       // Check localStorage flags as fallback
@@ -439,7 +444,7 @@ onMounted(async () => {
   // Wait for Firebase auth state to be ready
   const authReady = await waitForAuthState()
   if (!authReady) {
-    console.warn('Firebase auth not ready and no valid localStorage flags found')
+
     // Still proceed with checkAuthAndFetch which will handle redirect if needed
   }
   
@@ -449,7 +454,7 @@ onMounted(async () => {
   // Set up interval to periodically check auth state
   authStateCheckInterval = setInterval(async () => {
     if (!canAccessIndusDashboard()) {
-      console.warn('User lost authentication, redirecting to login')
+
       clearInterval(authStateCheckInterval)
       router.replace('/login')
     }

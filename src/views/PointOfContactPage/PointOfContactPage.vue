@@ -273,7 +273,7 @@ const handleApplyFilters = async (newFilters) => {
     const mappedData = mapLocationData(response.contacts)
     locations.value = mappedData
   } catch (error) {
-    console.error('Error applying filters:', error)
+
     locations.value = []
   } finally {
     loading.value = false
@@ -286,7 +286,7 @@ const loadInitialData = async () => {
     const organizationId = getOrganizationId()
     
     if (!organizationId) {
-      console.warn('No organization selected')
+  
       return
     }
     
@@ -299,7 +299,7 @@ const loadInitialData = async () => {
     allLocations.value = mappedData
     locations.value = mappedData
   } catch (error) {
-    console.error('Error loading point of contact data:', error)
+
     initialData.value = []
     allLocations.value = []
     locations.value = []

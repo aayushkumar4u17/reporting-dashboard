@@ -11,6 +11,8 @@ import components from './components'
 import { initializeAuthState } from './utils/auth'
 import { validateEnvironment } from './utils/envValidator'
 import ErrorBoundary from './components/ErrorBoundary.vue'
+import PageErrorIsolation, { createPageErrorGuard } from './utils/pageErrorIsolation'
+import ErrorHandler from './utils/errorHandler'
 
 // Validate environment before starting app
 try {
@@ -31,13 +33,22 @@ try {
 const app = createApp(App)
 const pinia = createPinia()
 
-// Global error handler
+// Enhanced global error handler with isolation
 app.config.errorHandler = (err, instance, info) => {
-  console.error('Global error:', {
-    error: err,
-    message: err?.message || 'Application error occurred',
+  const componentName = instance?.$?.type?.name || 'Unknown'
+  
+  // Use our error handler for consistent error processing
+  const safeError = ErrorHandler.handleError(err, {
+    component: componentName,
+    action: `Vue Error: ${info}`
+  })
+  
+  console.error('Global error handled:', {
+    component: componentName,
+    message: safeError.message,
+    severity: safeError.severity,
     info,
-    component: instance?.$?.type?.name || 'Unknown'
+    timestamp: new Date().toISOString()
   })
   
   // Don't let errors break the app completely
@@ -45,6 +56,9 @@ app.config.errorHandler = (err, instance, info) => {
     console.warn('Lifecycle hook error caught and handled')
   }
 }
+
+// Install error isolation plugin
+app.use(PageErrorIsolation)
 
 // Register global components
 app.component('ErrorBoundary', ErrorBoundary)
@@ -61,7 +75,15 @@ app.use(PrimeVue, {
   }
 })
 
+// Add page error guard to router
+router.beforeEach(createPageErrorGuard())
+
 // Initialize auth state before mounting
-initializeAuthState().catch(console.error).finally(() => {
+initializeAuthState().catch(error => {
+  ErrorHandler.handleError(error, {
+    component: 'App',
+    action: 'initializeAuthState'
+  })
+}).finally(() => {
   app.mount('#app')
 })

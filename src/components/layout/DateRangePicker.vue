@@ -38,7 +38,7 @@
       
       <div class="calendar-footer">
         <button @click="clearDates" class="clear-button">Clear</button>
-        <button @click="selectToday" class="today-button">Today</button>
+        <button @click="confirmSelection" class="ok-button">OK</button>
       </div>
     </div>
   </div>
@@ -65,6 +65,7 @@ const showCalendar = ref(false)
 const currentMonth = ref(new Date().getMonth())
 const currentYear = ref(new Date().getFullYear())
 const selectingStart = ref(true)
+const tempSelection = ref({ from: '', to: '' })
 
 const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -93,8 +94,8 @@ const calendarDates = computed(() => {
   startDate.setDate(startDate.getDate() - firstDay.getDay())
   
   const today = new Date()
-  const fromDate = props.modelValue.from ? new Date(props.modelValue.from) : null
-  const toDate = props.modelValue.to ? new Date(props.modelValue.to) : null
+  const fromDate = tempSelection.value.from ? new Date(tempSelection.value.from) : null
+  const toDate = tempSelection.value.to ? new Date(tempSelection.value.to) : null
   
   for (let i = 0; i < 42; i++) {
     const date = new Date(startDate)
@@ -131,6 +132,7 @@ const toggleCalendar = () => {
   showCalendar.value = !showCalendar.value
   if (showCalendar.value) {
     selectingStart.value = true
+    tempSelection.value = { ...props.modelValue }
   }
 }
 
@@ -139,20 +141,19 @@ const selectDate = (dateObj) => {
   
   const formattedDate = formatDate(dateObj.date)
   
-  if (selectingStart.value || !props.modelValue.from) {
-    emit('update:modelValue', { from: formattedDate, to: '' })
+  if (selectingStart.value || !tempSelection.value.from) {
+    tempSelection.value = { from: formattedDate, to: '' }
     selectingStart.value = false
   } else {
-    const fromDate = new Date(props.modelValue.from)
+    const fromDate = new Date(tempSelection.value.from)
     const selectedDate = dateObj.date
     
     if (selectedDate < fromDate) {
-      emit('update:modelValue', { from: formattedDate, to: props.modelValue.from })
+      tempSelection.value = { from: formattedDate, to: tempSelection.value.from }
     } else {
-      emit('update:modelValue', { from: props.modelValue.from, to: formattedDate })
+      tempSelection.value = { from: tempSelection.value.from, to: formattedDate }
     }
     selectingStart.value = true
-    showCalendar.value = false
   }
 }
 
@@ -164,15 +165,14 @@ const formatDate = (date) => {
 }
 
 const clearDates = () => {
+  tempSelection.value = { from: '', to: '' }
   emit('update:modelValue', { from: '', to: '' })
   selectingStart.value = true
   showCalendar.value = false
 }
 
-const selectToday = () => {
-  const today = new Date()
-  const formattedDate = formatDate(today)
-  emit('update:modelValue', { from: formattedDate, to: formattedDate })
+const confirmSelection = () => {
+  emit('update:modelValue', tempSelection.value)
   showCalendar.value = false
   selectingStart.value = true
 }
@@ -371,15 +371,16 @@ onUnmounted(() => {
   transform: none;
 }
 
-.calendar-date.selected, .calendar-date.range-start, .calendar-date.range-end {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: var(--text-inverse);
+.calendar-date.selected {
+  background: #22c55e;
+  color: white;
   font-weight: 600;
 }
 
-.calendar-date.in-range {
-  background: var(--accent-light);
-  color: var(--accent-primary);
+.calendar-date.range-start, .calendar-date.range-end, .calendar-date.in-range {
+  background: #22c55e;
+  color: white;
+  font-weight: 600;
 }
 
 .calendar-date.today {
@@ -395,7 +396,7 @@ onUnmounted(() => {
   gap: 0.5rem;
 }
 
-.clear-button, .today-button {
+.clear-button, .ok-button {
   background: var(--bg-glass);
   border: 1px solid var(--border-color);
   padding: 6px 12px;
@@ -413,13 +414,13 @@ onUnmounted(() => {
   color: var(--status-error-text);
 }
 
-.today-button {
+.ok-button {
   background: var(--accent-light);
   color: var(--accent-primary);
   border-color: var(--border-color);
 }
 
-.today-button:hover {
+.ok-button:hover {
   background: var(--accent-primary);
   color: var(--text-inverse);
   border-color: var(--accent-secondary);

@@ -347,7 +347,7 @@ const selectOrganization = async (org) => {
       initials: getInitials(org.name)
     }
     
-    console.log('Selecting organization:', orgWithAvatar)
+
     
     // Update organization store
     organizationStore.setSelectedOrganization(orgWithAvatar)

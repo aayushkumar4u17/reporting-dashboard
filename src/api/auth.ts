@@ -102,7 +102,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
         {
           size: "invisible",
           callback: (response: any) => {
-            console.log('reCAPTCHA solved:', !!response);
+    
           },
           "error-callback": (_error: any) => {
             console.error('reCAPTCHA error callback:', { hasError: true });

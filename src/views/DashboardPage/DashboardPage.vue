@@ -114,22 +114,7 @@
               </template>
             </MetricCard>
 
-            <MetricCard
-              title="Cost Optimization"
-              variant="cost-saved"
-              :items="[
-                { label: 'Saved Volume (L)', value: formatNumber(dashboardData.totalCostSaved.quantity) },
-                { label: 'Amount Saved', value: `₹${formatCurrency(dashboardData.totalCostSaved.amount)}` }
-              ]"
-              :loading="loading"
-              :animation-delay="1.2"
-            >
-              <template #icon>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                </svg>
-              </template>
-            </MetricCard>
+
           </div>
         </div>
 
@@ -314,6 +299,8 @@ const filterValues = ref({
   deliveryDateTo: '',
   orderDateFrom: '',
   orderDateTo: '',
+  orderDateRange: { from: '', to: '' },
+  deliveryDateRange: { from: '', to: '' },
   city: '',
   poc: ''
 })
@@ -393,6 +380,8 @@ const handleClearFilters = () => {
     deliveryDateTo: '',
     orderDateFrom: '',
     orderDateTo: '',
+    orderDateRange: { from: '', to: '' },
+    deliveryDateRange: { from: '', to: '' },
     city: '',
     poc: ''
   }
@@ -444,6 +433,9 @@ const fetchDashboardData = async (skipDefaultDates = false) => {
       const currentDate = getCurrentDate()
       tempFilters.orderedDateFrom = currentDate
       tempFilters.orderedDateTo = currentDate
+      
+      // Update filter display to show current date
+      filterValues.value.orderDateRange = { from: currentDate, to: currentDate }
     }
     
     // Build filter payload using temp filters
@@ -565,11 +557,14 @@ unwatchOrganization = watch(
     if (!oldOrgId || (oldOrgId !== newOrgId)) {
       if (oldOrgId && oldOrgId !== newOrgId) {
         // Reset filters to default when organization changes
+        const currentDate = getCurrentDate()
         filterValues.value = {
           deliveryDateFrom: '',
           deliveryDateTo: '',
           orderDateFrom: '',
           orderDateTo: '',
+          orderDateRange: { from: currentDate, to: currentDate },
+          deliveryDateRange: { from: '', to: '' },
           city: '',
           poc: ''
         }
@@ -581,26 +576,42 @@ unwatchOrganization = watch(
         Promise.all([
           fetchDashboardData(),
           loadPOCFilterData()
-        ]).catch(console.error)
+        ]).catch(() => {})
       } else {
         // Load dashboard data and POC filters in parallel on initial load
         Promise.all([
           fetchDashboardData(),
           loadPOCFilterData()
-        ]).catch(console.error)
+        ]).catch(() => {})
       }
     }
   },
   { immediate: true }
 )
 
+// Setup cleanup handlers before any async operations
+let refreshInterval: NodeJS.Timeout | null = null
+
+// Cleanup watcher and interval on unmount
+onUnmounted(() => {
+  if (unwatchOrganization) {
+    unwatchOrganization()
+  }
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
+})
+
 onMounted(async () => {
-  // Initialize with empty filters first
+  // Initialize with current date as default
+  const currentDate = getCurrentDate()
   filterValues.value = {
     deliveryDateFrom: '',
     deliveryDateTo: '',
     orderDateFrom: '',
     orderDateTo: '',
+    orderDateRange: { from: currentDate, to: currentDate },
+    deliveryDateRange: { from: '', to: '' },
     city: '',
     poc: ''
   }
@@ -628,24 +639,12 @@ onMounted(async () => {
   }
   
   // Auto-refresh every 5 minutes
-  const refreshInterval = setInterval(() => {
+  refreshInterval = setInterval(() => {
     updateLastUpdatedTime()
     if (!isFetchingData && !loading.value) {
       fetchDashboardData()
     }
   }, 300000)
-  
-  // Cleanup interval on unmount
-  onUnmounted(() => {
-    clearInterval(refreshInterval)
-  })
-})
-
-// Cleanup watcher on unmount
-onUnmounted(() => {
-  if (unwatchOrganization) {
-    unwatchOrganization()
-  }
 })
 </script>
 

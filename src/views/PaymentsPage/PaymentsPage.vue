@@ -51,7 +51,7 @@
                       <path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                     </svg>
                   </div>
-                  <div class="card-trend">Past-due</div>
+                  <!-- <div class="card-trend">Past-due</div> -->
                 </div>
                 <div class="oc-title">Overdue Amt.</div>
                 <div class="oc-subtitle">Past-due</div>
@@ -69,7 +69,7 @@
                       <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                     </svg>
                   </div>
-                  <div class="card-trend">Balance</div>
+                  <!-- <div class="card-trend">Balance</div> -->
                 </div>
                 <div class="oc-title">Outstanding Amt.</div>
                 <div class="oc-subtitle">Balance</div>
@@ -88,7 +88,7 @@
                       <line x1="1" y1="10" x2="23" y2="10"/>
                     </svg>
                   </div>
-                  <div class="card-trend">Maximum</div>
+                  <!-- <div class="card-trend">Maximum</div> -->
                 </div>
                 <div class="oc-title">Credit Limit</div>
                 <div class="oc-subtitle">Maximum</div>
@@ -106,7 +106,7 @@
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
-                  <div class="card-trend">Wallet</div>
+                  <!-- <div class="card-trend">Wallet</div> -->
                 </div>
                 <div class="oc-title">Remaining Limit</div>
                 <div class="oc-subtitle">Balance</div>
@@ -119,54 +119,10 @@
               </div>
             </div>
 
-            <!-- Bank Details Card -->
-            <div class="bank-details-card premium-bank" :class="{ 'expanded': bankExpanded }">
-              <div class="bank-header" @click="bankExpanded = !bankExpanded">
-                <div class="bank-icon-wrapper">
-                  <svg class="bank-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>
-                    <path d="M9 9v.01M9 12v.01M9 15v.01M13 9v.01M13 12v.01M13 15v.01"/>
-                  </svg>
-                </div>
-                <div class="bank-title">
-                  <div class="bank-main-title">Bank Details</div>
-                  <div class="bank-subtitle">Payment Information</div>
-                </div>
-                <div class="expand-icon">
-                  <svg :class="{ 'rotated': bankExpanded }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6,9 12,15 18,9"></polyline>
-                  </svg>
-                </div>
-              </div>
-              <div class="bank-preview">
-                <div class="preview-row">
-                  <span class="preview-label">Account</span>
-                  <span class="preview-value masked">{{ bankDetails.accountNumber }}</span>
-                </div>
-                <div class="preview-row">
-                  <span class="preview-label">Bank</span>
-                  <span class="preview-value">{{ bankDetails.bankName }}</span>
-                </div>
-              </div>
-              <div class="bank-info" v-show="bankExpanded">
-                <div class="bank-row">
-                  <span class="label">Account Number</span>
-                  <span class="value">{{ bankDetails.accountNumber }}</span>
-                </div>
-                <div class="bank-row">
-                  <span class="label">IFSC Code</span>
-                  <span class="value">{{ bankDetails.ifscCode }}</span>
-                </div>
-                <div class="bank-row">
-                  <span class="label">Beneficiary</span>
-                  <span class="value beneficiary">{{ bankDetails.beneficiaryName }}</span>
-                </div>
-                <div class="bank-row">
-                  <span class="label">Branch</span>
-                  <span class="value">{{ bankDetails.bankName }}</span>
-                </div>
-              </div>
-            </div>
+            <!-- Transfer Instructions -->
+            <p class="transfer-instructions">
+              Please transfer the amount to the below account details using your Bank Account or any UPI app. Your wallet balance will be updated once the amount has reflected in the account below
+            </p>
           </div>
         </div>
 
@@ -207,8 +163,8 @@
               :columns="paymentColumns"
               :data="filteredRows"
               :loading="loading"
-              :show-checkbox="true"
-              @selection-change="handleSelectionChange"
+              :pagination="true"
+              :items-per-page="10"
             >
             <template #cell-amount="{ value }">
               {{ formatCurrency(value) }}
@@ -310,7 +266,6 @@ const showNoDataPopup = ref(false)
 const searchQuery = ref('')
 const activeTab = ref('all')
 const payments = ref([])
-const bankExpanded = ref(false)
 const walletTransactions = ref([])
 const showAddMoneyModal = ref(false)
 const showPayViaModal = ref(false)
@@ -387,22 +342,7 @@ const availableCredit = computed(() => {
   return Math.max(0, creditLimit + amount - blockedAmount)
 })
 
-const bankDetails = computed(() => {
-  if (!walletDetails.value?.wallet?.[0]) return {
-    accountNumber: '--',
-    ifscCode: '--',
-    beneficiaryName: '--',
-    bankName: '--'
-  }
-  
-  const wallet = walletDetails.value.wallet[0]
-  return {
-    accountNumber: walletAccountNumber.value || '--',
-    ifscCode: wallet.ifsc_code || '--',
-    beneficiaryName: wallet.beneficiary_name || '--',
-    bankName: wallet.bank_name || '--'
-  }
-})
+
 
 const { getOrganizationId, watchOrganizationChange } = useOrganization()
 let unwatchOrganization = null
@@ -471,16 +411,23 @@ const filteredRows = computed(() => {
 
 const loadData = async () => {
   try {
-    loading.value = true
-    
-    // Clear existing data immediately when loading starts
+    // Clear existing data immediately before setting loading state
     walletTransactions.value = []
     paymentReportData.value = null
     payments.value = []
+    summaryData.value = {
+      creditLimit: '₹ 0',
+      availableBalance: '₹ 0',
+      totalOutstanding: '₹ 0',
+      totalOverdue: '₹ 0'
+    }
+    
+    loading.value = true
     
     const organizationId = getOrganizationId()
     
     if (!organizationId) {
+      loading.value = false
       return
     }
     
@@ -519,10 +466,17 @@ const loadData = async () => {
 
     
   } catch (error) {
-    console.error('Error loading payment data:', error)
-    // No mock data - using empty arrays
+
+    // Clear all data on error
     payments.value = []
     walletTransactions.value = []
+    paymentReportData.value = null
+    summaryData.value = {
+      creditLimit: '₹ 0',
+      availableBalance: '₹ 0',
+      totalOutstanding: '₹ 0',
+      totalOverdue: '₹ 0'
+    }
   } finally {
     loading.value = false
   }
@@ -609,9 +563,7 @@ const refreshWalletData = async (silent = false) => {
 
 
 
-const handleSelectionChange = (selectedItems) => {
-  // Handle selection change for payment items
-}
+
 
 const handleSummaryAction = (actionKey) => {
   if (actionKey === 'payOutstanding') {
@@ -948,6 +900,16 @@ onMounted(() => {
   loadData()
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
+      // Immediately clear data when organization changes
+      walletTransactions.value = []
+      paymentReportData.value = null
+      payments.value = []
+      summaryData.value = {
+        creditLimit: '₹ 0',
+        availableBalance: '₹ 0',
+        totalOutstanding: '₹ 0',
+        totalOverdue: '₹ 0'
+      }
       loadData()
     }
   })

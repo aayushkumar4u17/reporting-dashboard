@@ -142,6 +142,123 @@ export type CreateAppCustomerOrderOutput = {
   tax?: Maybe<Scalars['numeric']['output']>;
 };
 
+export type CreateCustomerOrderRequestCustomerAssetInput = {
+  customer_asset_id: Scalars['uuid']['input'];
+  quantity_requested?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+export type CreateCustomerOrderRequestCustomerAssetOutput = {
+  __typename?: 'CreateCustomerOrderRequestCustomerAssetOutput';
+  customer_asset_id?: Maybe<Scalars['uuid']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  quantity_requested?: Maybe<Scalars['numeric']['output']>;
+};
+
+export type CreateCustomerOrderRequestInput = {
+  billing_address_id: Scalars['uuid']['input'];
+  created_by: Scalars['uuid']['input'];
+  currency_id?: InputMaybe<Scalars['uuid']['input']>;
+  customer_order_request_customer_assets?: InputMaybe<Array<CreateCustomerOrderRequestCustomerAssetInput>>;
+  customer_order_request_items: Array<CreateCustomerOrderRequestItemInput>;
+  customer_order_request_photos?: InputMaybe<Array<CreateCustomerOrderRequestPhotoInput>>;
+  delivery_preferences?: InputMaybe<Scalars['String']['input']>;
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  is_otp_required?: InputMaybe<Scalars['Boolean']['input']>;
+  is_test_enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  order_source_of_creation?: InputMaybe<Scalars['String']['input']>;
+  organization_user_id?: InputMaybe<Scalars['uuid']['input']>;
+  product_variation_partner_localities_slot_id?: InputMaybe<Scalars['uuid']['input']>;
+  proposed_delivery_fee?: InputMaybe<Scalars['numeric']['input']>;
+  reservation_number?: InputMaybe<Scalars['String']['input']>;
+  shipping_address_id: Scalars['uuid']['input'];
+  state?: InputMaybe<Scalars['String']['input']>;
+  work_order?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateCustomerOrderRequestItemInput = {
+  actual_amount?: InputMaybe<Scalars['numeric']['input']>;
+  actual_delivery_date?: InputMaybe<Scalars['timestamp']['input']>;
+  amount?: InputMaybe<Scalars['numeric']['input']>;
+  delivery_fee?: InputMaybe<Scalars['numeric']['input']>;
+  delivery_type?: InputMaybe<Scalars['String']['input']>;
+  estimate_delivery_date?: InputMaybe<Scalars['timestamp']['input']>;
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  partner_id?: InputMaybe<Scalars['uuid']['input']>;
+  product_variation_id?: InputMaybe<Scalars['uuid']['input']>;
+  product_variation_partner_localities_slot_id?: InputMaybe<Scalars['uuid']['input']>;
+  qty?: InputMaybe<Scalars['numeric']['input']>;
+  requested_qty?: InputMaybe<Scalars['numeric']['input']>;
+  service_tax?: InputMaybe<Scalars['numeric']['input']>;
+  state?: InputMaybe<Scalars['String']['input']>;
+  tax?: InputMaybe<Scalars['numeric']['input']>;
+  unit?: InputMaybe<Scalars['String']['input']>;
+  unit_price?: InputMaybe<Scalars['numeric']['input']>;
+  voucher_discount?: InputMaybe<Scalars['numeric']['input']>;
+};
+
+export type CreateCustomerOrderRequestItemOutput = {
+  __typename?: 'CreateCustomerOrderRequestItemOutput';
+  actual_amount?: Maybe<Scalars['numeric']['output']>;
+  actual_delivery_date?: Maybe<Scalars['timestamp']['output']>;
+  amount?: Maybe<Scalars['numeric']['output']>;
+  delivery_fee?: Maybe<Scalars['numeric']['output']>;
+  delivery_type?: Maybe<Scalars['String']['output']>;
+  estimate_delivery_date?: Maybe<Scalars['timestamp']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  is_active?: Maybe<Scalars['Boolean']['output']>;
+  partner_id?: Maybe<Scalars['uuid']['output']>;
+  product_variation_id?: Maybe<Scalars['uuid']['output']>;
+  product_variation_partner_localities_slot_id?: Maybe<Scalars['uuid']['output']>;
+  qty?: Maybe<Scalars['numeric']['output']>;
+  requested_qty?: Maybe<Scalars['numeric']['output']>;
+  service_tax?: Maybe<Scalars['numeric']['output']>;
+  state?: Maybe<Scalars['String']['output']>;
+  tax?: Maybe<Scalars['numeric']['output']>;
+  unit?: Maybe<Scalars['String']['output']>;
+  unit_price?: Maybe<Scalars['numeric']['output']>;
+  voucher_discount?: Maybe<Scalars['numeric']['output']>;
+};
+
+export type CreateCustomerOrderRequestOutput = {
+  __typename?: 'CreateCustomerOrderRequestOutput';
+  billing_address_id?: Maybe<Scalars['uuid']['output']>;
+  created_at?: Maybe<Scalars['timestamp']['output']>;
+  created_by?: Maybe<Scalars['uuid']['output']>;
+  currency_id?: Maybe<Scalars['uuid']['output']>;
+  customer_order_request_customer_assets?: Maybe<Array<CreateCustomerOrderRequestCustomerAssetOutput>>;
+  customer_order_request_items?: Maybe<Array<CreateCustomerOrderRequestItemOutput>>;
+  customer_order_request_photos?: Maybe<Array<CreateCustomerOrderRequestPhotoOutput>>;
+  delivery_preferences?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  is_active?: Maybe<Scalars['Boolean']['output']>;
+  is_otp_required?: Maybe<Scalars['Boolean']['output']>;
+  is_test_enabled?: Maybe<Scalars['Boolean']['output']>;
+  order_source_of_creation?: Maybe<Scalars['String']['output']>;
+  organization_user_id?: Maybe<Scalars['uuid']['output']>;
+  product_variation_partner_localities_slot_id?: Maybe<Scalars['uuid']['output']>;
+  proposed_delivery_fee?: Maybe<Scalars['numeric']['output']>;
+  request_code?: Maybe<Scalars['bigint']['output']>;
+  reservation_number?: Maybe<Scalars['String']['output']>;
+  shipping_address_id?: Maybe<Scalars['uuid']['output']>;
+  state?: Maybe<Scalars['String']['output']>;
+  work_order?: Maybe<Scalars['String']['output']>;
+};
+
+export type CreateCustomerOrderRequestPhotoInput = {
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  note: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
+export type CreateCustomerOrderRequestPhotoOutput = {
+  __typename?: 'CreateCustomerOrderRequestPhotoOutput';
+  created_at?: Maybe<Scalars['timestamp']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  is_active?: Maybe<Scalars['Boolean']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
 export type CreatePaymentLinkInput = {
   amount?: InputMaybe<Scalars['numeric']['input']>;
   orderId?: InputMaybe<Scalars['uuid']['input']>;
@@ -325,7 +442,7 @@ export type FetchMultipleInvoiceInput = {
 export type FetchMultipleInvoiceOutput = {
   __typename?: 'FetchMultipleInvoiceOutput';
   code: Scalars['Int']['output'];
-  data: Array<InvoiceResult>;
+  data: InvoiceData;
   error?: Maybe<Scalars['String']['output']>;
   message: Scalars['String']['output'];
 };
@@ -414,14 +531,25 @@ export type Int_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
+export type InvoiceData = {
+  __typename?: 'InvoiceData';
+  failCount?: Maybe<Scalars['Int']['output']>;
+  sales_invoice_erp_code?: Maybe<Scalars['String']['output']>;
+  singlePdf?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  successCount?: Maybe<Scalars['Int']['output']>;
+  summary?: Maybe<Array<InvoiceSummary>>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+  zipFile?: Maybe<Scalars['String']['output']>;
+};
+
 export type InvoiceItem = {
   isPickup?: InputMaybe<Scalars['Boolean']['input']>;
   sales_invoice_erp_code: Scalars['String']['input'];
 };
 
-export type InvoiceResult = {
-  __typename?: 'InvoiceResult';
-  data?: Maybe<Scalars['String']['output']>;
+export type InvoiceSummary = {
+  __typename?: 'InvoiceSummary';
   error?: Maybe<Scalars['String']['output']>;
   sales_invoice_erp_code: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
@@ -1347,6 +1475,15 @@ export type Address_Type_Updates = {
   where: Address_Type_Bool_Exp;
 };
 
+export type ApproveRequestAndPunchOrderInput = {
+  customer_order_request_id: Scalars['uuid']['input'];
+};
+
+export type ApproveRequestAndPunchOrderOutput = {
+  __typename?: 'approveRequestAndPunchOrderOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
 /** columns and relationships of "asset_detail" */
 export type Asset_Detail = {
   __typename?: 'asset_detail';
@@ -2158,7 +2295,31 @@ export type Asset_Grouping_Updates = {
 export type Asset_Ownership = {
   __typename?: 'asset_ownership';
   comment?: Maybe<Scalars['String']['output']>;
+  /** An array relationship */
+  customer_assets: Array<Customer_Asset>;
+  /** An aggregate relationship */
+  customer_assets_aggregate: Customer_Asset_Aggregate;
   value: Scalars['String']['output'];
+};
+
+
+/** columns and relationships of "asset_ownership" */
+export type Asset_OwnershipCustomer_AssetsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Asset_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Asset_Order_By>>;
+  where?: InputMaybe<Customer_Asset_Bool_Exp>;
+};
+
+
+/** columns and relationships of "asset_ownership" */
+export type Asset_OwnershipCustomer_Assets_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Asset_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Asset_Order_By>>;
+  where?: InputMaybe<Customer_Asset_Bool_Exp>;
 };
 
 /** aggregated selection of "asset_ownership" */
@@ -2189,6 +2350,8 @@ export type Asset_Ownership_Bool_Exp = {
   _not?: InputMaybe<Asset_Ownership_Bool_Exp>;
   _or?: InputMaybe<Array<Asset_Ownership_Bool_Exp>>;
   comment?: InputMaybe<String_Comparison_Exp>;
+  customer_assets?: InputMaybe<Customer_Asset_Bool_Exp>;
+  customer_assets_aggregate?: InputMaybe<Customer_Asset_Aggregate_Bool_Exp>;
   value?: InputMaybe<String_Comparison_Exp>;
 };
 
@@ -2217,6 +2380,7 @@ export type Asset_Ownership_Enum_Comparison_Exp = {
 /** input type for inserting data into table "asset_ownership" */
 export type Asset_Ownership_Insert_Input = {
   comment?: InputMaybe<Scalars['String']['input']>;
+  customer_assets?: InputMaybe<Customer_Asset_Arr_Rel_Insert_Input>;
   value?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2243,6 +2407,13 @@ export type Asset_Ownership_Mutation_Response = {
   returning: Array<Asset_Ownership>;
 };
 
+/** input type for inserting object relation for remote table "asset_ownership" */
+export type Asset_Ownership_Obj_Rel_Insert_Input = {
+  data: Asset_Ownership_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Asset_Ownership_On_Conflict>;
+};
+
 /** on_conflict condition type for table "asset_ownership" */
 export type Asset_Ownership_On_Conflict = {
   constraint: Asset_Ownership_Constraint;
@@ -2253,6 +2424,7 @@ export type Asset_Ownership_On_Conflict = {
 /** Ordering options when selecting data from "asset_ownership". */
 export type Asset_Ownership_Order_By = {
   comment?: InputMaybe<Order_By>;
+  customer_assets_aggregate?: InputMaybe<Customer_Asset_Aggregate_Order_By>;
   value?: InputMaybe<Order_By>;
 };
 
@@ -3048,6 +3220,15 @@ export type BlockPocOutput = {
   code?: Maybe<Scalars['String']['output']>;
   error?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
+};
+
+export type CancelCustomerOrderRequestInput = {
+  customer_order_request_id: Scalars['uuid']['input'];
+};
+
+export type CancelCustomerOrderRequestOutput = {
+  __typename?: 'cancelCustomerOrderRequestOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
 };
 
 export type CancelOrderInput = {
@@ -5743,6 +5924,8 @@ export type Customer_Asset = {
   /** An aggregate relationship */
   asset_grouping_customer_assets_aggregate: Asset_Grouping_Customer_Asset_Aggregate;
   /** An object relationship */
+  asset_ownership?: Maybe<Asset_Ownership>;
+  /** An object relationship */
   asset_type: Asset_Type;
   asset_type_id: Scalars['uuid']['output'];
   capacity?: Maybe<Scalars['String']['output']>;
@@ -6158,6 +6341,7 @@ export type Customer_Asset_Bool_Exp = {
   asset_detail_id?: InputMaybe<Uuid_Comparison_Exp>;
   asset_grouping_customer_assets?: InputMaybe<Asset_Grouping_Customer_Asset_Bool_Exp>;
   asset_grouping_customer_assets_aggregate?: InputMaybe<Asset_Grouping_Customer_Asset_Aggregate_Bool_Exp>;
+  asset_ownership?: InputMaybe<Asset_Ownership_Bool_Exp>;
   asset_type?: InputMaybe<Asset_Type_Bool_Exp>;
   asset_type_id?: InputMaybe<Uuid_Comparison_Exp>;
   capacity?: InputMaybe<String_Comparison_Exp>;
@@ -6995,6 +7179,7 @@ export type Customer_Asset_Insert_Input = {
   asset_detail?: InputMaybe<Asset_Detail_Obj_Rel_Insert_Input>;
   asset_detail_id?: InputMaybe<Scalars['uuid']['input']>;
   asset_grouping_customer_assets?: InputMaybe<Asset_Grouping_Customer_Asset_Arr_Rel_Insert_Input>;
+  asset_ownership?: InputMaybe<Asset_Ownership_Obj_Rel_Insert_Input>;
   asset_type?: InputMaybe<Asset_Type_Obj_Rel_Insert_Input>;
   asset_type_id?: InputMaybe<Scalars['uuid']['input']>;
   capacity?: InputMaybe<Scalars['String']['input']>;
@@ -7635,6 +7820,7 @@ export type Customer_Asset_Order_By = {
   asset_detail?: InputMaybe<Asset_Detail_Order_By>;
   asset_detail_id?: InputMaybe<Order_By>;
   asset_grouping_customer_assets_aggregate?: InputMaybe<Asset_Grouping_Customer_Asset_Aggregate_Order_By>;
+  asset_ownership?: InputMaybe<Asset_Ownership_Order_By>;
   asset_type?: InputMaybe<Asset_Type_Order_By>;
   asset_type_id?: InputMaybe<Order_By>;
   capacity?: InputMaybe<Order_By>;
@@ -15701,14 +15887,28 @@ export type Customer_Order_Request = {
   customer_order_request_items: Array<Customer_Order_Request_Item>;
   /** An aggregate relationship */
   customer_order_request_items_aggregate: Customer_Order_Request_Item_Aggregate;
+  /** An array relationship */
+  customer_order_request_photos: Array<Customer_Order_Request_Photos>;
+  /** An aggregate relationship */
+  customer_order_request_photos_aggregate: Customer_Order_Request_Photos_Aggregate;
+  /** An object relationship */
+  customer_order_request_state: Customer_Order_Request_State;
+  /** An array relationship */
+  customer_order_request_stateflows: Array<Customer_Order_Request_Stateflow>;
+  /** An aggregate relationship */
+  customer_order_request_stateflows_aggregate: Customer_Order_Request_Stateflow_Aggregate;
   delivery_preferences?: Maybe<Scalars['String']['output']>;
   expires_at?: Maybe<Scalars['timestamp']['output']>;
   id: Scalars['uuid']['output'];
   is_active: Scalars['Boolean']['output'];
   is_otp_required: Scalars['Boolean']['output'];
+  is_test_enabled: Scalars['Boolean']['output'];
   last_modified?: Maybe<Scalars['timestamp']['output']>;
   last_modified_by?: Maybe<Scalars['uuid']['output']>;
   notes?: Maybe<Scalars['String']['output']>;
+  /** An object relationship */
+  orderSourceOfCreationByOrderSourceOfCreation?: Maybe<Order_Source_Of_Creation>;
+  order_source_of_creation?: Maybe<Order_Source_Of_Creation_Enum>;
   /** An object relationship */
   organizationAddressByShippingAddressId: Organization_Address;
   /** An object relationship */
@@ -15769,6 +15969,46 @@ export type Customer_Order_RequestCustomer_Order_Request_Items_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Customer_Order_Request_Item_Order_By>>;
   where?: InputMaybe<Customer_Order_Request_Item_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request" */
+export type Customer_Order_RequestCustomer_Order_Request_PhotosArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request" */
+export type Customer_Order_RequestCustomer_Order_Request_Photos_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request" */
+export type Customer_Order_RequestCustomer_Order_Request_StateflowsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request" */
+export type Customer_Order_RequestCustomer_Order_Request_Stateflows_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
 };
 
 /** aggregated selection of "customer_order_request" */
@@ -15878,14 +16118,22 @@ export type Customer_Order_Request_Bool_Exp = {
   customer_order_request_customer_assets_aggregate?: InputMaybe<Customer_Order_Request_Customer_Asset_Aggregate_Bool_Exp>;
   customer_order_request_items?: InputMaybe<Customer_Order_Request_Item_Bool_Exp>;
   customer_order_request_items_aggregate?: InputMaybe<Customer_Order_Request_Item_Aggregate_Bool_Exp>;
+  customer_order_request_photos?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+  customer_order_request_photos_aggregate?: InputMaybe<Customer_Order_Request_Photos_Aggregate_Bool_Exp>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Bool_Exp>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Bool_Exp>;
   delivery_preferences?: InputMaybe<String_Comparison_Exp>;
   expires_at?: InputMaybe<Timestamp_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
   is_active?: InputMaybe<Boolean_Comparison_Exp>;
   is_otp_required?: InputMaybe<Boolean_Comparison_Exp>;
+  is_test_enabled?: InputMaybe<Boolean_Comparison_Exp>;
   last_modified?: InputMaybe<Timestamp_Comparison_Exp>;
   last_modified_by?: InputMaybe<Uuid_Comparison_Exp>;
   notes?: InputMaybe<String_Comparison_Exp>;
+  orderSourceOfCreationByOrderSourceOfCreation?: InputMaybe<Order_Source_Of_Creation_Bool_Exp>;
+  order_source_of_creation?: InputMaybe<Order_Source_Of_Creation_Enum_Comparison_Exp>;
   organizationAddressByShippingAddressId?: InputMaybe<Organization_Address_Bool_Exp>;
   organization_address?: InputMaybe<Organization_Address_Bool_Exp>;
   organization_user?: InputMaybe<Organization_User_Bool_Exp>;
@@ -16361,14 +16609,20 @@ export type Customer_Order_Request_Insert_Input = {
   customer_order_id?: InputMaybe<Scalars['uuid']['input']>;
   customer_order_request_customer_assets?: InputMaybe<Customer_Order_Request_Customer_Asset_Arr_Rel_Insert_Input>;
   customer_order_request_items?: InputMaybe<Customer_Order_Request_Item_Arr_Rel_Insert_Input>;
+  customer_order_request_photos?: InputMaybe<Customer_Order_Request_Photos_Arr_Rel_Insert_Input>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Obj_Rel_Insert_Input>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Arr_Rel_Insert_Input>;
   delivery_preferences?: InputMaybe<Scalars['String']['input']>;
   expires_at?: InputMaybe<Scalars['timestamp']['input']>;
   id?: InputMaybe<Scalars['uuid']['input']>;
   is_active?: InputMaybe<Scalars['Boolean']['input']>;
   is_otp_required?: InputMaybe<Scalars['Boolean']['input']>;
+  is_test_enabled?: InputMaybe<Scalars['Boolean']['input']>;
   last_modified?: InputMaybe<Scalars['timestamp']['input']>;
   last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  orderSourceOfCreationByOrderSourceOfCreation?: InputMaybe<Order_Source_Of_Creation_Obj_Rel_Insert_Input>;
+  order_source_of_creation?: InputMaybe<Order_Source_Of_Creation_Enum>;
   organizationAddressByShippingAddressId?: InputMaybe<Organization_Address_Obj_Rel_Insert_Input>;
   organization_address?: InputMaybe<Organization_Address_Obj_Rel_Insert_Input>;
   organization_user?: InputMaybe<Organization_User_Obj_Rel_Insert_Input>;
@@ -17374,14 +17628,20 @@ export type Customer_Order_Request_Order_By = {
   customer_order_id?: InputMaybe<Order_By>;
   customer_order_request_customer_assets_aggregate?: InputMaybe<Customer_Order_Request_Customer_Asset_Aggregate_Order_By>;
   customer_order_request_items_aggregate?: InputMaybe<Customer_Order_Request_Item_Aggregate_Order_By>;
+  customer_order_request_photos_aggregate?: InputMaybe<Customer_Order_Request_Photos_Aggregate_Order_By>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Order_By>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Order_By>;
   delivery_preferences?: InputMaybe<Order_By>;
   expires_at?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
   is_active?: InputMaybe<Order_By>;
   is_otp_required?: InputMaybe<Order_By>;
+  is_test_enabled?: InputMaybe<Order_By>;
   last_modified?: InputMaybe<Order_By>;
   last_modified_by?: InputMaybe<Order_By>;
   notes?: InputMaybe<Order_By>;
+  orderSourceOfCreationByOrderSourceOfCreation?: InputMaybe<Order_Source_Of_Creation_Order_By>;
+  order_source_of_creation?: InputMaybe<Order_By>;
   organizationAddressByShippingAddressId?: InputMaybe<Organization_Address_Order_By>;
   organization_address?: InputMaybe<Organization_Address_Order_By>;
   organization_user?: InputMaybe<Organization_User_Order_By>;
@@ -17398,6 +17658,290 @@ export type Customer_Order_Request_Order_By = {
   shipping_address_id?: InputMaybe<Order_By>;
   state?: InputMaybe<Order_By>;
   work_order?: InputMaybe<Order_By>;
+};
+
+/** columns and relationships of "customer_order_request_photos" */
+export type Customer_Order_Request_Photos = {
+  __typename?: 'customer_order_request_photos';
+  created_at?: Maybe<Scalars['timestamp']['output']>;
+  /** An object relationship */
+  customer_order_request: Customer_Order_Request;
+  customer_order_request_id: Scalars['uuid']['output'];
+  id: Scalars['uuid']['output'];
+  is_active: Scalars['Boolean']['output'];
+  last_modified?: Maybe<Scalars['timestamp']['output']>;
+  last_modified_by?: Maybe<Scalars['uuid']['output']>;
+  note: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+/** aggregated selection of "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Aggregate = {
+  __typename?: 'customer_order_request_photos_aggregate';
+  aggregate?: Maybe<Customer_Order_Request_Photos_Aggregate_Fields>;
+  nodes: Array<Customer_Order_Request_Photos>;
+};
+
+export type Customer_Order_Request_Photos_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_Or>;
+  count?: InputMaybe<Customer_Order_Request_Photos_Aggregate_Bool_Exp_Count>;
+};
+
+export type Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_And = {
+  arguments: Customer_Order_Request_Photos_Select_Column_Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: Customer_Order_Request_Photos_Select_Column_Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type Customer_Order_Request_Photos_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
+};
+
+/** aggregate fields of "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Aggregate_Fields = {
+  __typename?: 'customer_order_request_photos_aggregate_fields';
+  count: Scalars['Int']['output'];
+  max?: Maybe<Customer_Order_Request_Photos_Max_Fields>;
+  min?: Maybe<Customer_Order_Request_Photos_Min_Fields>;
+};
+
+
+/** aggregate fields of "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** order by aggregate values of table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Aggregate_Order_By = {
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Customer_Order_Request_Photos_Max_Order_By>;
+  min?: InputMaybe<Customer_Order_Request_Photos_Min_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Arr_Rel_Insert_Input = {
+  data: Array<Customer_Order_Request_Photos_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Customer_Order_Request_Photos_On_Conflict>;
+};
+
+/** Boolean expression to filter rows from the table "customer_order_request_photos". All fields are combined with a logical 'AND'. */
+export type Customer_Order_Request_Photos_Bool_Exp = {
+  _and?: InputMaybe<Array<Customer_Order_Request_Photos_Bool_Exp>>;
+  _not?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+  _or?: InputMaybe<Array<Customer_Order_Request_Photos_Bool_Exp>>;
+  created_at?: InputMaybe<Timestamp_Comparison_Exp>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Bool_Exp>;
+  customer_order_request_id?: InputMaybe<Uuid_Comparison_Exp>;
+  id?: InputMaybe<Uuid_Comparison_Exp>;
+  is_active?: InputMaybe<Boolean_Comparison_Exp>;
+  last_modified?: InputMaybe<Timestamp_Comparison_Exp>;
+  last_modified_by?: InputMaybe<Uuid_Comparison_Exp>;
+  note?: InputMaybe<String_Comparison_Exp>;
+  url?: InputMaybe<String_Comparison_Exp>;
+};
+
+/** unique or primary key constraints on table "customer_order_request_photos" */
+export enum Customer_Order_Request_Photos_Constraint {
+  /** unique or primary key constraint on columns "id" */
+  CustomerOrderRequestPhotosPkey = 'customer_order_request_photos_pkey'
+}
+
+/** input type for inserting data into table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Insert_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']['input']>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Obj_Rel_Insert_Input>;
+  customer_order_request_id?: InputMaybe<Scalars['uuid']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  last_modified?: InputMaybe<Scalars['timestamp']['input']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** aggregate max on columns */
+export type Customer_Order_Request_Photos_Max_Fields = {
+  __typename?: 'customer_order_request_photos_max_fields';
+  created_at?: Maybe<Scalars['timestamp']['output']>;
+  customer_order_request_id?: Maybe<Scalars['uuid']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  last_modified?: Maybe<Scalars['timestamp']['output']>;
+  last_modified_by?: Maybe<Scalars['uuid']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by max() on columns of table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Max_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  customer_order_request_id?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  url?: InputMaybe<Order_By>;
+};
+
+/** aggregate min on columns */
+export type Customer_Order_Request_Photos_Min_Fields = {
+  __typename?: 'customer_order_request_photos_min_fields';
+  created_at?: Maybe<Scalars['timestamp']['output']>;
+  customer_order_request_id?: Maybe<Scalars['uuid']['output']>;
+  id?: Maybe<Scalars['uuid']['output']>;
+  last_modified?: Maybe<Scalars['timestamp']['output']>;
+  last_modified_by?: Maybe<Scalars['uuid']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+/** order by min() on columns of table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Min_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  customer_order_request_id?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  url?: InputMaybe<Order_By>;
+};
+
+/** response of any mutation on the table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Mutation_Response = {
+  __typename?: 'customer_order_request_photos_mutation_response';
+  /** number of rows affected by the mutation */
+  affected_rows: Scalars['Int']['output'];
+  /** data from the rows affected by the mutation */
+  returning: Array<Customer_Order_Request_Photos>;
+};
+
+/** on_conflict condition type for table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_On_Conflict = {
+  constraint: Customer_Order_Request_Photos_Constraint;
+  update_columns?: Array<Customer_Order_Request_Photos_Update_Column>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+/** Ordering options when selecting data from "customer_order_request_photos". */
+export type Customer_Order_Request_Photos_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Order_By>;
+  customer_order_request_id?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  is_active?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  note?: InputMaybe<Order_By>;
+  url?: InputMaybe<Order_By>;
+};
+
+/** primary key columns input for table: customer_order_request_photos */
+export type Customer_Order_Request_Photos_Pk_Columns_Input = {
+  id: Scalars['uuid']['input'];
+};
+
+/** select columns of table "customer_order_request_photos" */
+export enum Customer_Order_Request_Photos_Select_Column {
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  CustomerOrderRequestId = 'customer_order_request_id',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsActive = 'is_active',
+  /** column name */
+  LastModified = 'last_modified',
+  /** column name */
+  LastModifiedBy = 'last_modified_by',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Url = 'url'
+}
+
+/** select "customer_order_request_photos_aggregate_bool_exp_bool_and_arguments_columns" columns of table "customer_order_request_photos" */
+export enum Customer_Order_Request_Photos_Select_Column_Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  IsActive = 'is_active'
+}
+
+/** select "customer_order_request_photos_aggregate_bool_exp_bool_or_arguments_columns" columns of table "customer_order_request_photos" */
+export enum Customer_Order_Request_Photos_Select_Column_Customer_Order_Request_Photos_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  IsActive = 'is_active'
+}
+
+/** input type for updating data in table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Set_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']['input']>;
+  customer_order_request_id?: InputMaybe<Scalars['uuid']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  last_modified?: InputMaybe<Scalars['timestamp']['input']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Streaming cursor of the table "customer_order_request_photos" */
+export type Customer_Order_Request_Photos_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Customer_Order_Request_Photos_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Customer_Order_Request_Photos_Stream_Cursor_Value_Input = {
+  created_at?: InputMaybe<Scalars['timestamp']['input']>;
+  customer_order_request_id?: InputMaybe<Scalars['uuid']['input']>;
+  id?: InputMaybe<Scalars['uuid']['input']>;
+  is_active?: InputMaybe<Scalars['Boolean']['input']>;
+  last_modified?: InputMaybe<Scalars['timestamp']['input']>;
+  last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** update columns of table "customer_order_request_photos" */
+export enum Customer_Order_Request_Photos_Update_Column {
+  /** column name */
+  CreatedAt = 'created_at',
+  /** column name */
+  CustomerOrderRequestId = 'customer_order_request_id',
+  /** column name */
+  Id = 'id',
+  /** column name */
+  IsActive = 'is_active',
+  /** column name */
+  LastModified = 'last_modified',
+  /** column name */
+  LastModifiedBy = 'last_modified_by',
+  /** column name */
+  Note = 'note',
+  /** column name */
+  Url = 'url'
+}
+
+export type Customer_Order_Request_Photos_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Customer_Order_Request_Photos_Set_Input>;
+  /** filter the rows which have to be updated */
+  where: Customer_Order_Request_Photos_Bool_Exp;
 };
 
 /** primary key columns input for table: customer_order_request */
@@ -17428,11 +17972,15 @@ export enum Customer_Order_Request_Select_Column {
   /** column name */
   IsOtpRequired = 'is_otp_required',
   /** column name */
+  IsTestEnabled = 'is_test_enabled',
+  /** column name */
   LastModified = 'last_modified',
   /** column name */
   LastModifiedBy = 'last_modified_by',
   /** column name */
   Notes = 'notes',
+  /** column name */
+  OrderSourceOfCreation = 'order_source_of_creation',
   /** column name */
   OrganizationUserId = 'organization_user_id',
   /** column name */
@@ -17464,7 +18012,9 @@ export enum Customer_Order_Request_Select_Column_Customer_Order_Request_Aggregat
   /** column name */
   IsActive = 'is_active',
   /** column name */
-  IsOtpRequired = 'is_otp_required'
+  IsOtpRequired = 'is_otp_required',
+  /** column name */
+  IsTestEnabled = 'is_test_enabled'
 }
 
 /** select "customer_order_request_aggregate_bool_exp_bool_or_arguments_columns" columns of table "customer_order_request" */
@@ -17472,7 +18022,9 @@ export enum Customer_Order_Request_Select_Column_Customer_Order_Request_Aggregat
   /** column name */
   IsActive = 'is_active',
   /** column name */
-  IsOtpRequired = 'is_otp_required'
+  IsOtpRequired = 'is_otp_required',
+  /** column name */
+  IsTestEnabled = 'is_test_enabled'
 }
 
 /** input type for updating data in table "customer_order_request" */
@@ -17487,9 +18039,11 @@ export type Customer_Order_Request_Set_Input = {
   id?: InputMaybe<Scalars['uuid']['input']>;
   is_active?: InputMaybe<Scalars['Boolean']['input']>;
   is_otp_required?: InputMaybe<Scalars['Boolean']['input']>;
+  is_test_enabled?: InputMaybe<Scalars['Boolean']['input']>;
   last_modified?: InputMaybe<Scalars['timestamp']['input']>;
   last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  order_source_of_creation?: InputMaybe<Order_Source_Of_Creation_Enum>;
   organization_user_id?: InputMaybe<Scalars['uuid']['input']>;
   price_snapshot_ts?: InputMaybe<Scalars['timestamp']['input']>;
   product_variation_partner_localities_slot_id?: InputMaybe<Scalars['uuid']['input']>;
@@ -17508,7 +18062,55 @@ export type Customer_Order_Request_Set_Input = {
 export type Customer_Order_Request_State = {
   __typename?: 'customer_order_request_state';
   comment: Scalars['String']['output'];
+  /** An array relationship */
+  customer_order_request_stateflows: Array<Customer_Order_Request_Stateflow>;
+  /** An aggregate relationship */
+  customer_order_request_stateflows_aggregate: Customer_Order_Request_Stateflow_Aggregate;
+  /** An array relationship */
+  customer_order_requests: Array<Customer_Order_Request>;
+  /** An aggregate relationship */
+  customer_order_requests_aggregate: Customer_Order_Request_Aggregate;
   value: Scalars['String']['output'];
+};
+
+
+/** columns and relationships of "customer_order_request_state" */
+export type Customer_Order_Request_StateCustomer_Order_Request_StateflowsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request_state" */
+export type Customer_Order_Request_StateCustomer_Order_Request_Stateflows_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request_state" */
+export type Customer_Order_Request_StateCustomer_Order_RequestsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Bool_Exp>;
+};
+
+
+/** columns and relationships of "customer_order_request_state" */
+export type Customer_Order_Request_StateCustomer_Order_Requests_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Bool_Exp>;
 };
 
 /** aggregated selection of "customer_order_request_state" */
@@ -17539,6 +18141,10 @@ export type Customer_Order_Request_State_Bool_Exp = {
   _not?: InputMaybe<Customer_Order_Request_State_Bool_Exp>;
   _or?: InputMaybe<Array<Customer_Order_Request_State_Bool_Exp>>;
   comment?: InputMaybe<String_Comparison_Exp>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Bool_Exp>;
+  customer_order_requests?: InputMaybe<Customer_Order_Request_Bool_Exp>;
+  customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Bool_Exp>;
   value?: InputMaybe<String_Comparison_Exp>;
 };
 
@@ -17577,6 +18183,8 @@ export type Customer_Order_Request_State_Enum_Comparison_Exp = {
 /** input type for inserting data into table "customer_order_request_state" */
 export type Customer_Order_Request_State_Insert_Input = {
   comment?: InputMaybe<Scalars['String']['input']>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Arr_Rel_Insert_Input>;
+  customer_order_requests?: InputMaybe<Customer_Order_Request_Arr_Rel_Insert_Input>;
   value?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -17603,6 +18211,13 @@ export type Customer_Order_Request_State_Mutation_Response = {
   returning: Array<Customer_Order_Request_State>;
 };
 
+/** input type for inserting object relation for remote table "customer_order_request_state" */
+export type Customer_Order_Request_State_Obj_Rel_Insert_Input = {
+  data: Customer_Order_Request_State_Insert_Input;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Customer_Order_Request_State_On_Conflict>;
+};
+
 /** on_conflict condition type for table "customer_order_request_state" */
 export type Customer_Order_Request_State_On_Conflict = {
   constraint: Customer_Order_Request_State_Constraint;
@@ -17613,6 +18228,8 @@ export type Customer_Order_Request_State_On_Conflict = {
 /** Ordering options when selecting data from "customer_order_request_state". */
 export type Customer_Order_Request_State_Order_By = {
   comment?: InputMaybe<Order_By>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Order_By>;
+  customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Order_By>;
   value?: InputMaybe<Order_By>;
 };
 
@@ -17668,10 +18285,16 @@ export type Customer_Order_Request_State_Updates = {
 export type Customer_Order_Request_Stateflow = {
   __typename?: 'customer_order_request_stateflow';
   created_at?: Maybe<Scalars['timestamp']['output']>;
+  /** An object relationship */
+  customer_order_request: Customer_Order_Request;
   customer_order_request_id: Scalars['uuid']['output'];
+  /** An object relationship */
+  customer_order_request_state: Customer_Order_Request_State;
   id: Scalars['uuid']['output'];
   last_modified?: Maybe<Scalars['timestamp']['output']>;
   last_modified_by?: Maybe<Scalars['uuid']['output']>;
+  /** An object relationship */
+  organization_user: Organization_User;
   organization_user_id: Scalars['uuid']['output'];
   state: Customer_Order_Request_State_Enum;
 };
@@ -17681,6 +18304,17 @@ export type Customer_Order_Request_Stateflow_Aggregate = {
   __typename?: 'customer_order_request_stateflow_aggregate';
   aggregate?: Maybe<Customer_Order_Request_Stateflow_Aggregate_Fields>;
   nodes: Array<Customer_Order_Request_Stateflow>;
+};
+
+export type Customer_Order_Request_Stateflow_Aggregate_Bool_Exp = {
+  count?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Bool_Exp_Count>;
+};
+
+export type Customer_Order_Request_Stateflow_Aggregate_Bool_Exp_Count = {
+  arguments?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+  filter?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+  predicate: Int_Comparison_Exp;
 };
 
 /** aggregate fields of "customer_order_request_stateflow" */
@@ -17698,16 +18332,33 @@ export type Customer_Order_Request_Stateflow_Aggregate_FieldsCountArgs = {
   distinct?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+/** order by aggregate values of table "customer_order_request_stateflow" */
+export type Customer_Order_Request_Stateflow_Aggregate_Order_By = {
+  count?: InputMaybe<Order_By>;
+  max?: InputMaybe<Customer_Order_Request_Stateflow_Max_Order_By>;
+  min?: InputMaybe<Customer_Order_Request_Stateflow_Min_Order_By>;
+};
+
+/** input type for inserting array relation for remote table "customer_order_request_stateflow" */
+export type Customer_Order_Request_Stateflow_Arr_Rel_Insert_Input = {
+  data: Array<Customer_Order_Request_Stateflow_Insert_Input>;
+  /** upsert condition */
+  on_conflict?: InputMaybe<Customer_Order_Request_Stateflow_On_Conflict>;
+};
+
 /** Boolean expression to filter rows from the table "customer_order_request_stateflow". All fields are combined with a logical 'AND'. */
 export type Customer_Order_Request_Stateflow_Bool_Exp = {
   _and?: InputMaybe<Array<Customer_Order_Request_Stateflow_Bool_Exp>>;
   _not?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
   _or?: InputMaybe<Array<Customer_Order_Request_Stateflow_Bool_Exp>>;
   created_at?: InputMaybe<Timestamp_Comparison_Exp>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Bool_Exp>;
   customer_order_request_id?: InputMaybe<Uuid_Comparison_Exp>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Bool_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
   last_modified?: InputMaybe<Timestamp_Comparison_Exp>;
   last_modified_by?: InputMaybe<Uuid_Comparison_Exp>;
+  organization_user?: InputMaybe<Organization_User_Bool_Exp>;
   organization_user_id?: InputMaybe<Uuid_Comparison_Exp>;
   state?: InputMaybe<Customer_Order_Request_State_Enum_Comparison_Exp>;
 };
@@ -17721,10 +18372,13 @@ export enum Customer_Order_Request_Stateflow_Constraint {
 /** input type for inserting data into table "customer_order_request_stateflow" */
 export type Customer_Order_Request_Stateflow_Insert_Input = {
   created_at?: InputMaybe<Scalars['timestamp']['input']>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Obj_Rel_Insert_Input>;
   customer_order_request_id?: InputMaybe<Scalars['uuid']['input']>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Obj_Rel_Insert_Input>;
   id?: InputMaybe<Scalars['uuid']['input']>;
   last_modified?: InputMaybe<Scalars['timestamp']['input']>;
   last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
+  organization_user?: InputMaybe<Organization_User_Obj_Rel_Insert_Input>;
   organization_user_id?: InputMaybe<Scalars['uuid']['input']>;
   state?: InputMaybe<Customer_Order_Request_State_Enum>;
 };
@@ -17740,6 +18394,16 @@ export type Customer_Order_Request_Stateflow_Max_Fields = {
   organization_user_id?: Maybe<Scalars['uuid']['output']>;
 };
 
+/** order by max() on columns of table "customer_order_request_stateflow" */
+export type Customer_Order_Request_Stateflow_Max_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  customer_order_request_id?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  organization_user_id?: InputMaybe<Order_By>;
+};
+
 /** aggregate min on columns */
 export type Customer_Order_Request_Stateflow_Min_Fields = {
   __typename?: 'customer_order_request_stateflow_min_fields';
@@ -17749,6 +18413,16 @@ export type Customer_Order_Request_Stateflow_Min_Fields = {
   last_modified?: Maybe<Scalars['timestamp']['output']>;
   last_modified_by?: Maybe<Scalars['uuid']['output']>;
   organization_user_id?: Maybe<Scalars['uuid']['output']>;
+};
+
+/** order by min() on columns of table "customer_order_request_stateflow" */
+export type Customer_Order_Request_Stateflow_Min_Order_By = {
+  created_at?: InputMaybe<Order_By>;
+  customer_order_request_id?: InputMaybe<Order_By>;
+  id?: InputMaybe<Order_By>;
+  last_modified?: InputMaybe<Order_By>;
+  last_modified_by?: InputMaybe<Order_By>;
+  organization_user_id?: InputMaybe<Order_By>;
 };
 
 /** response of any mutation on the table "customer_order_request_stateflow" */
@@ -17770,10 +18444,13 @@ export type Customer_Order_Request_Stateflow_On_Conflict = {
 /** Ordering options when selecting data from "customer_order_request_stateflow". */
 export type Customer_Order_Request_Stateflow_Order_By = {
   created_at?: InputMaybe<Order_By>;
+  customer_order_request?: InputMaybe<Customer_Order_Request_Order_By>;
   customer_order_request_id?: InputMaybe<Order_By>;
+  customer_order_request_state?: InputMaybe<Customer_Order_Request_State_Order_By>;
   id?: InputMaybe<Order_By>;
   last_modified?: InputMaybe<Order_By>;
   last_modified_by?: InputMaybe<Order_By>;
+  organization_user?: InputMaybe<Organization_User_Order_By>;
   organization_user_id?: InputMaybe<Order_By>;
   state?: InputMaybe<Order_By>;
 };
@@ -17915,9 +18592,11 @@ export type Customer_Order_Request_Stream_Cursor_Value_Input = {
   id?: InputMaybe<Scalars['uuid']['input']>;
   is_active?: InputMaybe<Scalars['Boolean']['input']>;
   is_otp_required?: InputMaybe<Scalars['Boolean']['input']>;
+  is_test_enabled?: InputMaybe<Scalars['Boolean']['input']>;
   last_modified?: InputMaybe<Scalars['timestamp']['input']>;
   last_modified_by?: InputMaybe<Scalars['uuid']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  order_source_of_creation?: InputMaybe<Order_Source_Of_Creation_Enum>;
   organization_user_id?: InputMaybe<Scalars['uuid']['input']>;
   price_snapshot_ts?: InputMaybe<Scalars['timestamp']['input']>;
   product_variation_partner_localities_slot_id?: InputMaybe<Scalars['uuid']['input']>;
@@ -17968,11 +18647,15 @@ export enum Customer_Order_Request_Update_Column {
   /** column name */
   IsOtpRequired = 'is_otp_required',
   /** column name */
+  IsTestEnabled = 'is_test_enabled',
+  /** column name */
   LastModified = 'last_modified',
   /** column name */
   LastModifiedBy = 'last_modified_by',
   /** column name */
   Notes = 'notes',
+  /** column name */
+  OrderSourceOfCreation = 'order_source_of_creation',
   /** column name */
   OrganizationUserId = 'organization_user_id',
   /** column name */
@@ -31222,6 +31905,50 @@ export type Float8_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['float8']['input']>>;
 };
 
+export type FmsAssetCountDataInput = {
+  department_name?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  end_date: Scalars['timestamp']['input'];
+  start_date: Scalars['timestamp']['input'];
+};
+
+export type FmsAssetCountDataOutput = {
+  __typename?: 'fmsAssetCountDataOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type FmsAssetWiseRawDataInput = {
+  department_name?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  end_date?: InputMaybe<Scalars['timestamp']['input']>;
+  start_date?: InputMaybe<Scalars['timestamp']['input']>;
+};
+
+export type FmsAssetWiseRawDataOutput = {
+  __typename?: 'fmsAssetWiseRawDataOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type FmsOrderSummaryCountInput = {
+  department_name?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  end_date: Scalars['timestamp']['input'];
+  start_date: Scalars['timestamp']['input'];
+};
+
+export type FmsOrderSummaryCountOutput = {
+  __typename?: 'fmsOrderSummaryCountOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type FmsRawOrderDataInput = {
+  department_name?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  end_date: Scalars['timestamp']['input'];
+  start_date: Scalars['timestamp']['input'];
+};
+
+export type FmsRawOrderDataOutput = {
+  __typename?: 'fmsRawOrderDataOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
 /** columns and relationships of "fuel_delivery" */
 export type Fuel_Delivery = {
   __typename?: 'fuel_delivery';
@@ -40284,6 +41011,7 @@ export type Mutation_Root = {
   addDeliveryNoteAndSalesInvoiceByOrderCode?: Maybe<SalesInvoiceByOrderCodeOutput>;
   addStockEntryForFillupOnErp?: Maybe<AddStockEntryForFillupOnErpOutput>;
   addVehicleToService?: Maybe<AddVehicleToServiceOutput>;
+  approveRequestAndPunchOrder?: Maybe<ApproveRequestAndPunchOrderOutput>;
   assignedBulkDriverForTask?: Maybe<AssignedBulkDriverForTaskOutput>;
   assignedDriverForTask?: Maybe<AssignedDriverForTaskOutput>;
   attachedRfidWithCustomerAsset?: Maybe<AttachedRfidWithCustomerAssetOutput>;
@@ -40291,6 +41019,7 @@ export type Mutation_Root = {
   axisBankPaymentVerify?: Maybe<AxisBankPaymentVerifyOutput>;
   /** this will help to block any poc in app & erp */
   blockPoc: BlockPocOutput;
+  cancelCustomerOrderRequest?: Maybe<CancelCustomerOrderRequestOutput>;
   cancelOrder?: Maybe<CancelOrderOutput>;
   cancelOrderByUser?: Maybe<CancelCustomerOrderOutput>;
   cancelPartnerOrderByUser?: Maybe<CancelPartnerOrderByUserOutput>;
@@ -40298,6 +41027,8 @@ export type Mutation_Root = {
   clearSalesInvoice?: Maybe<ClearSalesInvoiceOutput>;
   createAppCustomerOrder?: Maybe<CreateAppCustomerOrderOutput>;
   createCustomerOrder?: Maybe<CustomerOrderOutput>;
+  /** Creates a customer order request with all items and customer assets based on GraphQL mutation */
+  createCustomerOrderRequest?: Maybe<CreateCustomerOrderRequestOutput>;
   createDeliveryInvoice?: Maybe<CreateDeliveryInvoiceOutput>;
   createEasebuzzPaymentLink?: Maybe<CreatePaymentLinkOutput>;
   createGrnRequestOnErp?: Maybe<CreateGrnRequestOnErpOutput>;
@@ -40475,6 +41206,10 @@ export type Mutation_Root = {
   delete_customer_order_request_item?: Maybe<Customer_Order_Request_Item_Mutation_Response>;
   /** delete single row from the table: "customer_order_request_item" */
   delete_customer_order_request_item_by_pk?: Maybe<Customer_Order_Request_Item>;
+  /** delete data from the table: "customer_order_request_photos" */
+  delete_customer_order_request_photos?: Maybe<Customer_Order_Request_Photos_Mutation_Response>;
+  /** delete single row from the table: "customer_order_request_photos" */
+  delete_customer_order_request_photos_by_pk?: Maybe<Customer_Order_Request_Photos>;
   /** delete data from the table: "customer_order_request_state" */
   delete_customer_order_request_state?: Maybe<Customer_Order_Request_State_Mutation_Response>;
   /** delete single row from the table: "customer_order_request_state" */
@@ -41324,7 +42059,6 @@ export type Mutation_Root = {
   fetchCustomerOrderDashboradData?: Maybe<CustomerOrderDataOutput>;
   fetchCustomerOrderItemSlotsById?: Maybe<FetchCustomerOrderItemSlotsByIdOutput>;
   fetchIssueList?: Maybe<FetchIssueListOutput>;
-  fetchMultipleInvoicesPdf: FetchMultipleInvoiceOutput;
   fetchOrderStatsForDriver?: Maybe<FetchOrderStatsForDriverOutput>;
   fetchOrderStatsForDriverV1?: Maybe<FetchOrderStatsForDriverV1Output>;
   fetchOrderStatsForDriverV2?: Maybe<FetchOrderStatsForDriverV2Output>;
@@ -41509,6 +42243,10 @@ export type Mutation_Root = {
   insert_customer_order_request_item_one?: Maybe<Customer_Order_Request_Item>;
   /** insert a single row into the table: "customer_order_request" */
   insert_customer_order_request_one?: Maybe<Customer_Order_Request>;
+  /** insert data into the table: "customer_order_request_photos" */
+  insert_customer_order_request_photos?: Maybe<Customer_Order_Request_Photos_Mutation_Response>;
+  /** insert a single row into the table: "customer_order_request_photos" */
+  insert_customer_order_request_photos_one?: Maybe<Customer_Order_Request_Photos>;
   /** insert data into the table: "customer_order_request_state" */
   insert_customer_order_request_state?: Maybe<Customer_Order_Request_State_Mutation_Response>;
   /** insert a single row into the table: "customer_order_request_state" */
@@ -42638,6 +43376,12 @@ export type Mutation_Root = {
   update_customer_order_request_item_many?: Maybe<Array<Maybe<Customer_Order_Request_Item_Mutation_Response>>>;
   /** update multiples rows of table: "customer_order_request" */
   update_customer_order_request_many?: Maybe<Array<Maybe<Customer_Order_Request_Mutation_Response>>>;
+  /** update data of the table: "customer_order_request_photos" */
+  update_customer_order_request_photos?: Maybe<Customer_Order_Request_Photos_Mutation_Response>;
+  /** update single row of the table: "customer_order_request_photos" */
+  update_customer_order_request_photos_by_pk?: Maybe<Customer_Order_Request_Photos>;
+  /** update multiples rows of table: "customer_order_request_photos" */
+  update_customer_order_request_photos_many?: Maybe<Array<Maybe<Customer_Order_Request_Photos_Mutation_Response>>>;
   /** update data of the table: "customer_order_request_state" */
   update_customer_order_request_state?: Maybe<Customer_Order_Request_State_Mutation_Response>;
   /** update single row of the table: "customer_order_request_state" */
@@ -43950,6 +44694,12 @@ export type Mutation_RootAddVehicleToServiceArgs = {
 
 
 /** mutation root */
+export type Mutation_RootApproveRequestAndPunchOrderArgs = {
+  object: ApproveRequestAndPunchOrderInput;
+};
+
+
+/** mutation root */
 export type Mutation_RootAssignedBulkDriverForTaskArgs = {
   object: Array<AssignedBulkDriverForTaskInput>;
 };
@@ -43982,6 +44732,12 @@ export type Mutation_RootAxisBankPaymentVerifyArgs = {
 /** mutation root */
 export type Mutation_RootBlockPocArgs = {
   object: BlockPocInput;
+};
+
+
+/** mutation root */
+export type Mutation_RootCancelCustomerOrderRequestArgs = {
+  object: CancelCustomerOrderRequestInput;
 };
 
 
@@ -44024,6 +44780,12 @@ export type Mutation_RootCreateAppCustomerOrderArgs = {
 /** mutation root */
 export type Mutation_RootCreateCustomerOrderArgs = {
   object: CustomerOrderInput;
+};
+
+
+/** mutation root */
+export type Mutation_RootCreateCustomerOrderRequestArgs = {
+  object: CreateCustomerOrderRequestInput;
 };
 
 
@@ -44593,6 +45355,18 @@ export type Mutation_RootDelete_Customer_Order_Request_ItemArgs = {
 
 /** mutation root */
 export type Mutation_RootDelete_Customer_Order_Request_Item_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Customer_Order_Request_PhotosArgs = {
+  where: Customer_Order_Request_Photos_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootDelete_Customer_Order_Request_Photos_By_PkArgs = {
   id: Scalars['uuid']['input'];
 };
 
@@ -47160,12 +47934,6 @@ export type Mutation_RootFetchIssueListArgs = {
 
 
 /** mutation root */
-export type Mutation_RootFetchMultipleInvoicesPdfArgs = {
-  object: FetchMultipleInvoiceInput;
-};
-
-
-/** mutation root */
 export type Mutation_RootFetchOrderStatsForDriverArgs = {
   object: FetchOrderStatsForDriverInput;
 };
@@ -47844,6 +48612,20 @@ export type Mutation_RootInsert_Customer_Order_Request_Item_OneArgs = {
 export type Mutation_RootInsert_Customer_Order_Request_OneArgs = {
   object: Customer_Order_Request_Insert_Input;
   on_conflict?: InputMaybe<Customer_Order_Request_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Customer_Order_Request_PhotosArgs = {
+  objects: Array<Customer_Order_Request_Photos_Insert_Input>;
+  on_conflict?: InputMaybe<Customer_Order_Request_Photos_On_Conflict>;
+};
+
+
+/** mutation root */
+export type Mutation_RootInsert_Customer_Order_Request_Photos_OneArgs = {
+  object: Customer_Order_Request_Photos_Insert_Input;
+  on_conflict?: InputMaybe<Customer_Order_Request_Photos_On_Conflict>;
 };
 
 
@@ -51861,6 +52643,26 @@ export type Mutation_RootUpdate_Customer_Order_Request_Item_ManyArgs = {
 /** mutation root */
 export type Mutation_RootUpdate_Customer_Order_Request_ManyArgs = {
   updates: Array<Customer_Order_Request_Updates>;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Customer_Order_Request_PhotosArgs = {
+  _set?: InputMaybe<Customer_Order_Request_Photos_Set_Input>;
+  where: Customer_Order_Request_Photos_Bool_Exp;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Customer_Order_Request_Photos_By_PkArgs = {
+  _set?: InputMaybe<Customer_Order_Request_Photos_Set_Input>;
+  pk_columns: Customer_Order_Request_Photos_Pk_Columns_Input;
+};
+
+
+/** mutation root */
+export type Mutation_RootUpdate_Customer_Order_Request_Photos_ManyArgs = {
+  updates: Array<Customer_Order_Request_Photos_Updates>;
 };
 
 
@@ -58386,10 +59188,34 @@ export type Order_Source_Of_Creation = {
   __typename?: 'order_source_of_creation';
   comment: Scalars['String']['output'];
   /** An array relationship */
+  customer_order_requests: Array<Customer_Order_Request>;
+  /** An aggregate relationship */
+  customer_order_requests_aggregate: Customer_Order_Request_Aggregate;
+  /** An array relationship */
   customer_orders: Array<Customer_Order>;
   /** An aggregate relationship */
   customer_orders_aggregate: Customer_Order_Aggregate;
   value: Scalars['String']['output'];
+};
+
+
+/** columns and relationships of "order_source_of_creation" */
+export type Order_Source_Of_CreationCustomer_Order_RequestsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Bool_Exp>;
+};
+
+
+/** columns and relationships of "order_source_of_creation" */
+export type Order_Source_Of_CreationCustomer_Order_Requests_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Bool_Exp>;
 };
 
 
@@ -58440,6 +59266,8 @@ export type Order_Source_Of_Creation_Bool_Exp = {
   _not?: InputMaybe<Order_Source_Of_Creation_Bool_Exp>;
   _or?: InputMaybe<Array<Order_Source_Of_Creation_Bool_Exp>>;
   comment?: InputMaybe<String_Comparison_Exp>;
+  customer_order_requests?: InputMaybe<Customer_Order_Request_Bool_Exp>;
+  customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Bool_Exp>;
   customer_orders?: InputMaybe<Customer_Order_Bool_Exp>;
   customer_orders_aggregate?: InputMaybe<Customer_Order_Aggregate_Bool_Exp>;
   value?: InputMaybe<String_Comparison_Exp>;
@@ -58474,6 +59302,7 @@ export type Order_Source_Of_Creation_Enum_Comparison_Exp = {
 /** input type for inserting data into table "order_source_of_creation" */
 export type Order_Source_Of_Creation_Insert_Input = {
   comment?: InputMaybe<Scalars['String']['input']>;
+  customer_order_requests?: InputMaybe<Customer_Order_Request_Arr_Rel_Insert_Input>;
   customer_orders?: InputMaybe<Customer_Order_Arr_Rel_Insert_Input>;
   value?: InputMaybe<Scalars['String']['input']>;
 };
@@ -58518,6 +59347,7 @@ export type Order_Source_Of_Creation_On_Conflict = {
 /** Ordering options when selecting data from "order_source_of_creation". */
 export type Order_Source_Of_Creation_Order_By = {
   comment?: InputMaybe<Order_By>;
+  customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Order_By>;
   customer_orders_aggregate?: InputMaybe<Customer_Order_Aggregate_Order_By>;
   value?: InputMaybe<Order_By>;
 };
@@ -62397,6 +63227,10 @@ export type Organization_User = {
   /** An aggregate relationship */
   customer_order_item_stateflows_aggregate: Customer_Order_Item_Stateflow_Aggregate;
   /** An array relationship */
+  customer_order_request_stateflows: Array<Customer_Order_Request_Stateflow>;
+  /** An aggregate relationship */
+  customer_order_request_stateflows_aggregate: Customer_Order_Request_Stateflow_Aggregate;
+  /** An array relationship */
   customer_order_requests: Array<Customer_Order_Request>;
   /** An aggregate relationship */
   customer_order_requests_aggregate: Customer_Order_Request_Aggregate;
@@ -62552,6 +63386,26 @@ export type Organization_UserCustomer_Order_Item_Stateflows_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Customer_Order_Item_Stateflow_Order_By>>;
   where?: InputMaybe<Customer_Order_Item_Stateflow_Bool_Exp>;
+};
+
+
+/** columns and relationships of "organization_user" */
+export type Organization_UserCustomer_Order_Request_StateflowsArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+};
+
+
+/** columns and relationships of "organization_user" */
+export type Organization_UserCustomer_Order_Request_Stateflows_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Stateflow_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Stateflow_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
 };
 
 
@@ -63039,6 +63893,8 @@ export type Organization_User_Bool_Exp = {
   customer_order_item_commissions_aggregate?: InputMaybe<Customer_Order_Item_Commission_Aggregate_Bool_Exp>;
   customer_order_item_stateflows?: InputMaybe<Customer_Order_Item_Stateflow_Bool_Exp>;
   customer_order_item_stateflows_aggregate?: InputMaybe<Customer_Order_Item_Stateflow_Aggregate_Bool_Exp>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Bool_Exp>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Bool_Exp>;
   customer_order_requests?: InputMaybe<Customer_Order_Request_Bool_Exp>;
   customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Bool_Exp>;
   customer_order_stateflows?: InputMaybe<Customer_Order_Stateflow_Bool_Exp>;
@@ -63730,6 +64586,7 @@ export type Organization_User_Insert_Input = {
   customer_erp_code?: InputMaybe<Scalars['String']['input']>;
   customer_order_item_commissions?: InputMaybe<Customer_Order_Item_Commission_Arr_Rel_Insert_Input>;
   customer_order_item_stateflows?: InputMaybe<Customer_Order_Item_Stateflow_Arr_Rel_Insert_Input>;
+  customer_order_request_stateflows?: InputMaybe<Customer_Order_Request_Stateflow_Arr_Rel_Insert_Input>;
   customer_order_requests?: InputMaybe<Customer_Order_Request_Arr_Rel_Insert_Input>;
   customer_order_stateflows?: InputMaybe<Customer_Order_Stateflow_Arr_Rel_Insert_Input>;
   customer_orders?: InputMaybe<Customer_Order_Arr_Rel_Insert_Input>;
@@ -63859,6 +64716,7 @@ export type Organization_User_Order_By = {
   customer_erp_code?: InputMaybe<Order_By>;
   customer_order_item_commissions_aggregate?: InputMaybe<Customer_Order_Item_Commission_Aggregate_Order_By>;
   customer_order_item_stateflows_aggregate?: InputMaybe<Customer_Order_Item_Stateflow_Aggregate_Order_By>;
+  customer_order_request_stateflows_aggregate?: InputMaybe<Customer_Order_Request_Stateflow_Aggregate_Order_By>;
   customer_order_requests_aggregate?: InputMaybe<Customer_Order_Request_Aggregate_Order_By>;
   customer_order_stateflows_aggregate?: InputMaybe<Customer_Order_Stateflow_Aggregate_Order_By>;
   customer_orders_aggregate?: InputMaybe<Customer_Order_Aggregate_Order_By>;
@@ -92823,6 +93681,12 @@ export type Query_Root = {
   customer_order_request_item_aggregate: Customer_Order_Request_Item_Aggregate;
   /** fetch data from the table: "customer_order_request_item" using primary key columns */
   customer_order_request_item_by_pk?: Maybe<Customer_Order_Request_Item>;
+  /** An array relationship */
+  customer_order_request_photos: Array<Customer_Order_Request_Photos>;
+  /** An aggregate relationship */
+  customer_order_request_photos_aggregate: Customer_Order_Request_Photos_Aggregate;
+  /** fetch data from the table: "customer_order_request_photos" using primary key columns */
+  customer_order_request_photos_by_pk?: Maybe<Customer_Order_Request_Photos>;
   /** fetch data from the table: "customer_order_request_state" */
   customer_order_request_state: Array<Customer_Order_Request_State>;
   /** fetch aggregated fields from the table: "customer_order_request_state" */
@@ -93062,6 +93926,7 @@ export type Query_Root = {
   fetchInqueueOrdersAndQtyWithDatesV1?: Maybe<FetchInqueueOrdersAndQtyWithDatesV1Output>;
   fetchLiveStreamDataForUser?: Maybe<FetchLiveStreamDataForUserOutput>;
   fetchMonthlyComplianceReport?: Maybe<FetchMonthlyComplianceReportOutput>;
+  fetchMultipleInvoicesPdf: FetchMultipleInvoiceOutput;
   fetchNearFillingStation?: Maybe<FetchNearFillingStationOutput>;
   fetchNearbyPartners?: Maybe<FetchNearbyPartnersOutput>;
   fetchNewCustomerOrders?: Maybe<FetchNewCustomerOrdersOutput>;
@@ -93150,6 +94015,10 @@ export type Query_Root = {
   filtered_orders_live_streaming_view: Array<Filtered_Orders_Live_Streaming_View>;
   /** fetch aggregated fields from the table: "filtered_orders_live_streaming_view" */
   filtered_orders_live_streaming_view_aggregate: Filtered_Orders_Live_Streaming_View_Aggregate;
+  fmsAssetCountData?: Maybe<FmsAssetCountDataOutput>;
+  fmsAssetWiseRawData?: Maybe<FmsAssetWiseRawDataOutput>;
+  fmsOrderSummaryCount?: Maybe<FmsOrderSummaryCountOutput>;
+  fmsRawOrderData?: Maybe<FmsRawOrderDataOutput>;
   /** fetch data from the table: "fuel_delivery" */
   fuel_delivery: Array<Fuel_Delivery>;
   /** fetch aggregated fields from the table: "fuel_delivery" */
@@ -95374,6 +96243,29 @@ export type Query_RootCustomer_Order_Request_Item_By_PkArgs = {
 };
 
 
+export type Query_RootCustomer_Order_Request_PhotosArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+export type Query_RootCustomer_Order_Request_Photos_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+export type Query_RootCustomer_Order_Request_Photos_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
 export type Query_RootCustomer_Order_Request_StateArgs = {
   distinct_on?: InputMaybe<Array<Customer_Order_Request_State_Select_Column>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -96319,6 +97211,11 @@ export type Query_RootFetchMonthlyComplianceReportArgs = {
 };
 
 
+export type Query_RootFetchMultipleInvoicesPdfArgs = {
+  object: FetchMultipleInvoiceInput;
+};
+
+
 export type Query_RootFetchNearFillingStationArgs = {
   object: FetchNearFillingStationInput;
 };
@@ -96685,6 +97582,26 @@ export type Query_RootFiltered_Orders_Live_Streaming_View_AggregateArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   order_by?: InputMaybe<Array<Filtered_Orders_Live_Streaming_View_Order_By>>;
   where?: InputMaybe<Filtered_Orders_Live_Streaming_View_Bool_Exp>;
+};
+
+
+export type Query_RootFmsAssetCountDataArgs = {
+  object: FmsAssetCountDataInput;
+};
+
+
+export type Query_RootFmsAssetWiseRawDataArgs = {
+  object: FmsAssetWiseRawDataInput;
+};
+
+
+export type Query_RootFmsOrderSummaryCountArgs = {
+  object: FmsOrderSummaryCountInput;
+};
+
+
+export type Query_RootFmsRawOrderDataArgs = {
+  object: FmsRawOrderDataInput;
 };
 
 
@@ -107125,6 +108042,14 @@ export type Subscription_Root = {
   customer_order_request_item_by_pk?: Maybe<Customer_Order_Request_Item>;
   /** fetch data from the table in a streaming manner: "customer_order_request_item" */
   customer_order_request_item_stream: Array<Customer_Order_Request_Item>;
+  /** An array relationship */
+  customer_order_request_photos: Array<Customer_Order_Request_Photos>;
+  /** An aggregate relationship */
+  customer_order_request_photos_aggregate: Customer_Order_Request_Photos_Aggregate;
+  /** fetch data from the table: "customer_order_request_photos" using primary key columns */
+  customer_order_request_photos_by_pk?: Maybe<Customer_Order_Request_Photos>;
+  /** fetch data from the table in a streaming manner: "customer_order_request_photos" */
+  customer_order_request_photos_stream: Array<Customer_Order_Request_Photos>;
   /** fetch data from the table: "customer_order_request_state" */
   customer_order_request_state: Array<Customer_Order_Request_State>;
   /** fetch aggregated fields from the table: "customer_order_request_state" */
@@ -110105,6 +111030,36 @@ export type Subscription_RootCustomer_Order_Request_Item_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Customer_Order_Request_Item_Stream_Cursor_Input>>;
   where?: InputMaybe<Customer_Order_Request_Item_Bool_Exp>;
+};
+
+
+export type Subscription_RootCustomer_Order_Request_PhotosArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+export type Subscription_RootCustomer_Order_Request_Photos_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Customer_Order_Request_Photos_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Customer_Order_Request_Photos_Order_By>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
+};
+
+
+export type Subscription_RootCustomer_Order_Request_Photos_By_PkArgs = {
+  id: Scalars['uuid']['input'];
+};
+
+
+export type Subscription_RootCustomer_Order_Request_Photos_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Customer_Order_Request_Photos_Stream_Cursor_Input>>;
+  where?: InputMaybe<Customer_Order_Request_Photos_Bool_Exp>;
 };
 
 
@@ -133936,6 +134891,13 @@ export type DashboardAnalyticsQueryVariables = Exact<{
 
 export type DashboardAnalyticsQuery = { __typename?: 'query_root', dashboardAnalytics?: { __typename?: 'DashboardAnalyticsOutput', months: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }>, weeks: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }>, year: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }> } | null };
 
+export type FetchMultipleInvoicesPdfQueryVariables = Exact<{
+  object: FetchMultipleInvoiceInput;
+}>;
+
+
+export type FetchMultipleInvoicesPdfQuery = { __typename?: 'query_root', fetchMultipleInvoicesPdf: { __typename?: 'FetchMultipleInvoiceOutput', message: string, code: number, error?: string | null, data: { __typename?: 'InvoiceData', zipFile?: string | null, totalCount?: number | null, successCount?: number | null, failCount?: number | null, singlePdf?: string | null, success?: boolean | null, sales_invoice_erp_code?: string | null, summary?: Array<{ __typename?: 'InvoiceSummary', sales_invoice_erp_code: string, success: boolean, error?: string | null }> | null } } };
+
 export type FetchUserOrganizationsQueryVariables = Exact<{
   user_id: Scalars['uuid']['input'];
 }>;
@@ -134077,6 +135039,29 @@ export const DashboardAnalyticsDocument = gql`
       order_count
       planned_orders
       time_range
+    }
+  }
+}
+    `;
+export const FetchMultipleInvoicesPdfDocument = gql`
+    query FetchMultipleInvoicesPdf($object: FetchMultipleInvoiceInput!) {
+  fetchMultipleInvoicesPdf(object: $object) {
+    message
+    code
+    error
+    data {
+      zipFile
+      totalCount
+      successCount
+      failCount
+      summary {
+        sales_invoice_erp_code
+        success
+        error
+      }
+      singlePdf
+      success
+      sales_invoice_erp_code
     }
   }
 }
@@ -134327,6 +135312,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     DashboardAnalytics(variables: DashboardAnalyticsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DashboardAnalyticsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<DashboardAnalyticsQuery>({ document: DashboardAnalyticsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'DashboardAnalytics', 'query', variables);
+    },
+    FetchMultipleInvoicesPdf(variables: FetchMultipleInvoicesPdfQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<FetchMultipleInvoicesPdfQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<FetchMultipleInvoicesPdfQuery>({ document: FetchMultipleInvoicesPdfDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'FetchMultipleInvoicesPdf', 'query', variables);
     },
     fetchUserOrganizations(variables: FetchUserOrganizationsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<FetchUserOrganizationsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<FetchUserOrganizationsQuery>({ document: FetchUserOrganizationsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'fetchUserOrganizations', 'query', variables);

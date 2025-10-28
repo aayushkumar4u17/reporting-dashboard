@@ -18,7 +18,7 @@
               <polyline points="7,10 12,15 17,10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Download Invoices
+            {{ selectedInvoices.size === 1 ? 'Download PDF' : selectedInvoices.size > 1 ? 'Download as ZIP' : 'Download Selected' }}
           </AnimatedButton>
         </template>
       </FilterBar>
@@ -103,8 +103,9 @@
               :frozenValue="lockedInvoices"
               paginator
               showGridlines
-              :rows="10"
+              :rows="rowsPerPage"
               dataKey="id"
+              @page="onPageChange"
               :pt="{
                 table: { style: 'min-width: 50rem' },
                 bodyrow: ({ props }) => ({
@@ -138,6 +139,18 @@
                     class="invoice-checkbox"
                     title="Select for Download"
                   />
+                </template>
+              </Column>
+              
+              <Column header="Download" style="min-width: 100px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="40px" height="32px" border-radius="6px" />
+                  <div v-else style="display: flex; justify-content: center;">
+                    <ModernDownloadButton 
+                      @click="downloadInvoice(data.id)" 
+                      :loading="downloadingInvoice === data.id"
+                    />
+                  </div>
                 </template>
               </Column>
               
@@ -215,18 +228,6 @@
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="90px" height="16px" />
                   <span v-else>{{ data.pocContact }}</span>
-                </template>
-              </Column>
-              
-              <Column header="Download" style="min-width: 100px; width: auto">
-                <template #body="{ data }">
-                  <SkeletonLoader v-if="loading" width="40px" height="32px" border-radius="6px" />
-                  <div v-else style="display: flex; justify-content: center;">
-                    <ModernDownloadButton 
-                      @click="downloadInvoice(data.id)" 
-                      :loading="downloadingInvoice === data.id"
-                    />
-                  </div>
                 </template>
               </Column>
             </DataTable>
@@ -334,6 +335,9 @@ const errorMessage = ref('')
 const downloadingInvoice = ref(null)
 const downloadingBulk = ref(false)
 
+const currentPage = ref(0)
+const rowsPerPage = 10
+
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
 const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
@@ -377,11 +381,25 @@ const appliedFilters = ref({
   search: ''
 })
 
-// Optimized select all state
+// Get current page invoices
+const getCurrentPageInvoices = () => {
+  const start = currentPage.value * rowsPerPage
+  const end = start + rowsPerPage
+  return filteredInvoices.value.slice(start, end)
+}
+
+// Optimized select all state for current page
 const selectAll = computed(() => {
-  if (selectedInvoices.value.size === 0) return false
-  const totalCount = invoices.value.length + lockedInvoices.value.length
-  return totalCount > 0 && selectedInvoices.value.size === totalCount
+  const currentPageInvoices = getCurrentPageInvoices()
+  const allCurrentPageInvoices = [...currentPageInvoices, ...lockedInvoices.value]
+  
+  if (allCurrentPageInvoices.length === 0) return false
+  
+  const selectedCount = allCurrentPageInvoices.filter(invoice => 
+    selectedInvoices.value.has(invoice.id)
+  ).length
+  
+  return selectedCount === allCurrentPageInvoices.length
 })
 
 // Cached summary statistics to avoid recalculation
@@ -575,13 +593,24 @@ const toggleLockByCheckbox = (data, frozen) => {
   lockedInvoices.value.sort((val1, val2) => val1.id - val2.id)
 }
 
+const onPageChange = (event) => {
+  currentPage.value = event.page
+}
+
 const toggleSelectAll = () => {
+  const currentPageInvoices = getCurrentPageInvoices()
+  const allCurrentPageInvoices = [...currentPageInvoices, ...lockedInvoices.value]
+  
   if (selectAll.value) {
-    selectedInvoices.value.clear()
+    // Deselect current page invoices
+    allCurrentPageInvoices.forEach(invoice => {
+      selectedInvoices.value.delete(invoice.id)
+    })
   } else {
-    // Select all without array spreading
-    invoices.value.forEach(invoice => selectedInvoices.value.add(invoice.id))
-    lockedInvoices.value.forEach(invoice => selectedInvoices.value.add(invoice.id))
+    // Select current page invoices
+    allCurrentPageInvoices.forEach(invoice => {
+      selectedInvoices.value.add(invoice.id)
+    })
   }
 }
 
@@ -607,10 +636,9 @@ const downloadInvoice = async (invoiceId) => {
     await downloadInvoicesPdf([{
       sales_invoice_erp_code: invoice.salesInvoiceNumber,
       isPickup: false
-    }])
+    }], undefined)
   } catch (error) {
-    console.error('Error downloading invoice:', error)
-    errorMessage.value = `Failed to download PDF: ${error.message}`
+    errorMessage.value = error.message || 'Unable to download invoice. Please try again.'
     showNoDataPopup.value = true
   } finally {
     downloadingInvoice.value = null
@@ -656,8 +684,8 @@ const downloadInvoices = async () => {
     
     await downloadInvoicesPdf(invoicesWithErpCodes)
   } catch (error) {
-    console.error('Error downloading invoices:', error)
-    errorMessage.value = `Failed to download PDFs: ${error.message}`
+    // Show user-friendly error message
+    errorMessage.value = error.message || 'Unable to download invoices. Please try again.'
     showNoDataPopup.value = true
   } finally {
     downloadingBulk.value = false
@@ -665,12 +693,12 @@ const downloadInvoices = async () => {
 }
 
 const downloadExcel = () => {
-  console.log('Downloading Excel format')
+
   // Implement Excel download logic
 }
 
 const downloadPDF = () => {
-  console.log('Downloading PDF format')
+
   // Implement PDF download logic
 }
 
@@ -685,16 +713,16 @@ const loadData = async () => {
     const organizationId = getOrganizationId()
     
     if (!organizationId) {
-      console.warn('No organization selected')
+  
       return
     }
     
     // Build filter payload with organization ID
     const filterPayload = buildFilterPayload(organizationId)
-    console.log('Loading invoices with filters:', filterPayload)
+
     
     const reportData = await fetchPointOfContactInvoiceReport(organizationId, filterPayload)
-    console.log('Loaded invoices data:', reportData.length, 'records')
+
     // Sort by latest date first (order date or delivery date)
     const sortedData = reportData.sort((a, b) => {
       const getDate = (item) => {
@@ -743,7 +771,7 @@ const loadData = async () => {
     nextTick(() => calculateSummaryStats())
     
   } catch (error) {
-    console.error('Error loading invoices:', error)
+
   } finally {
     loading.value = false
   }

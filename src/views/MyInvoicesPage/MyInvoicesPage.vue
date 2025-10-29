@@ -142,7 +142,21 @@
                 </template>
               </Column>
               
-              <Column header="Download" style="min-width: 100px; width: auto">
+              <Column field="aspOrderCode" header="Order Code" style="min-width: 100px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="80px" height="16px" />
+                  <span v-else>{{ data.aspOrderCode }}</span>
+                </template>
+              </Column>
+              
+              <Column field="salesInvoiceNumber" header="Sales Invoice No." style="min-width: 180px; width: auto; white-space: nowrap">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="90px" height="16px" />
+                  <span v-else>{{ data.salesInvoiceNumber }}</span>
+                </template>
+              </Column>
+              
+              <Column header="Download" style="min-width: 80px; width: auto">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="40px" height="32px" border-radius="6px" />
                   <div v-else style="display: flex; justify-content: center;">
@@ -151,20 +165,6 @@
                       :loading="downloadingInvoice === data.id"
                     />
                   </div>
-                </template>
-              </Column>
-              
-              <Column field="aspOrderCode" header="Order Code" style="min-width: 100px; width: auto">
-                <template #body="{ data }">
-                  <SkeletonLoader v-if="loading" width="80px" height="16px" />
-                  <span v-else>{{ data.aspOrderCode }}</span>
-                </template>
-              </Column>
-              
-              <Column field="salesInvoiceNumber" header="Sales Invoice No." style="min-width: 220px; width: auto; white-space: nowrap">
-                <template #body="{ data }">
-                  <SkeletonLoader v-if="loading" width="90px" height="16px" />
-                  <span v-else>{{ data.salesInvoiceNumber }}</span>
                 </template>
               </Column>
               

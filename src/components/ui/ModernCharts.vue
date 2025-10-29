@@ -82,7 +82,7 @@ ChartJS.register(
 interface DashboardData {
   order_count: number
   cancelled_count: number
-  planned_orders: number
+  pending_orders: number
   delivered_orders: number
   rescheduled_count: number
 }
@@ -126,23 +126,23 @@ const chartTitle = computed(() => {
 const pieChartData = computed(() => {
   const delivered = props.data.delivered_orders || 0
   const cancelled = props.data.cancelled_count || 0
-  const planned = props.data.planned_orders || 0
+  const pending = props.data.pending_orders || 0
   const rescheduled = props.data.rescheduled_count || 0
   
   return {
-    labels: ['Delivered', 'Cancelled', 'Planned', 'Rescheduled'],
+    labels: ['Delivered', 'Cancelled', 'Pending', 'Rescheduled'],
     datasets: [{
-      data: [delivered, cancelled, planned, rescheduled],
+      data: [delivered, cancelled, pending, rescheduled],
       backgroundColor: [
         '#22c55e', // delivered - green
         '#ef4444', // cancelled - red
-        '#8b5cf6', // planned - purple
+        '#8b5cf6', // pending - purple
         '#f59e0b'  // rescheduled - amber
       ],
       hoverBackgroundColor: [
         '#16a34a', // delivered hover
         '#dc2626', // cancelled hover
-        '#7c3aed', // planned hover
+        '#7c3aed', // pending hover
         '#d97706'  // rescheduled hover
       ]
     }]
@@ -241,9 +241,9 @@ const timeBasedChartData = computed(() => {
         maxBarThickness: 40
       },
       {
-        label: 'Planned Orders',
-        data: timeBasedData.value.map(item => item.ordersPlanned || 0),
-        backgroundColor: '#8b5cf6', // planned - purple
+        label: 'Pending Orders',
+        data: timeBasedData.value.map(item => item.ordersPending || 0),
+        backgroundColor: '#8b5cf6', // pending - purple
         borderRadius: 4,
         maxBarThickness: 40
       }
@@ -373,7 +373,7 @@ const updateTimeBasedData = (data: any[]) => {
     ordersPlaced: item.ordersPlaced || item.order_count || 0,
     ordersDelivered: item.ordersDelivered || item.delivered_orders || 0,
     ordersCancelled: item.ordersCancelled || item.cancelled_count || 0,
-    ordersPlanned: item.ordersPlanned || item.planned_orders || 0,
+    ordersPending: item.ordersPending || item.pending_orders || item.ordersPlanned || item.planned_orders || 0,
     ordersRescheduled: item.ordersRescheduled || 0,
     period: item.period || item.time_range
   }))

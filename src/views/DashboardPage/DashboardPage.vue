@@ -95,11 +95,11 @@
             </MetricCard>
 
             <MetricCard
-              title="Planned Orders"
-              variant="planned"
+              title="Pending Orders"
+              variant="pending"
               :items="[
-                { label: 'Total Count', value: formatNumber(dashboardData.totalPlannedOrders.count) },
-                { label: 'Volume (L)', value: formatNumber(dashboardData.totalPlannedOrders.quantity) }
+                { label: 'Total Count', value: formatNumber(dashboardData.totalPendingOrders.count) },
+                { label: 'Volume (L)', value: formatNumber(dashboardData.totalPendingOrders.quantity) }
               ]"
               :loading="loading"
               :animation-delay="1.0"
@@ -177,7 +177,7 @@ const modernChartsRef = ref(null)
 const chartData = computed(() => ({
   order_count: dashboardData.value.totalOrdersPlaced.count,
   cancelled_count: dashboardData.value.totalOrdersCancelled.count,
-  planned_orders: dashboardData.value.totalPlannedOrders.count,
+  pending_orders: dashboardData.value.totalPendingOrders.count,
   delivered_orders: dashboardData.value.totalOrdersDelivered.count,
   rescheduled_count: dashboardData.value.totalOrdersRescheduled.count
 }))
@@ -311,7 +311,7 @@ const initializeDashboardData = () => ({
   totalOrdersDelivered: { count: 0, quantity: 0 },
   totalOrdersRescheduled: { count: 0, quantity: 0 },
   totalOrdersCancelled: { count: 0, quantity: 0 },
-  totalPlannedOrders: { count: 0, quantity: 0 },
+  totalPendingOrders: { count: 0, quantity: 0 },
   totalCostSaved: { quantity: '0', amount: '0' }
 })
 
@@ -332,7 +332,7 @@ const getDemoData = () => ({
   totalOrdersDelivered: { count: 20, quantity: 400 },
   totalOrdersRescheduled: { count: 3, quantity: 60 },
   totalOrdersCancelled: { count: 2, quantity: 40 },
-  totalPlannedOrders: { count: 15, quantity: 300 },
+  totalPendingOrders: { count: 15, quantity: 300 },
   totalCostSaved: { quantity: '50', amount: '5000' }
 })
 
@@ -493,13 +493,13 @@ const fetchDashboardData = async (skipDefaultDates = false) => {
         count: data?.cancelled_count || 0,
         quantity: data?.cancelled_qty ? Number(data.cancelled_qty) : 0
       },
-      totalPlannedOrders: {
-        count: data?.planned_orders || 0,
-        quantity: data?.planned_qty ? Number(data.planned_qty) : 0
+      totalPendingOrders: {
+        count: data?.pending_orders || data?.planned_orders || 0,
+        quantity: data?.pending_qty ? Number(data.pending_qty) : (data?.planned_qty ? Number(data.planned_qty) : 0)
       },
       totalCostSaved: {
-        quantity: String(data?.planned_qty ?? 0),
-        amount: String((data?.planned_orders ?? 0) * 100)
+        quantity: String(data?.pending_qty ?? data?.planned_qty ?? 0),
+        amount: String((data?.pending_orders ?? data?.planned_orders ?? 0) * 100)
       }
     }
     

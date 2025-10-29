@@ -99,6 +99,10 @@
               </div>
             </div>
             <div class="topbar-right">
+              <ExportButton 
+                :orders="filteredOrders"
+                filename="my_orders"
+              />
               <input 
                 v-model="orderSearchQuery" 
                 type="text" 
@@ -270,6 +274,7 @@ import Tag from 'primevue/tag'
 import FilterBar from '@/components/ui/FilterBar.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 import ModernLoader from '@/components/ui/ModernLoader.vue'
+import ExportButton from '@/components/ui/ExportButton.vue'
 import { fetchPointOfContactDetailedReport } from '@/api/pointOfContactDetailedReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'

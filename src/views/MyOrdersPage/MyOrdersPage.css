@@ -210,6 +210,10 @@
   gap: 0.75rem;
 }
 
+.topbar-right > * {
+  flex-shrink: 0;
+}
+
 .search-input {
   height: 38px;
   padding: 0 1rem;

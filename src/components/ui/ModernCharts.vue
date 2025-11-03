@@ -389,7 +389,7 @@ defineExpose({ updateTimeBasedData })
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: hidden;

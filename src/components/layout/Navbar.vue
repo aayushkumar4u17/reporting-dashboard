@@ -105,32 +105,51 @@
   </div>
 
   <!-- Sidebar Navigation -->
-  <aside class="sidebar" :class="{ 'mobile-open': isMobileMenuOpen }">
+  <aside class="sidebar" :class="{ 'mobile-open': isMobileMenuOpen, 'collapsed': isSidebarCollapsed }">
+    <!-- Collapse Toggle Button on Border -->
+    <button 
+      class="collapse-toggle-border" 
+      @click="toggleSidebar"
+      :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <svg 
+        class="collapse-icon" 
+        :class="{ 'rotated': isSidebarCollapsed }"
+        width="14" 
+        height="14" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2.5"
+      >
+        <polyline points="15,18 9,12 15,6"/>
+      </svg>
+    </button>
     <nav class="nav-menu">
-      <router-link to="/dashboard" class="nav-item" active-class="active" @click="closeMobileMenu">
+      <router-link to="/dashboard" class="nav-item" active-class="active" @click="closeMobileMenu" data-tooltip="Dashboard">
         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"/>
           <rect x="14" y="3" width="7" height="7"/>
           <rect x="14" y="14" width="7" height="7"/>
           <rect x="3" y="14" width="7" height="7"/>
         </svg>
-        <span>Dashboard</span>
+        <span class="nav-text">Dashboard</span>
       </router-link>
-      <router-link to="/point-of-contact" class="nav-item" active-class="active" @click="closeMobileMenu">
+      <router-link to="/point-of-contact" class="nav-item" active-class="active" @click="closeMobileMenu" data-tooltip="Point of Contact">
         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
         </svg>
-        <span>Point of Contact</span>
+        <span class="nav-text">Point of Contact</span>
       </router-link>
-      <router-link to="/my-orders" class="nav-item" active-class="active" @click="closeMobileMenu">
+      <router-link to="/my-orders" class="nav-item" active-class="active" @click="closeMobileMenu" data-tooltip="My Orders">
         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
           <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
         </svg>
-        <span>My Orders</span>
+        <span class="nav-text">My Orders</span>
       </router-link>
-      <router-link to="/my-invoices" class="nav-item" active-class="active" @click="closeMobileMenu">
+      <router-link to="/my-invoices" class="nav-item" active-class="active" @click="closeMobileMenu" data-tooltip="My Invoices">
         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
@@ -138,26 +157,26 @@
           <line x1="16" y1="17" x2="8" y2="17"/>
           <polyline points="10,9 9,9 8,9"/>
         </svg>
-        <span>My Invoices</span>
+        <span class="nav-text">My Invoices</span>
       </router-link>
-      <router-link to="/payments" class="nav-item" active-class="active" @click="closeMobileMenu">
+      <router-link to="/payments" class="nav-item" active-class="active" @click="closeMobileMenu" data-tooltip="Payments">
         <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
           <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
-        <span>Payments</span>
+        <span class="nav-text">Payments</span>
       </router-link>
     </nav>
-    <div class="nav-item logout" @click="handleLogout" :class="{ 'loading': isLoggingOut }">
+    <div class="nav-item logout" @click="handleLogout" :class="{ 'loading': isLoggingOut }" data-tooltip="Logout">
       <svg v-if="!isLoggingOut" class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
         <polyline points="16,17 21,12 16,7"/>
         <line x1="21" y1="12" x2="9" y2="12"/>
       </svg>
-      <span v-if="!isLoggingOut">Logout</span>
+      <span v-if="!isLoggingOut" class="nav-text">Logout</span>
       <span v-else class="logout-loading">
         <span class="loading-spinner"></span>
-        Signing out...
+        <span class="nav-text">Signing out...</span>
       </span>
     </div>
   </aside>
@@ -174,6 +193,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { signOutUser } from '@/api/auth'
 import { useUserProfile } from '@/composables/useUserProfile'
+import { useSidebar } from '@/composables/useSidebar'
 import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
@@ -192,6 +212,9 @@ const orgLoading = ref(false)
 const orgError = ref(null)
 const searchQuery = ref('')
 const selectingOrgId = ref(null)
+
+// Use sidebar composable
+const { isSidebarCollapsed, toggleSidebar } = useSidebar()
 
 // User profile composable
 const { displayName, organizationName, fetchUserProfile, clearUserProfile, isLoading, userProfile } = useUserProfile()
@@ -222,6 +245,8 @@ const toggleMobileMenu = () => {
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
+
+// toggleSidebar is now provided by the composable
 
 const toggleUserPopup = () => {
   showUserPopup.value = !showUserPopup.value
@@ -792,6 +817,106 @@ onUnmounted(() => {
   bottom: 0;
   z-index: 999;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.collapse-toggle-border {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.collapse-toggle-border:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px var(--accent-light);
+  border-color: var(--accent-primary);
+}
+
+.collapse-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapse-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.nav-text {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed .nav-text {
+  opacity: 0;
+  transform: translateX(-10px);
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 1rem 0.75rem;
+}
+
+/* Tooltip for collapsed nav items */
+.sidebar.collapsed .nav-item {
+  position: relative;
+}
+
+.sidebar.collapsed .nav-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-glass);
+  backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  margin-left: 0.5rem;
+}
+
+.sidebar.collapsed .nav-item:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hide collapse button on mobile */
+@media (max-width: 768px) {
+  .collapse-toggle-border {
+    display: none;
+  }
+  
+  .sidebar.collapsed {
+    width: 260px;
+  }
 }
 
 /* Responsive Design */

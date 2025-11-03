@@ -1,6 +1,6 @@
 <template>
   <div class="my-orders-page">
-    <div class="orders-container" :class="{ 'fade-in': isLoaded }">
+    <div class="orders-container" :class="{ 'fade-in': isLoaded, 'sidebar-collapsed': isSidebarCollapsed }">
       <!-- Filter Bar -->
       <FilterBar
         :filters="['dateRanges', 'city', 'poc']"
@@ -280,7 +280,11 @@ import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'
 import { useFilters } from '@/composables/useFilters'
 import { usePOCFilters } from '@/composables/usePOCFilters'
+import { useSidebar } from '@/composables/useSidebar'
 import { useRouter } from 'vue-router'
+
+// Sidebar state
+const { isSidebarCollapsed } = useSidebar()
 
 // Animation state
 const isLoaded = ref(false)

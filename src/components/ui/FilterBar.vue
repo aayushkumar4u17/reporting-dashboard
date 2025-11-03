@@ -229,12 +229,12 @@ onMounted(() => {
   top: auto;
   background: var(--bg-glass);
   backdrop-filter: blur(10px);
-  padding: 1rem 2rem;
-  margin-left: -2rem;
-  margin-right: -2rem;
+  padding: 1rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 4rem;
+  gap: 1.5rem;
   align-items: flex-end;
   position: relative;
   z-index: 10;
@@ -243,8 +243,7 @@ onMounted(() => {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   border: 1px solid var(--border-color);
-  /* border-radius: 12px; */
-  /* box-shadow: 0 8px 32px var(--shadow-color), 0 0 0 1px var(--border-light); */
+  width: calc(100% + 2rem);
 }
 
 .filter-bar.animate-slide-down {
@@ -379,14 +378,16 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+
+
 @media (max-width: 768px) {
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
-    padding: 1rem;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    width: 100vw;
+    padding: 0.75rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    width: calc(100% + 1.5rem);
   }
   
   .filter-group {
@@ -409,9 +410,10 @@ onMounted(() => {
 
 @media (max-width: 480px) {
   .filter-bar {
-    padding: 0.75rem;
-    margin: 0.75rem;
-    width: calc(100% - 1.5rem);
+    padding: 0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
     gap: 0.75rem;
   }
   

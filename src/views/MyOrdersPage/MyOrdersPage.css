@@ -1,12 +1,11 @@
 .my-orders-page {
   width: 100%;
-  min-height: calc(100vh - 70px);
+  height: calc(100vh - 70px);
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
   scroll-behavior: smooth;
   box-sizing: border-box;
-  padding-top: 0.4rem;
 }
 
 .my-orders-page::before {
@@ -24,17 +23,22 @@
 .orders-container {
   width: 100%;
   max-width: none;
-  padding: 0 2rem 2rem 2rem;
+  padding: 0 1rem;
   position: relative;
   z-index: 1;
   opacity: 0;
   transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   margin: 0;
+  height: 100%;
 }
 
 .orders-container.fade-in {
   opacity: 1;
+}
+
+.orders-container.sidebar-collapsed {
+  padding: 0 1rem;
 }
 
 /* Main content layout */
@@ -338,7 +342,15 @@
   }
 }
 
+/* Sidebar collapsed styles */
+.orders-container.sidebar-collapsed .details-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
 /* Responsive Design */
+
+
 @media (max-width: 768px) {
   .my-orders-page {
     width: 100%;
@@ -346,7 +358,8 @@
   }
   
   .orders-container {
-    padding: 1rem;
+    padding: 0.75rem;
+    width: 100%;
   }
   
   /* FilterBar responsive styles are handled by the component itself */
@@ -402,7 +415,8 @@
 
 @media (max-width: 480px) {
   .orders-container {
-    padding: 0.75rem;
+    padding: 0.5rem;
+    width: 100%;
   }
   
   /* FilterBar responsive styles are handled by the component itself */

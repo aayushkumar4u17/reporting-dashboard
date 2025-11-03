@@ -3,6 +3,7 @@ import { onMounted, onErrorCaptured } from 'vue'
 import { useRouter } from "vue-router"
 import { useErrorHandler } from "@/composables/useErrorHandler"
 import { useThemeStore } from "@/stores/theme"
+import { useSidebar } from "@/composables/useSidebar"
 import Navbar from "@/components/layout/Navbar.vue"
 import ErrorNotification from "@/components/ErrorNotification.vue"
 import AuthGuard from "@/components/AuthGuard.vue"
@@ -11,6 +12,7 @@ import ErrorHandler from "@/utils/errorHandler"
 const router = useRouter()
 const { errorState, hideError, handleRetry } = useErrorHandler()
 const themeStore = useThemeStore()
+const { isSidebarCollapsed } = useSidebar()
 
 const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
 
@@ -65,11 +67,12 @@ onMounted(() => {
       <div
         v-else
         class="content-wrapper"
-        :class="
+        :class="[
           routesWithoutXPadding.includes(router.currentRoute.value.fullPath)
             ? 'with-sidebar'
-            : 'without-sidebar'
-        ">
+            : 'without-sidebar',
+          { 'sidebar-collapsed': isSidebarCollapsed }
+        ]">
         <router-view />
       </div>
     </AuthGuard>
@@ -98,24 +101,21 @@ main {
   touch-action: manipulation;
   position: relative;
 }
-.content-wrapper {
-  min-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: #00C851 #f1f1f1;
-  /* Mobile scrolling fixes */
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  position: relative;
-}
+
 
 .content-wrapper.with-sidebar {
   margin-left: 200px;
   padding-top: 64px;
   padding-left: 0;
   padding-right: 0;
+  width: calc(100vw - 200px);
+  max-width: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-wrapper.with-sidebar.sidebar-collapsed {
+  margin-left: 60px;
+  width: calc(100vw - 60px);
 }
 
 .content-wrapper.without-sidebar {
@@ -124,6 +124,8 @@ main {
   padding-right: 3rem;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
+  max-width: none;
 }
 
 .fullscreen-content {
@@ -139,6 +141,8 @@ main {
   .content-wrapper.with-sidebar {
     margin-left: 0;
     padding-top: 64px;
+    width: 100vw;
+    max-width: none;
     /* Mobile scrolling fixes */
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
@@ -148,6 +152,8 @@ main {
   .content-wrapper.without-sidebar {
     padding-left: 1rem;
     padding-right: 1rem;
+    width: 100vw;
+    max-width: none;
     /* Mobile scrolling fixes */
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;

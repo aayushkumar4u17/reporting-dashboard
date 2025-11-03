@@ -129,22 +129,20 @@ html {
 
 /* Enhanced scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--bg-secondary);
-  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
-  border-radius: 4px;
-  transition: background 0.3s ease;
+  background: var(--border-medium);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--accent-secondary), #00A844);
+  background: var(--text-secondary);
 }
 
 /* Smooth transitions for all elements */
@@ -300,6 +298,27 @@ html {
 .p-datatable .p-datatable-thead > tr > th:nth-child(2),
 .p-datatable .p-datatable-tbody > tr > td:nth-child(2) {
   padding-left: 0.25rem !important;
+}
+
+/* Ensure all page containers use full width */
+.dashboard-container,
+.orders-container,
+.poc-container,
+.invoices-container,
+.payments-container {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container,
+  .orders-container,
+  .poc-container,
+  .invoices-container,
+  .payments-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
 }
 
 

@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-page">
-    <div class="dashboard-container" :class="{ 'fade-in': isLoaded }">
+    <div class="dashboard-container" :class="{ 'fade-in': isLoaded, 'sidebar-collapsed': isSidebarCollapsed }">
         <!-- Filter Bar -->
         <FilterBar
           :key="`filter-${orgId}`"
@@ -162,9 +162,13 @@ import { fetchTimeBasedChartData } from '@/api/timeBasedChartData'
 import { fetchDashboardAnalytics, transformAnalyticsData } from '@/api/dashboardAnalytics'
 import { useFilters } from '@/composables/useFilters'
 import { usePOCFilters } from '@/composables/usePOCFilters'
+import { useSidebar } from '@/composables/useSidebar'
 import { testDashboardQueries } from '@/utils/testDashboardQueries'
 
 const router = useRouter()
+
+// Sidebar state
+const { isSidebarCollapsed } = useSidebar()
 
 // Animation state
 const isLoaded = ref(false)

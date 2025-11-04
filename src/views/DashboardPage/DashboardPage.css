@@ -46,8 +46,8 @@
 }
 
 .dashboard-container.sidebar-collapsed .metrics-grid {
-  grid-template-columns: repeat(5, 1fr);
-  gap: 2rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
 }
 
 .dashboard-container.sidebar-collapsed .analytics-grid-top,

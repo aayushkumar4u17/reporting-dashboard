@@ -2,17 +2,35 @@
 import { onMounted, onErrorCaptured } from 'vue'
 import { useRouter } from "vue-router"
 import { useErrorHandler } from "@/composables/useErrorHandler"
+import { useGlobalErrorHandler } from "@/composables/useGlobalErrorHandler"
 import { useThemeStore } from "@/stores/theme"
 import { useSidebar } from "@/composables/useSidebar"
 import Navbar from "@/components/layout/Navbar.vue"
 import ErrorNotification from "@/components/ErrorNotification.vue"
+import UserFriendlyError from "@/components/UserFriendlyError.vue"
 import AuthGuard from "@/components/AuthGuard.vue"
 import ErrorHandler from "@/utils/errorHandler"
 
 const router = useRouter()
 const { errorState, hideError, handleRetry } = useErrorHandler()
+const { globalErrorState, hideError: hideGlobalError, handleRetry: handleGlobalRetry, handleRefresh } = useGlobalErrorHandler()
 const themeStore = useThemeStore()
 const { isSidebarCollapsed } = useSidebar()
+
+const getSuggestions = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return ['Refresh the page', 'Clear browser cache', 'Contact support immediately']
+    case 'high':
+      return ['Try refreshing the page', 'Check your internet connection', 'Contact support if issue persists']
+    case 'medium':
+      return ['Refresh the page', 'Try again in a few moments', 'Check your connection']
+    case 'low':
+      return ['Try again', 'Refresh if needed']
+    default:
+      return ['Try refreshing the page', 'Contact support if needed']
+  }
+}
 
 const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
 
@@ -85,6 +103,19 @@ onMounted(() => {
       :show-retry="errorState.showRetry"
       @close="hideError"
       @retry="handleRetry"
+    />
+    
+    <UserFriendlyError
+      :show="globalErrorState.show"
+      :title="globalErrorState.title"
+      :message="globalErrorState.message"
+      :details="globalErrorState.details"
+      :severity="globalErrorState.severity"
+      :show-retry="globalErrorState.showRetry"
+      :suggestions="getSuggestions(globalErrorState.severity)"
+      @close="hideGlobalError"
+      @retry="handleGlobalRetry"
+      @refresh="handleRefresh"
     />
   </main>
 </template>

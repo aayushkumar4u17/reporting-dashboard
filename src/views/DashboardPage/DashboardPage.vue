@@ -163,12 +163,15 @@ import { fetchDashboardAnalytics, transformAnalyticsData } from '@/api/dashboard
 import { useFilters } from '@/composables/useFilters'
 import { usePOCFilters } from '@/composables/usePOCFilters'
 import { useSidebar } from '@/composables/useSidebar'
+
 import { testDashboardQueries } from '@/utils/testDashboardQueries'
 
 const router = useRouter()
 
 // Sidebar state
 const { isSidebarCollapsed } = useSidebar()
+
+
 
 // Animation state
 const isLoaded = ref(false)
@@ -403,7 +406,7 @@ const retryDashboardData = () => {
   fetchDashboardData()
 }
 
-const showError = (title: string, message: string) => {
+const showErrorDialog = (title: string, message: string) => {
   errorTitle.value = title
   errorMessage.value = message
   showErrorPopup.value = true
@@ -526,6 +529,7 @@ const fetchDashboardData = async (skipDefaultDates = false) => {
 
     
   } catch (err) {
+    console.error('Dashboard data loading error:', err)
     error.value = err instanceof Error ? err.message : String(err)
     
     // Check if it's a network error (CORS, connection issues)
@@ -535,9 +539,9 @@ const fetchDashboardData = async (skipDefaultDates = false) => {
     if (isNetworkError) {
       isOfflineMode.value = true
       dashboardData.value = getDemoData()
-      showError('Demo Mode', 'Unable to connect to server. Showing demo data.')
+      showErrorDialog('Demo Mode', 'Unable to connect to server. Showing demo data.')
     } else {
-      showError('Error', err instanceof Error ? err.message : 'Unable to load dashboard data. Please try again.')
+      showErrorDialog('Error', err instanceof Error ? err.message : 'Unable to load dashboard data. Please try again.')
       dashboardData.value = initializeDashboardData()
     }
   } finally {

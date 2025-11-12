@@ -155,6 +155,7 @@ import TermsPopup from '@/components/layout/TermsPopup.vue'
 
 import { useAuthStore } from '@/stores'
 import { useThemeStore } from '@/stores/theme'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction, startTimer } from '@/api/auth'
 import { otpRateLimiter, loginRateLimiter, formatTime } from '@/utils/rateLimiter'
 import ErrorHandler from '@/utils/errorHandler'
@@ -162,6 +163,7 @@ import ErrorHandler from '@/utils/errorHandler'
 const router = useRouter()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+const { showError, showNetworkError, showAuthError } = useGlobalErrorHandler()
 
 const phoneNumber = ref('')
 const isAgreed = ref(false)
@@ -303,13 +305,22 @@ const sendOTPHandler = async () => {
       }, 100)
     } catch (error: unknown) {
       isLoading.value = false
+      console.error('OTP send error:', error)
       
       const safeError = ErrorHandler.handleError(error, { component: 'LoginPage', action: 'sendOTP' })
-      authStore.showErrorPopup({
-        title: safeError.severity === 'critical' ? 'Critical Error' : 'Error Sending OTP',
-        message: safeError.userMessage,
-        showRetry: safeError.shouldRetry
-      })
+      
+      // Use global error handler for better UX
+      if (safeError.category === 'network') {
+        showNetworkError(() => sendOTPHandler())
+      } else if (safeError.category === 'auth') {
+        showAuthError()
+      } else {
+        authStore.showErrorPopup({
+          title: safeError.severity === 'critical' ? 'Critical Error' : 'Error Sending OTP',
+          message: safeError.userMessage,
+          showRetry: safeError.shouldRetry
+        })
+      }
     }
   }
 }
@@ -359,21 +370,35 @@ const verifyOTPHandler = async () => {
       // Clear OTP on error
       otpCode.value = ''
       isVerifying.value = false
+      console.error('OTP verification error:', error)
       
-      // Show appropriate error message
-      if (error && typeof error === 'object' && 'code' in error) {
-        if (error.code === 'auth/invalid-verification-code') {
-          authStore.showErrorPopup({
-            title: 'Incorrect OTP',
-            message: 'Incorrect OTP. Please try again.',
-            showRetry: true
-          })
-        } else if (error.code === 'auth/code-expired') {
-          authStore.showErrorPopup({
-            title: 'OTP Expired',
-            message: 'The OTP has expired. Please request a new one.',
-            showRetry: true
-          })
+      const safeError = ErrorHandler.handleError(error, { component: 'LoginPage', action: 'verifyOTP' })
+      
+      // Use global error handler for network issues, fallback to auth store for OTP-specific errors
+      if (safeError.category === 'network') {
+        showNetworkError(() => verifyOTPHandler())
+      } else {
+        // Show appropriate error message
+        if (error && typeof error === 'object' && 'code' in error) {
+          if (error.code === 'auth/invalid-verification-code') {
+            authStore.showErrorPopup({
+              title: 'Incorrect OTP',
+              message: 'Incorrect OTP. Please try again.',
+              showRetry: true
+            })
+          } else if (error.code === 'auth/code-expired') {
+            authStore.showErrorPopup({
+              title: 'OTP Expired',
+              message: 'The OTP has expired. Please request a new one.',
+              showRetry: true
+            })
+          } else {
+            authStore.showErrorPopup({
+              title: 'Verification Error',
+              message: 'An error occurred during verification. Please try again.',
+              showRetry: true
+            })
+          }
         } else {
           authStore.showErrorPopup({
             title: 'Verification Error',
@@ -381,12 +406,6 @@ const verifyOTPHandler = async () => {
             showRetry: true
           })
         }
-      } else {
-        authStore.showErrorPopup({
-          title: 'Verification Error',
-          message: 'An error occurred during verification. Please try again.',
-          showRetry: true
-        })
       }
     }
   }

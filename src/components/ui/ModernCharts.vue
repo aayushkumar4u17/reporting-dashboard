@@ -15,7 +15,38 @@
           </div>
         </div>
         <div v-else class="pie-chart-wrapper">
-          <Chart type="pie" :data="pieChartData" :options="pieChartOptions" class="pie-chart-canvas" />
+          <div v-if="!hasData" class="no-data-placeholder">
+            <div class="liquid-chart">
+              <div class="morphing-blob"></div>
+              <div class="particle particle-1"></div>
+              <div class="particle particle-2"></div>
+              <div class="particle particle-3"></div>
+              <div class="particle particle-4"></div>
+              <div class="particle particle-5"></div>
+              <div class="liquid-center">
+                <div class="liquid-icon">📊</div>
+                <div class="liquid-text">Loading insights...</div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="pie-chart-container">
+            <Chart type="pie" :data="pieChartData" :options="pieChartOptions" class="pie-chart-canvas" />
+            <div class="custom-legend">
+              <div 
+                v-for="(label, index) in pieChartData.labels" 
+                :key="index"
+                class="legend-item"
+              >
+                <div 
+                  class="legend-color" 
+                  :style="{ backgroundColor: pieChartData.datasets[0].backgroundColor[index] }"
+                ></div>
+                <span class="legend-text">
+                  {{ label }}: {{ getPercentage(pieChartData.datasets[0].data[index]) }}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -144,10 +175,20 @@ const pieChartData = computed(() => {
         '#dc2626', // cancelled hover
         '#7c3aed', // pending hover
         '#d97706'  // rescheduled hover
-      ]
+      ],
+      borderWidth: 0,
+      hoverBorderWidth: 2,
+      hoverBorderColor: '#ffffff'
     }]
   }
 })
+
+const hasData = computed(() => {
+  const total = pieChartData.value.datasets[0].data.reduce((a: number, b: number) => a + b, 0)
+  return total > 0
+})
+
+
 
 const pieChartOptions = computed(() => {
   const documentStyle = getComputedStyle(document.documentElement)
@@ -159,48 +200,43 @@ const pieChartOptions = computed(() => {
     maintainAspectRatio: false,
     layout: {
       padding: {
-        top: 2,
-        bottom: 2,
-        left: 1,
-        right: 1
+        top: 10,
+        bottom: 10,
+        left: 10,
+        right: 10
       }
     },
     plugins: {
       legend: {
-        position: isMobile ? 'bottom' : 'right',
-        labels: {
-          usePointStyle: true,
-          color: textColor,
-          padding: isMobile ? 8 : 12,
-          font: { size: isMobile ? 10 : 12 },
-          boxWidth: isMobile ? 8 : 12,
-          generateLabels: (chart: any) => {
-            const data = chart.data
-            if (data.labels.length && data.datasets.length) {
-              return data.labels.map((label: string, i: number) => {
-                const value = data.datasets[0].data[i]
-                return {
-                  text: `${label}: ${value}`,
-                  fillStyle: data.datasets[0].backgroundColor[i],
-                  strokeStyle: data.datasets[0].backgroundColor[i],
-                  lineWidth: 0,
-                  pointStyle: 'circle',
-                  hidden: false,
-                  index: i
-                }
-              })
-            }
-            return []
-          }
-        }
+        display: false // Hide default legend to create custom one
       },
       tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#ffffff',
+        borderWidth: 1,
+        cornerRadius: 8,
+        displayColors: true,
         callbacks: {
           label: (context: any) => {
-            return `${context.label}: ${context.parsed} orders`
+            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+            const percentage = ((context.parsed / total) * 100).toFixed(0)
+            return `${context.label}: ${percentage}%`
           }
         }
       }
+    },
+    elements: {
+      arc: {
+        borderWidth: 0,
+        hoverBorderWidth: 3,
+        hoverBorderColor: '#ffffff'
+      }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'nearest'
     }
   }
 })
@@ -317,6 +353,12 @@ const timeBasedChartOptions = computed(() => {
 })
 
 // Methods
+const getPercentage = (value: number) => {
+  const total = pieChartData.value.datasets[0].data.reduce((a: number, b: number) => a + b, 0)
+  if (total === 0) return 0
+  return Math.round((value / total) * 100)
+}
+
 const setActivePeriod = async (period: string) => {
   if (period === activePeriod.value || barChartLoading.value) return
   
@@ -583,12 +625,201 @@ defineExpose({ updateTimeBasedData })
   box-sizing: border-box;
 }
 
-.pie-chart-canvas {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 500px;
-  max-height: 380px;
+.pie-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
 }
+
+.pie-chart-canvas {
+  width: 280px !important;
+  height: 280px !important;
+  flex-shrink: 0;
+}
+
+.custom-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 150px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.no-data-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.liquid-chart {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.morphing-blob {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #22c55e, #f59e0b);
+  background-size: 400% 400%;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  opacity: 0.1;
+  animation: morphBlob 4s ease-in-out infinite, gradientShift 3s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.particle-1 {
+  background: #22c55e;
+  top: 30px;
+  left: 60px;
+  animation: float1 2.5s ease-in-out infinite;
+}
+
+.particle-2 {
+  background: #ef4444;
+  top: 60px;
+  right: 40px;
+  animation: float2 3s ease-in-out infinite;
+}
+
+.particle-3 {
+  background: #8b5cf6;
+  bottom: 50px;
+  left: 80px;
+  animation: float3 2.8s ease-in-out infinite;
+}
+
+.particle-4 {
+  background: #f59e0b;
+  top: 80px;
+  left: 40px;
+  animation: float4 3.2s ease-in-out infinite;
+}
+
+.particle-5 {
+  background: #06b6d4;
+  bottom: 70px;
+  right: 60px;
+  animation: float5 2.7s ease-in-out infinite;
+}
+
+.liquid-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.liquid-icon {
+  font-size: 1.5rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.liquid-text {
+  color: #6b7280;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+@keyframes morphBlob {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: rotate(90deg) scale(1.1);
+  }
+  50% {
+    border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+    transform: rotate(180deg) scale(0.9);
+  }
+  75% {
+    border-radius: 60% 40% 60% 40% / 70% 30% 50% 60%;
+    transform: rotate(270deg) scale(1.05);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(180deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translateX(0px) rotate(0deg); }
+  50% { transform: translateX(12px) rotate(-180deg); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  50% { transform: translate(-10px, -8px) rotate(180deg); }
+}
+
+@keyframes float4 {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  50% { transform: translate(8px, 12px) rotate(-180deg); }
+}
+
+@keyframes float5 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(180deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+
 
 .bar-chart {
   position: relative;
@@ -663,9 +894,31 @@ defineExpose({ updateTimeBasedData })
     padding: 0.25rem;
   }
   
+  .pie-chart-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
   .pie-chart-canvas {
-    max-width: 320px;
-    max-height: 250px;
+    width: 220px !important;
+    height: 220px !important;
+  }
+  
+  .custom-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: auto;
+  }
+  
+  .legend-item {
+    font-size: 0.75rem;
+  }
+  
+  .legend-color {
+    width: 10px;
+    height: 10px;
   }
   
   .donut-skeleton {
@@ -734,8 +987,17 @@ defineExpose({ updateTimeBasedData })
   }
   
   .pie-chart-canvas {
-    max-width: 260px;
-    max-height: 220px;
+    width: 180px !important;
+    height: 180px !important;
+  }
+  
+  .legend-item {
+    font-size: 0.7rem;
+  }
+  
+  .legend-color {
+    width: 8px;
+    height: 8px;
   }
 }
 

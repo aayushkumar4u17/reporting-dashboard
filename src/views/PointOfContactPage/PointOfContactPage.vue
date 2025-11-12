@@ -137,6 +137,7 @@ import { fetchPointOfContactReport } from '@/api/pointOfContact'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganization } from '@/composables/useOrganization'
 import { useFilters } from '@/composables/useFilters'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import { useRouter } from 'vue-router'
 
 // Animation state
@@ -145,6 +146,7 @@ const loading = ref(true)
 
 // Filter states using composable
 const { filters, clearFilters } = useFilters()
+const { showError, showDataLoadError, showNetworkError } = useGlobalErrorHandler()
 const router = useRouter()
 
 // Navigation functions
@@ -273,8 +275,15 @@ const handleApplyFilters = async (newFilters) => {
     const mappedData = mapLocationData(response.contacts)
     locations.value = mappedData
   } catch (error) {
-
+    console.error('Error loading filtered contacts:', error)
     locations.value = []
+    
+    // Show appropriate error based on error type
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => handleApplyFilters(appliedFilters.value))
+    } else {
+      showDataLoadError(() => handleApplyFilters(appliedFilters.value))
+    }
   } finally {
     loading.value = false
   }
@@ -299,10 +308,17 @@ const loadInitialData = async () => {
     allLocations.value = mappedData
     locations.value = mappedData
   } catch (error) {
-
+    console.error('Error loading contacts data:', error)
     initialData.value = []
     allLocations.value = []
     locations.value = []
+    
+    // Show appropriate error based on error type
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadInitialData())
+    } else {
+      showDataLoadError(() => loadInitialData())
+    }
   } finally {
     loading.value = false
   }

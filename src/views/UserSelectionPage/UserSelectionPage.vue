@@ -107,6 +107,7 @@ import { useUserStore } from '@/stores'
 import { useThemeStore } from '@/stores/theme'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useOrganizationStore } from '@/stores/organization'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 
 const router = useRouter()
@@ -114,6 +115,7 @@ const userStore = useUserStore()
 const themeStore = useThemeStore()
 const pointOfContactStore = usePointOfContactStore()
 const organizationStore = useOrganizationStore()
+const { showError, showNetworkError, showAuthError, showDataLoadError } = useGlobalErrorHandler()
 const organizations = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -340,6 +342,15 @@ const fetchOrganizations = async () => {
       error.value = 'Development Mode: Unable to load organizations. This may be due to backend services not running locally.'
     } else {
       error.value = 'Failed to load organizations. Please try again.'
+      
+      // Show global error for better UX
+      if (err.message?.includes('network') || err.message?.includes('fetch')) {
+        showNetworkError(() => retryFetch())
+      } else if (err.message?.includes('auth') || err.message?.includes('Authentication')) {
+        showAuthError()
+      } else {
+        showDataLoadError(() => retryFetch())
+      }
     }
     
     organizations.value = []
@@ -386,9 +397,12 @@ const checkAuthAndFetch = async () => {
     // Fetch fresh data
     await fetchOrganizations()
   } catch (err) {
-
+    console.error('Authentication check error:', err)
     error.value = 'Authentication error. Please try logging in again.'
     loading.value = false
+    
+    // Show auth error for better UX
+    showAuthError()
   }
 }
 

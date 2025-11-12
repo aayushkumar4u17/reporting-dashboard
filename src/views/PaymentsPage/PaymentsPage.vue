@@ -238,6 +238,7 @@ import PaymentStatusModal from '@/components/ui/PaymentStatusModal.vue'
 import PayViaModal from '@/components/ui/PayViaModal.vue'
 import ModernLoader from '@/components/ui/ModernLoader.vue'
 import { useOrganization } from '@/composables/useOrganization'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import { fetchPointOfContactPaymentReport, mapPaymentData, calculateSummary } from '@/api/pointOfContactPaymentReport'
 import { generatePaymentsPDF } from '@/utils/pdfGenerator'
 import { 
@@ -345,6 +346,7 @@ const availableCredit = computed(() => {
 
 
 const { getOrganizationId, watchOrganizationChange } = useOrganization()
+const { showError, showDataLoadError, showNetworkError, showServerError } = useGlobalErrorHandler()
 let unwatchOrganization = null
 
 // Tabs
@@ -466,7 +468,8 @@ const loadData = async () => {
 
     
   } catch (error) {
-
+    console.error('Error loading payment data:', error)
+    
     // Clear all data on error
     payments.value = []
     walletTransactions.value = []
@@ -476,6 +479,15 @@ const loadData = async () => {
       availableBalance: '₹ 0',
       totalOutstanding: '₹ 0',
       totalOverdue: '₹ 0'
+    }
+    
+    // Show appropriate error based on error type
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadData())
+    } else if (error?.message?.includes('500') || error?.message?.includes('server')) {
+      showServerError(() => loadData())
+    } else {
+      showDataLoadError(() => loadData())
     }
   } finally {
     loading.value = false
@@ -556,6 +568,14 @@ const refreshWalletData = async (silent = false) => {
     console.error('Error refreshing wallet data:', error)
     // Set empty wallet structure on error
     walletDetails.value = { wallet: [] }
+    
+    if (!silent) {
+      if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+        showNetworkError(() => refreshWalletData())
+      } else {
+        showError(error, { component: 'PaymentsPage', action: 'refreshWalletData' })
+      }
+    }
   } finally {
     if (!silent) loading.value = false
   }
@@ -900,6 +920,10 @@ onMounted(() => {
   loadData()
   unwatchOrganization = watchOrganizationChange((newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
+      // Reset filters when organization changes
+      searchQuery.value = ''
+      activeTab.value = 'all'
+      
       // Immediately clear data when organization changes
       walletTransactions.value = []
       paymentReportData.value = null

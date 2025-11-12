@@ -353,17 +353,21 @@ export type DashboardAnalyticsInput = {
 
 export type DashboardAnalyticsOutput = {
   __typename?: 'DashboardAnalyticsOutput';
-  months: Array<DashboardData>;
+  last3months: Array<DashboardData>;
+  last4months: Array<DashboardData>;
   weeks: Array<DashboardData>;
-  year: Array<DashboardData>;
 };
 
 export type DashboardData = {
   __typename?: 'DashboardData';
   cancelled_count: Scalars['Int']['output'];
+  cancelled_qty: Scalars['Float']['output'];
   delivered_orders: Scalars['Int']['output'];
+  delivered_qty: Scalars['Float']['output'];
   order_count: Scalars['Int']['output'];
+  ordered_qty: Scalars['Float']['output'];
   planned_orders: Scalars['Int']['output'];
+  planned_qty: Scalars['Float']['output'];
   time_range: Scalars['String']['output'];
 };
 
@@ -5889,8 +5893,10 @@ export type CustomerWiseDeliveryReportInput = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type CustomerWiseDeliveryReportOutput = {
@@ -5904,8 +5910,10 @@ export type CustomerWiseDeliveryReportv1Input = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type CustomerWiseDeliveryReportv1Output = {
@@ -27502,6 +27510,20 @@ export type FetchCustomerAddressOutput = {
   data?: Maybe<Scalars['jsonb']['output']>;
 };
 
+export type FetchCustomerDeliveryOrderRequestsInput = {
+  end_date: Scalars['timestamp']['input'];
+  limit: Scalars['numeric']['input'];
+  offset: Scalars['numeric']['input'];
+  organization_user_id: Scalars['uuid']['input'];
+  start_date: Scalars['timestamp']['input'];
+  state: Array<InputMaybe<Scalars['String']['input']>>;
+};
+
+export type FetchCustomerDeliveryOrderRequestsOutput = {
+  __typename?: 'fetchCustomerDeliveryOrderRequestsOutput';
+  data: Scalars['jsonb']['output'];
+};
+
 export type FetchCustomerDeliveryOrdersInput = {
   end_date: Scalars['timestamp']['input'];
   limit: Scalars['numeric']['input'];
@@ -27572,6 +27594,27 @@ export type FetchCustomerOrderDetailsByIdInput = {
 export type FetchCustomerOrderDetailsByIdOutput = {
   __typename?: 'fetchCustomerOrderDetailsByIdOutput';
   data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type FetchCustomerOrderRequestByRequestCodeInput = {
+  organization_user_id: Scalars['uuid']['input'];
+  request_code: Scalars['bigint']['input'];
+  state?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type FetchCustomerOrderRequestByRequestCodeOutput = {
+  __typename?: 'fetchCustomerOrderRequestByRequestCodeOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type FetchCustomerOrderRequestDetailsByIdInput = {
+  organization_user_id: Scalars['uuid']['input'];
+  request_id: Scalars['uuid']['input'];
+};
+
+export type FetchCustomerOrderRequestDetailsByIdOutput = {
+  __typename?: 'fetchCustomerOrderRequestDetailsByIdOutput';
+  data: Scalars['jsonb']['output'];
 };
 
 export type FetchCustomerOrdersForUserInput = {
@@ -27903,8 +27946,10 @@ export type FetchInqueueOrdersAndQtyForMonthInput = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type FetchInqueueOrdersAndQtyForMonthOutput = {
@@ -27918,8 +27963,10 @@ export type FetchInqueueOrdersAndQtyForMonthV1Input = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type FetchInqueueOrdersAndQtyForMonthV1Output = {
@@ -27933,8 +27980,10 @@ export type FetchInqueueOrdersAndQtyWithDatesInput = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type FetchInqueueOrdersAndQtyWithDatesOutput = {
@@ -93883,6 +93932,7 @@ export type Query_Root = {
   fetchCumulativeInqueueOrdersAndQty?: Maybe<FetchCumulativeInqueueOrdersAndQtyOutput>;
   fetchCumulativeInqueueOrdersAndQtyV1?: Maybe<FetchCumulativeInqueueOrdersAndQtyV1Output>;
   fetchCustomerAddress?: Maybe<FetchCustomerAddressOutput>;
+  fetchCustomerDeliveryOrderRequests?: Maybe<FetchCustomerDeliveryOrderRequestsOutput>;
   fetchCustomerDeliveryOrders?: Maybe<FetchCustomerDeliveryOrdersOutput>;
   fetchCustomerIdsReport?: Maybe<FetchCustomerIdsReportOutput>;
   fetchCustomerLiveStreamData?: Maybe<FetchCustomerLiveStreamDataOutput>;
@@ -93890,6 +93940,8 @@ export type Query_Root = {
   fetchCustomerOrderByOrderCode?: Maybe<FetchCustomerOrderByOrderCodeOutput>;
   fetchCustomerOrderCountForUser?: Maybe<FetchCustomerOrderCountForUserOutput>;
   fetchCustomerOrderDetailsById?: Maybe<FetchCustomerOrderDetailsByIdOutput>;
+  fetchCustomerOrderRequestByRequestCode?: Maybe<FetchCustomerOrderRequestByRequestCodeOutput>;
+  fetchCustomerOrderRequestDetailsById?: Maybe<FetchCustomerOrderRequestDetailsByIdOutput>;
   fetchCustomerOrdersForUser?: Maybe<FetchCustomerOrdersForUserOutput>;
   fetchCustomerOrdersForUserLarge?: Maybe<FetchCustomerOrdersForUserLargeOutput>;
   fetchCustomerOrdersForUserV1?: Maybe<FetchCustomerOrdersForUserV1Output>;
@@ -93975,6 +94027,7 @@ export type Query_Root = {
   fetchVehicleLiveData?: Maybe<VehicleLiveDataOutput>;
   fetchVehicleLiveDataForDashboard?: Maybe<FetchVehicleLiveDataForDashboardOutput>;
   fetchVehicleLiveDataV1?: Maybe<VehicleLiveDataV1Output>;
+  fetchVehicleLiveDataV2?: Maybe<VehicleLiveDataOutputV2>;
   /** fetch data from the table: "fetch_marker_orders" */
   fetch_marker_orders: Array<Fetch_Marker_Orders>;
   /** fetch aggregated fields from the table: "fetch_marker_orders" */
@@ -97021,6 +97074,11 @@ export type Query_RootFetchCustomerAddressArgs = {
 };
 
 
+export type Query_RootFetchCustomerDeliveryOrderRequestsArgs = {
+  object: FetchCustomerDeliveryOrderRequestsInput;
+};
+
+
 export type Query_RootFetchCustomerDeliveryOrdersArgs = {
   object: FetchCustomerDeliveryOrdersInput;
 };
@@ -97043,6 +97101,16 @@ export type Query_RootFetchCustomerOrderCountForUserArgs = {
 
 export type Query_RootFetchCustomerOrderDetailsByIdArgs = {
   object: FetchCustomerOrderDetailsByIdInput;
+};
+
+
+export type Query_RootFetchCustomerOrderRequestByRequestCodeArgs = {
+  object: FetchCustomerOrderRequestByRequestCodeInput;
+};
+
+
+export type Query_RootFetchCustomerOrderRequestDetailsByIdArgs = {
+  object: FetchCustomerOrderRequestDetailsByIdInput;
 };
 
 
@@ -97418,6 +97486,11 @@ export type Query_RootFetchVehicleLiveDataForDashboardArgs = {
 
 export type Query_RootFetchVehicleLiveDataV1Args = {
   object: VehicleLiveDataV1Input;
+};
+
+
+export type Query_RootFetchVehicleLiveDataV2Args = {
+  object: VehicleLiveDataInputV2;
 };
 
 
@@ -102814,8 +102887,10 @@ export type RescheduledOrdersReportInput = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type RescheduledOrdersReportOutput = {
@@ -102829,8 +102904,10 @@ export type RescheduledOrdersReportV1Input = {
   cities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   customer_ids?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   end_date: Scalars['timestamp']['input'];
+  end_time?: InputMaybe<Scalars['timetz']['input']>;
   site_type?: InputMaybe<Scalars['String']['input']>;
   start_date: Scalars['timestamp']['input'];
+  start_time?: InputMaybe<Scalars['timetz']['input']>;
 };
 
 export type RescheduledOrdersReportV1Output = {
@@ -129179,8 +129256,20 @@ export type VehicleLiveDataInput = {
   start_date: Scalars['timestamp']['input'];
 };
 
+export type VehicleLiveDataInputV2 = {
+  end_date: Scalars['timestamp']['input'];
+  partner_id: Scalars['uuid']['input'];
+  registration_number?: InputMaybe<Array<Scalars['String']['input']>>;
+  start_date: Scalars['timestamp']['input'];
+};
+
 export type VehicleLiveDataOutput = {
   __typename?: 'vehicleLiveDataOutput';
+  data?: Maybe<Scalars['jsonb']['output']>;
+};
+
+export type VehicleLiveDataOutputV2 = {
+  __typename?: 'vehicleLiveDataOutputV2';
   data?: Maybe<Scalars['jsonb']['output']>;
 };
 
@@ -134884,26 +134973,12 @@ export type Wallet_Variance_Order_By = {
   van_number?: InputMaybe<Order_By>;
 };
 
-export type DashboardAnalyticsQueryVariables = Exact<{
-  orgId: Scalars['String']['input'];
-}>;
-
-
-export type DashboardAnalyticsQuery = { __typename?: 'query_root', dashboardAnalytics?: { __typename?: 'DashboardAnalyticsOutput', months: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }>, weeks: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }>, year: Array<{ __typename?: 'DashboardData', cancelled_count: number, delivered_orders: number, order_count: number, planned_orders: number, time_range: string }> } | null };
-
-export type FetchMultipleInvoicesPdfQueryVariables = Exact<{
-  object: FetchMultipleInvoiceInput;
-}>;
-
-
-export type FetchMultipleInvoicesPdfQuery = { __typename?: 'query_root', fetchMultipleInvoicesPdf: { __typename?: 'FetchMultipleInvoiceOutput', message: string, code: number, error?: string | null, data: { __typename?: 'InvoiceData', zipFile?: string | null, totalCount?: number | null, successCount?: number | null, failCount?: number | null, singlePdf?: string | null, success?: boolean | null, sales_invoice_erp_code?: string | null, summary?: Array<{ __typename?: 'InvoiceSummary', sales_invoice_erp_code: string, success: boolean, error?: string | null }> | null } } };
-
 export type FetchUserOrganizationsQueryVariables = Exact<{
   user_id: Scalars['uuid']['input'];
 }>;
 
 
-export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, created_at?: any | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null, brand_logo?: string | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
+export type FetchUserOrganizationsQuery = { __typename?: 'query_root', organization_user: Array<{ __typename?: 'organization_user', id: any, user_id: any, is_active: boolean, is_owner: boolean, organization_id: any, organization_user_type?: string | null, role_id?: any | null, created_at?: any | null, role?: { __typename?: 'role', id: any, role?: string | null } | null, organization: { __typename?: 'organization', id: any, name?: string | null, is_active: boolean, created_at?: any | null, brand_logo?: string | null }, user: { __typename?: 'user', id: any, first_name?: string | null, last_name?: string | null, phone_number?: string | null, email?: string | null, created_at?: any | null } }> };
 
 export type PointOfContactDashboardQueryVariables = Exact<{
   org_id: Scalars['String']['input'];
@@ -135016,60 +135091,10 @@ export type GetWalletLedgerQueryVariables = Exact<{
 export type GetWalletLedgerQuery = { __typename?: 'query_root', user_ledger: Array<{ __typename?: 'user_ledger', id: any, amount?: any | null, created_at?: any | null, payment_type?: Payment_Type_Enum | null, transaction_details: string, invoice?: { __typename?: 'invoice', id: any, amount?: any | null, sales_invoice_erp_code?: string | null, erp_sales_invoice_status?: string | null } | null }>, user_ledger_aggregate: { __typename?: 'user_ledger_aggregate', aggregate?: { __typename?: 'user_ledger_aggregate_fields', count: number, sum?: { __typename?: 'user_ledger_sum_fields', amount?: any | null } | null } | null } };
 
 
-export const DashboardAnalyticsDocument = gql`
-    query DashboardAnalytics($orgId: String!) {
-  dashboardAnalytics(object: {org_id: $orgId}) {
-    months {
-      cancelled_count
-      delivered_orders
-      order_count
-      planned_orders
-      time_range
-    }
-    weeks {
-      cancelled_count
-      delivered_orders
-      order_count
-      planned_orders
-      time_range
-    }
-    year {
-      cancelled_count
-      delivered_orders
-      order_count
-      planned_orders
-      time_range
-    }
-  }
-}
-    `;
-export const FetchMultipleInvoicesPdfDocument = gql`
-    query FetchMultipleInvoicesPdf($object: FetchMultipleInvoiceInput!) {
-  fetchMultipleInvoicesPdf(object: $object) {
-    message
-    code
-    error
-    data {
-      zipFile
-      totalCount
-      successCount
-      failCount
-      summary {
-        sales_invoice_erp_code
-        success
-        error
-      }
-      singlePdf
-      success
-      sales_invoice_erp_code
-    }
-  }
-}
-    `;
 export const FetchUserOrganizationsDocument = gql`
     query fetchUserOrganizations($user_id: uuid!) {
   organization_user(
-    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, is_owner: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}}
+    where: {user_id: {_eq: $user_id}, is_active: {_eq: true}, organization_user_type: {_eq: "DELIVERY"}, _or: [{is_owner: {_eq: true}}, {_and: [{is_owner: {_eq: false}}, {role: {role: {_in: ["owner", "manager"]}}}]}]}
   ) {
     id
     user_id
@@ -135077,6 +135102,11 @@ export const FetchUserOrganizationsDocument = gql`
     is_owner
     organization_id
     organization_user_type
+    role_id
+    role {
+      id
+      role
+    }
     organization {
       id
       name
@@ -135310,12 +135340,6 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    DashboardAnalytics(variables: DashboardAnalyticsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DashboardAnalyticsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<DashboardAnalyticsQuery>({ document: DashboardAnalyticsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'DashboardAnalytics', 'query', variables);
-    },
-    FetchMultipleInvoicesPdf(variables: FetchMultipleInvoicesPdfQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<FetchMultipleInvoicesPdfQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<FetchMultipleInvoicesPdfQuery>({ document: FetchMultipleInvoicesPdfDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'FetchMultipleInvoicesPdf', 'query', variables);
-    },
     fetchUserOrganizations(variables: FetchUserOrganizationsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<FetchUserOrganizationsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<FetchUserOrganizationsQuery>({ document: FetchUserOrganizationsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'fetchUserOrganizations', 'query', variables);
     },

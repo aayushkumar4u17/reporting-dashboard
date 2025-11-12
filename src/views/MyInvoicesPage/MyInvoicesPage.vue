@@ -189,17 +189,17 @@
                 </template>
               </Column>
               
-              <Column field="orderedQuantity" header="Order Qty" style="min-width: 120px; width: auto">
+              <Column field="orderedQuantity" header="Order Qty" style="min-width: 120px; width: auto; text-align: center">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="50px" height="16px" />
-                  <span v-else>{{ data.orderedQuantity }}</span>
+                  <span v-else style="display: block; text-align: center">{{ data.orderedQuantity }}</span>
                 </template>
               </Column>
               
-              <Column field="deliveredQuantity" header="Delivery Qty" style="min-width: 130px; width: auto">
+              <Column field="deliveredQuantity" header="Delivery Qty" style="min-width: 130px; width: auto; text-align: center">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="50px" height="16px" />
-                  <span v-else>{{ data.deliveredQuantity }}</span>
+                  <span v-else style="display: block; text-align: center">{{ data.deliveredQuantity }}</span>
                 </template>
               </Column>
               
@@ -322,6 +322,7 @@ import { fetchPointOfContactInvoiceReport } from '@/api/pointOfContactInvoiceRep
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
 import { useOrganization } from '@/composables/useOrganization'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import { downloadInvoices as downloadInvoicesPdf } from '@/api/salesInvoicePdf'
 import { usePOCFilters } from '@/composables/usePOCFilters'
 import { useRouter } from 'vue-router'
@@ -341,6 +342,7 @@ const rowsPerPage = 10
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
 const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
+const { showError, showDataLoadError, showNetworkError } = useGlobalErrorHandler()
 const router = useRouter()
 
 // Navigation functions
@@ -360,11 +362,32 @@ const navigateToDashboard = () => {
   router.push('/dashboard')
 }
 
+// Get current date in YYYY-MM-DD format
+const getCurrentDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+// Get current date range (today only)
+const getCurrentDateRange = () => {
+  const today = new Date()
+  const currentDate = today.toISOString().split('T')[0]
+  
+  return {
+    from: currentDate,
+    to: currentDate
+  }
+}
+
+const currentDateRange = getCurrentDateRange()
+
 const filterValues = ref({
   orderDateFrom: '',
   orderDateTo: '',
   deliveryDateFrom: '',
   deliveryDateTo: '',
+  orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+  deliveryDateRange: { from: '', to: '' },
   city: '',
   poc: '',
   search: ''
@@ -638,6 +661,7 @@ const downloadInvoice = async (invoiceId) => {
       isPickup: false
     }], undefined)
   } catch (error) {
+    console.error('Error downloading invoice:', error)
     errorMessage.value = error.message || 'Unable to download invoice. Please try again.'
     showNoDataPopup.value = true
   } finally {
@@ -684,6 +708,7 @@ const downloadInvoices = async () => {
     
     await downloadInvoicesPdf(invoicesWithErpCodes)
   } catch (error) {
+    console.error('Error downloading invoices:', error)
     // Show user-friendly error message
     errorMessage.value = error.message || 'Unable to download invoices. Please try again.'
     showNoDataPopup.value = true
@@ -708,13 +733,29 @@ const { getOrganizationId, watchOrganizationChange } = useOrganization()
 // Watch for organization changes
 let unwatchOrganization = null
 
+const formatDate = (value) => {
+  if (!value) return ''
+  const date = typeof value === 'string' ? new Date(value) : value
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
+
 const loadData = async () => {
   try {
     const organizationId = getOrganizationId()
     
     if (!organizationId) {
-  
       return
+    }
+    
+    // Use current date if no filters are applied
+    if (!filters.value.orderedDateFrom && !filters.value.deliveredDateFrom) {
+      const currentDate = getCurrentDate()
+      filters.value.orderedDateFrom = currentDate
+      filters.value.orderedDateTo = currentDate
     }
     
     // Build filter payload with organization ID
@@ -753,8 +794,8 @@ const loadData = async () => {
       aspOrderCode: item.app_order_code || '',
       salesInvoiceNumber: item.invoice || '',
       salesOrderCode: item.erp_order_code || '',
-      orderedDate: item.order_date?.value || item.order_date || '',
-      deliveredDate: item.delivered_date?.value || item.delivered_date || '',
+      orderedDate: formatDate(item.order_date?.value || item.order_date || ''),
+      deliveredDate: formatDate(item.delivered_date?.value || item.delivered_date || ''),
       orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
       deliveredQuantity: item.order_delivered_qty ? `${item.order_delivered_qty} Ltr` : '0 Ltr',
       amount: `₹ ${(parseFloat(item.order_amount) || 0).toFixed(2)}`,
@@ -771,7 +812,24 @@ const loadData = async () => {
     nextTick(() => calculateSummaryStats())
     
   } catch (error) {
-
+    console.error('Error loading invoices data:', error)
+    
+    // Clear data on error
+    invoices.value = []
+    summaryStats.value = {
+      totalInvoices: 0,
+      totalAmount: '0.00',
+      pendingDeliveries: 0,
+      totalFuelVolume: '0',
+      deliveryEfficiency: '0'
+    }
+    
+    // Show appropriate error based on error type
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadData())
+    } else {
+      showDataLoadError(() => loadData())
+    }
   } finally {
     loading.value = false
   }
@@ -798,7 +856,35 @@ onMounted(async () => {
   unwatchOrganization = watchOrganizationChange(async (newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
       loading.value = true
+      
+      // Reset all filters when organization changes
+      filterValues.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+        deliveryDateRange: { from: '', to: '' },
+        city: '',
+        poc: '',
+        search: ''
+      }
+      appliedFilters.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        city: '',
+        poc: '',
+        search: ''
+      }
+      
+      // Reset selection states
+      selectedInvoices.value.clear()
+      
+      clearFilters()
       clearPOCData()
+      
       // Load data and POC filters in parallel
       await Promise.all([
         loadData(),

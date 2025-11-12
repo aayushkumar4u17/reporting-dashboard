@@ -126,70 +126,70 @@
                 </div>
               </template>
               
-              <Column field="aspOrderNo" header="App Order No" style="min-width: 12rem">
+              <Column field="aspOrderNo" header="App Order No" style="min-width: 8rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="80px" height="16px" />
                   <span v-else>{{ data.aspOrderNo }}</span>
                 </template>
               </Column>
               
-              <Column field="salesOrderCode" header="Sales Order Code" style="min-width: 18rem">
+              <Column field="salesOrderCode" header="Sales Order Code" style="min-width: 14rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="90px" height="16px" />
                   <span v-else>{{ data.salesOrderCode }}</span>
                 </template>
               </Column>
               
-              <Column header="Order Date" field="orderedDate" style="min-width: 9rem">
+              <Column header="Order Date" field="orderedDate" style="min-width: 7rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="70px" height="16px" />
                   <span v-else>{{ formatDate(data.orderedDate) }}</span>
                 </template>
               </Column>
               
-              <Column header="Delivery Date" field="deliveryDate" style="min-width: 9rem">
+              <Column header="Delivery Date" field="deliveryDate" style="min-width: 8rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="70px" height="16px" />
                   <span v-else>{{ formatDate(data.deliveryDate) }}</span>
                 </template>
               </Column>
               
-              <Column field="deliveryTimeSlot" header="Delivery Time" style="min-width: 10rem">
+              <Column field="deliveryTimeSlot" header="Delivery Time" style="min-width: 8rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="60px" height="16px" />
                   <span v-else>{{ data.deliveryTimeSlot }}</span>
                 </template>
               </Column>
               
-              <Column field="orderedQuantity" header="Order Quantity" style="min-width: 10rem">
+              <Column field="orderedQuantity" header="Order Quantity" style="min-width: 10rem; text-align: center">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="50px" height="16px" />
-                  <span v-else>{{ data.orderedQuantity }}</span>
+                  <span v-else style="display: block; text-align: center">{{ data.orderedQuantity }}</span>
                 </template>
               </Column>
               
-              <Column header="City" field="deliveryLocation" style="min-width: 12rem">
+              <Column header="City" field="deliveryLocation" style="min-width: 8rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="80px" height="16px" />
                   <span v-else>{{ data.deliveryLocation }}</span>
                 </template>
               </Column>
               
-              <Column header="POC Name" field="pocName" style="min-width: 14rem">
+              <Column header="POC Name" field="pocName" style="min-width: 10rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="100px" height="16px" />
                   <span v-else>{{ data.pocName }}</span>
                 </template>
               </Column>
               
-              <Column field="pocContact" header="POC Contact" style="min-width: 12rem">
+              <Column field="pocContact" header="POC Contact" style="min-width: 8rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="90px" height="16px" />
                   <span v-else>{{ data.pocContact }}</span>
                 </template>
               </Column>
               
-              <Column header="Status" field="deliveryStatus" style="min-width: 12rem">
+              <Column header="Status" field="deliveryStatus" style="min-width: 9rem">
                 <template #body="{ data }">
                   <SkeletonLoader v-if="loading" width="80px" height="20px" border-radius="6px" />
                   <Tag v-else :value="data.deliveryStatus" :severity="getSeverity(data.deliveryStatus)" />
@@ -281,10 +281,14 @@ import { useOrganization } from '@/composables/useOrganization'
 import { useFilters } from '@/composables/useFilters'
 import { usePOCFilters } from '@/composables/usePOCFilters'
 import { useSidebar } from '@/composables/useSidebar'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import { useRouter } from 'vue-router'
 
 // Sidebar state
 const { isSidebarCollapsed } = useSidebar()
+
+// Error handling
+const { showError, showDataLoadError, showNetworkError } = useGlobalErrorHandler()
 
 // Animation state
 const isLoaded = ref(false)
@@ -311,15 +315,14 @@ const getCurrentDate = () => {
   return today.toISOString().split('T')[0]
 }
 
-// Get last month date range
-const getLastMonthRange = () => {
+// Get current date range (today only)
+const getCurrentDateRange = () => {
   const today = new Date()
-  const firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-  const lastDayLastMonth = new Date(today.getFullYear(), today.getMonth(), 0)
+  const currentDate = today.toISOString().split('T')[0]
   
   return {
-    from: firstDayLastMonth.toISOString().split('T')[0],
-    to: lastDayLastMonth.toISOString().split('T')[0]
+    from: currentDate,
+    to: currentDate
   }
 }
 
@@ -347,11 +350,15 @@ const navigateToDashboard = () => {
 
 const currentDate = getCurrentDate()
 
+const currentDateRange = getCurrentDateRange()
+
 const filterValues = ref({
   orderDateFrom: '',
   orderDateTo: '',
   deliveryDateFrom: '',
   deliveryDateTo: '',
+  orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+  deliveryDateRange: { from: '', to: '' },
   city: '',
   poc: '',
   search: ''
@@ -473,7 +480,7 @@ const deliveredOrders = computed(() =>
 )
 const pendingOrders = computed(() => 
   filteredOrders.value.filter(order => 
-    ['PENDING', 'ASSIGNED', 'CONFIRMED', 'DISPENSING'].includes(order.deliveryStatus?.toUpperCase())
+    ['PENDING', 'ASSIGNED', 'CONFIRMED', 'DISPENSING', 'UNASSIGNED'].includes(order.deliveryStatus?.toUpperCase())
   ).length
 )
 const totalQuantity = computed(() => 
@@ -489,8 +496,8 @@ const formatDate = (value) => {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
   return date.toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: '2-digit',
+    month: 'short',
+    day: 'numeric',
     year: 'numeric'
   })
 }
@@ -635,11 +642,11 @@ const loadInitialData = async () => {
       return
     }
     
-    const lastMonth = getLastMonthRange()
+    const currentDate = getCurrentDateRange()
     const filterParams = {
       city: '',
-      order_date_from: lastMonth.from,
-      order_date_to: lastMonth.to,
+      order_date_from: currentDate.from,
+      order_date_to: currentDate.to,
       delivery_date_from: '',
       delivery_date_to: '',
       point_of_contact: ''
@@ -654,7 +661,12 @@ const loadInitialData = async () => {
     
     updatePOCFilterOptions()
   } catch (error) {
-
+    console.error('Error loading orders data:', error)
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadInitialData())
+    } else {
+      showDataLoadError(() => loadInitialData())
+    }
   } finally {
     loading.value = false
   }
@@ -684,7 +696,12 @@ const loadFilteredData = async () => {
     
     orders.value = mapOrderData(reportData)
   } catch (error) {
-
+    console.error('Error loading filtered orders data:', error)
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadFilteredData())
+    } else {
+      showDataLoadError(() => loadFilteredData())
+    }
   } finally {
     loading.value = false
   }
@@ -713,7 +730,36 @@ onMounted(async () => {
   unwatchOrganization = watchOrganizationChange(async (newOrgId, oldOrgId) => {
     if (newOrgId && newOrgId !== oldOrgId) {
       loading.value = true
+      
+      // Reset all filters when organization changes
+      filterValues.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+        deliveryDateRange: { from: '', to: '' },
+        city: '',
+        poc: '',
+        search: ''
+      }
+      appliedFilters.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        city: '',
+        poc: '',
+        search: ''
+      }
+      
+      // Reset top bar filters
+      activeOrderTab.value = 'all'
+      orderSearchQuery.value = ''
+      
+      clearFilters()
       clearPOCData()
+      
       // Load data and POC filters in parallel
       await Promise.all([
         loadData(),

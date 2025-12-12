@@ -1,0 +1,40 @@
+query GetWalletLedger($org_id: uuid!, $limit: Int = 100, $offset: Int = 0, $payment_type: payment_type_enum) {
+  user_ledger(
+    where: {
+      organization_user: {
+        organization_id: { _eq: $org_id }
+      }
+      payment_type: { _eq: $payment_type }
+    }
+    limit: $limit
+    offset: $offset
+    order_by: { created_at: desc }
+  ) {
+    id
+    amount
+    created_at
+    payment_type
+    transaction_details
+    invoice {
+      id
+      amount
+      sales_invoice_erp_code
+      erp_sales_invoice_status
+    }
+  }
+  user_ledger_aggregate(
+    where: {
+      organization_user: {
+        organization_id: { _eq: $org_id }
+      }
+      payment_type: { _eq: $payment_type }
+    }
+  ) {
+    aggregate {
+      count
+      sum {
+        amount
+      }
+    }
+  }
+}

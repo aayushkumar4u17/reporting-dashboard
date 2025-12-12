@@ -1,0 +1,25 @@
+# query DashboardAnalytics($orgId: String!) {
+#   dashboardAnalytics(object: {org_id: $orgId}) {
+#     months {
+#       cancelled_count
+#       delivered_orders
+#       order_count
+#       planned_orders
+#       time_range
+#     }
+#     weeks {
+#       cancelled_count
+#       delivered_orders
+#       order_count
+#       planned_orders
+#       time_range
+#     }
+#     year {
+#       cancelled_count
+#       delivered_orders
+#       order_count
+#       planned_orders
+#       time_range
+#     }
+#   }
+# }

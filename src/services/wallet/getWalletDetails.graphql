@@ -1,0 +1,12 @@
+query GetWalletDetails($org_id: uuid!) {
+  wallet(where: {organization_id: {_eq: $org_id}, is_active: {_eq: true}}) {
+    id
+    amount
+    van_code
+    van_number
+    ifsc_code
+    bank_name
+    beneficiary_name
+    blocked_amount
+  }
+}

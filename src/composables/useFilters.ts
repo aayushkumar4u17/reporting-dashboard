@@ -29,13 +29,14 @@ export interface FilterOptions {
 }
 
 export interface FilterPayload {
-  org_user_id: string[]
+  org_user_id?: string[]
   order_date_from?: string
   order_date_to?: string
   delivery_date_from?: string
   delivery_date_to?: string
   cities?: string[]
-  point_of_contact?: string[]
+  city?: string
+  point_of_contact?: string
   state?: string
   payment_due_date?: string
 }
@@ -65,9 +66,11 @@ export const useFilters = () => {
     }
   }
 
-  const buildFilterPayload = (orgUserId: string): FilterPayload => {
-    const payload: FilterPayload = {
-      org_user_id: [orgUserId]
+  const buildFilterPayload = (orgUserId?: string): FilterPayload => {
+    const payload: FilterPayload = {}
+    
+    if (orgUserId) {
+      payload.org_user_id = [orgUserId]
     }
 
     if (filters.value.orderedDateFrom) {
@@ -84,9 +87,10 @@ export const useFilters = () => {
     }
     if (filters.value.selectedCity) {
       payload.cities = [filters.value.selectedCity]
+      payload.city = filters.value.selectedCity
     }
     if (filters.value.selectedPOC) {
-      payload.point_of_contact = [filters.value.selectedPOC]
+      payload.point_of_contact = filters.value.selectedPOC
     }
     if (filters.value.selectedState) {
       payload.state = filters.value.selectedState

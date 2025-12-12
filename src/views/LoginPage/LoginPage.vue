@@ -51,7 +51,6 @@
             />
             I agree to the 
             <span class="terms-link" @click.stop="showTermsPopup = true">Terms of Service & Privacy Policy</span> 
-            
           </label>
         </div>
         
@@ -154,15 +153,17 @@ import ErrorPopup from '@/components/layout/ErrorPopup.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
 import TermsPopup from '@/components/layout/TermsPopup.vue'
 
-// Import Firebase Auth actions
 import { useAuthStore } from '@/stores'
-import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction } from '@/api/auth'
-import { startTimer, formatTime } from '@/api/auth'
-import { validatePhoneNumber } from '@/api/general'
-import { auth } from '@/config/firebase'
+import { useThemeStore } from '@/stores/theme'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
+import { sendOTP as sendOTPAction, verifyOTP as verifyOTPAction, startTimer } from '@/api/auth'
+import { otpRateLimiter, loginRateLimiter, formatTime } from '@/utils/rateLimiter'
+import ErrorHandler from '@/utils/errorHandler'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
+const { showError, showNetworkError, showAuthError } = useGlobalErrorHandler()
 
 const phoneNumber = ref('')
 const isAgreed = ref(false)
@@ -210,6 +211,9 @@ const setupRecaptcha = () => {
 }
 
 onMounted(() => {
+  // Force light mode for login page
+  themeStore.setTheme('light')
+  
   // Show the page immediately
   isLoaded.value = true;
   
@@ -228,7 +232,7 @@ onMounted(() => {
     }
   }, 1000);
   
-  // Remove automatic redirect check to prevent navigation loops
+
 })
 
 onUnmounted(() => {
@@ -259,6 +263,26 @@ watch(
 
 const sendOTPHandler = async () => {
   if (isPhoneNumberValid.value && isAgreed.value) {
+    // Check rate limiting
+    if (otpRateLimiter.isBlocked()) {
+      const remainingTime = otpRateLimiter.getRemainingTime()
+      authStore.showErrorPopup({
+        title: 'Too Many Attempts',
+        message: `Please wait ${formatTime(remainingTime)} before trying again.`,
+        showRetry: false
+      })
+      return
+    }
+    
+    if (!otpRateLimiter.recordAttempt()) {
+      authStore.showErrorPopup({
+        title: 'Rate Limited',
+        message: 'Too many OTP requests. Please wait before trying again.',
+        showRetry: false
+      })
+      return
+    }
+    
     isLoading.value = true
     
     try {
@@ -281,18 +305,20 @@ const sendOTPHandler = async () => {
       }, 100)
     } catch (error: unknown) {
       isLoading.value = false
+      console.error('OTP send error:', error)
       
-      if (error && typeof error === 'object' && 'message' in error && error.message === 'Unauthorized user') {
-        authStore.showErrorPopup({
-          title: 'Unauthorized Access',
-          message: 'Only organization owners can access the reporting dashboard',
-          showRetry: false
-        })
+      const safeError = ErrorHandler.handleError(error, { component: 'LoginPage', action: 'sendOTP' })
+      
+      // Use global error handler for better UX
+      if (safeError.category === 'network') {
+        showNetworkError(() => sendOTPHandler())
+      } else if (safeError.category === 'auth') {
+        showAuthError()
       } else {
         authStore.showErrorPopup({
-          title: 'Error Sending OTP',
-          message: 'Unable to send OTP. Please try again.',
-          showRetry: true
+          title: safeError.severity === 'critical' ? 'Critical Error' : 'Error Sending OTP',
+          message: safeError.userMessage,
+          showRetry: safeError.shouldRetry
         })
       }
     }
@@ -344,21 +370,35 @@ const verifyOTPHandler = async () => {
       // Clear OTP on error
       otpCode.value = ''
       isVerifying.value = false
+      console.error('OTP verification error:', error)
       
-      // Show appropriate error message
-      if (error && typeof error === 'object' && 'code' in error) {
-        if (error.code === 'auth/invalid-verification-code') {
-          authStore.showErrorPopup({
-            title: 'Incorrect OTP',
-            message: 'Incorrect OTP. Please try again.',
-            showRetry: true
-          })
-        } else if (error.code === 'auth/code-expired') {
-          authStore.showErrorPopup({
-            title: 'OTP Expired',
-            message: 'The OTP has expired. Please request a new one.',
-            showRetry: true
-          })
+      const safeError = ErrorHandler.handleError(error, { component: 'LoginPage', action: 'verifyOTP' })
+      
+      // Use global error handler for network issues, fallback to auth store for OTP-specific errors
+      if (safeError.category === 'network') {
+        showNetworkError(() => verifyOTPHandler())
+      } else {
+        // Show appropriate error message
+        if (error && typeof error === 'object' && 'code' in error) {
+          if (error.code === 'auth/invalid-verification-code') {
+            authStore.showErrorPopup({
+              title: 'Incorrect OTP',
+              message: 'Incorrect OTP. Please try again.',
+              showRetry: true
+            })
+          } else if (error.code === 'auth/code-expired') {
+            authStore.showErrorPopup({
+              title: 'OTP Expired',
+              message: 'The OTP has expired. Please request a new one.',
+              showRetry: true
+            })
+          } else {
+            authStore.showErrorPopup({
+              title: 'Verification Error',
+              message: 'An error occurred during verification. Please try again.',
+              showRetry: true
+            })
+          }
         } else {
           authStore.showErrorPopup({
             title: 'Verification Error',
@@ -366,12 +406,6 @@ const verifyOTPHandler = async () => {
             showRetry: true
           })
         }
-      } else {
-        authStore.showErrorPopup({
-          title: 'Verification Error',
-          message: 'An error occurred during verification. Please try again.',
-          showRetry: true
-        })
       }
     }
   }
@@ -393,8 +427,7 @@ const resendOTPHandler = async () => {
       
       otpCode.value = ''
       startResendTimer()
-      // Note: We don't call startTimer() here as it's for the main OTP expiry (30 minutes)
-      // The resend timer is separate (30 seconds)
+
       
     } catch (error: unknown) {
       // Parse error for better user feedback

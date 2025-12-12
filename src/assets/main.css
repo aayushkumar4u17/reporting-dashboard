@@ -1,3 +1,75 @@
+/* PrimeVue CSS imports */
+@import 'primeicons/primeicons.css';
+
+/* CSS Custom Properties for Theme */
+:root {
+  /* Light theme colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f5f5f5;
+  --bg-hover: rgba(0, 200, 81, 0.05);
+  --bg-glass: rgba(255, 255, 255, 0.95);
+  --bg-glass-secondary: rgba(248, 249, 250, 0.8);
+  
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-inverse: #ffffff;
+  
+  --border-color: rgba(0, 200, 81, 0.15);
+  --border-light: rgba(0, 200, 81, 0.1);
+  --border-medium: #e9ecef;
+  
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  
+  --accent-primary: #00C851;
+  --accent-secondary: #00A844;
+  --accent-light: rgba(0, 200, 81, 0.1);
+  
+  --status-success: #d4edda;
+  --status-success-text: #155724;
+  --status-warning: #fff3cd;
+  --status-warning-text: #856404;
+  --status-error: #f8d7da;
+  --status-error-text: #721c24;
+}
+
+/* Dark theme colors */
+:root.dark {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #0f0f0f;
+  --bg-hover: rgba(0, 200, 81, 0.1);
+  --bg-glass: rgba(26, 26, 26, 0.95);
+  --bg-glass-secondary: rgba(45, 45, 45, 0.8);
+  
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-tertiary: #808080;
+  --text-inverse: #333333;
+  
+  --border-color: rgba(0, 200, 81, 0.3);
+  --border-light: rgba(0, 200, 81, 0.2);
+  --border-medium: #404040;
+  
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  
+  --accent-primary: #00E55C;
+  --accent-secondary: #00C851;
+  --accent-light: rgba(0, 229, 92, 0.15);
+  
+  --status-success: #1e4d2b;
+  --status-success-text: #4ade80;
+  --status-warning: #4d3d1a;
+  --status-warning-text: #fbbf24;
+  --status-error: #4d1e23;
+  --status-error-text: #f87171;
+}
+
 /* Reset and base styles */
 * {
   margin: 0;
@@ -8,13 +80,17 @@
 html, body {
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
   line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* zoom: 0.95; */
-  transform-origin: top left;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Mobile scrolling fixes */
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  overscroll-behavior: contain;
 }
 
 #app {
@@ -22,11 +98,15 @@ html, body {
   margin: 0;
   padding: 0;
   font-weight: normal;
+  /* Mobile scrolling fixes */
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  position: relative;
 }
 
 a {
   text-decoration: none;
-  color: #00C851;
+  color: #6366f1;
   transition: 0.3s;
 }
 
@@ -49,22 +129,20 @@ html {
 
 /* Enhanced scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00C851, #00A844);
-  border-radius: 4px;
-  transition: background 0.3s ease;
+  background: var(--border-medium);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #00A844, #008833);
+  background: var(--text-secondary);
 }
 
 /* Smooth transitions for all elements */
@@ -77,3 +155,170 @@ html {
   display: inline !important;
   margin: 0 !important;
 }
+
+/* PrimeVue DataTable Custom Styles */
+.p-datatable {
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  width: 100%;
+}
+
+.p-datatable .p-datatable-wrapper {
+  width: 100%;
+}
+
+.p-datatable .p-datatable-table {
+  width: 100%;
+  min-width: 1200px;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-medium);
+  font-weight: 600;
+  /* font-size: 0.875rem; */
+  padding: 0.75rem;
+  border: none;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background: var(--bg-glass);
+  border-bottom: 1px solid var(--border-medium);
+  transition: background-color 0.2s ease;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--bg-hover);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0.75rem;
+  border: none;
+}
+
+.p-datatable .p-datatable-loading-overlay {
+  display: none !important;
+}
+
+.p-paginator {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-medium);
+  border-top: none;
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page {
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  margin: 0 2px;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-medium);
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.p-button {
+  background: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  color: var(--bg-primary);
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.p-button:hover {
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.p-inputtext {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  box-shadow: none;
+}
+
+.p-inputtext:focus {
+  border-color: var(--border-medium);
+  box-shadow: none;
+}
+
+.p-tag {
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.p-tag.p-tag-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.p-tag.p-tag-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.p-tag.p-tag-warn {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.p-tag.p-tag-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.p-tag.p-tag-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Reduce gap between first two columns */
+.p-datatable .p-datatable-thead > tr > th:nth-child(1),
+.p-datatable .p-datatable-tbody > tr > td:nth-child(1) {
+  padding-right: 0.25rem !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th:nth-child(2),
+.p-datatable .p-datatable-tbody > tr > td:nth-child(2) {
+  padding-left: 0.25rem !important;
+}
+
+/* Ensure all page containers use full width */
+.dashboard-container,
+.orders-container,
+.poc-container,
+.invoices-container,
+.payments-container {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container,
+  .orders-container,
+  .poc-container,
+  .invoices-container,
+  .payments-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+

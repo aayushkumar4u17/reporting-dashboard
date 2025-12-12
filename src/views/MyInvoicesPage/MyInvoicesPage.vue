@@ -1,133 +1,297 @@
 <template>
   <div class="my-invoices-page">
-    <div class="invoices-container">
+    <div class="invoices-container" :class="{ 'fade-in': isLoaded }">
       <!-- Filter Bar -->
-      <div class="filter-bar" :class="{ 'animate-slide-down': isLoaded }">
-        <div class="filter-group">
-          <label class="filter-label">Order Date</label>
-          <DatePicker v-model="orderedDate" placeholder="Select Order Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">Delivery Date</label>
-          <DatePicker v-model="deliveredDate" placeholder="Select Delivery Date" />
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">City</label>
-          <select v-model="selectedCity" class="filter-select">
-            <option value="">Select City</option>
-            <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
-          </select>
-        </div>
-        
-        <div class="filter-group">
-          <label class="filter-label">Point of Contact</label>
-          <select v-model="selectedPOC" class="filter-select">
-            <option value="">Select POC</option>
-            <option v-for="poc in availablePOCs" :key="poc" :value="poc">{{ poc }}</option>
-          </select>
-        </div>
-        
-        <div class="filter-actions">
-          <AnimatedButton @click="applyFilters" variant="primary" size="small">
-            Apply Filter
-          </AnimatedButton>
-          <AnimatedButton @click="clearAllFilters" variant="clear" size="small">
-            Clear All Filters
-          </AnimatedButton>
+      <FilterBar
+        :filters="['dateRanges', 'city', 'poc']"
+        v-model="filterValues"
+        :city-options="cityOptions"
+        :poc-options="pocOptions"
+        @apply="handleApplyFilters"
+        @clear="handleClearFilters"
+        :loading="loading"
+      >
+        <template #actions>
           <AnimatedButton @click="downloadInvoices" variant="success" size="small" :loading="downloadingBulk">
-            Download Invoice
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            {{ selectedInvoices.size === 1 ? 'Download PDF' : selectedInvoices.size > 1 ? 'Download as ZIP' : 'Download Selected' }}
           </AnimatedButton>
-        </div>
-      </div>
+        </template>
+      </FilterBar>
 
-      <!-- Download Options -->
-      <!-- <div class="download-options" :class="{ 'animate-fade-in-up': isLoaded }"> -->
-        <!-- <div class="download-format">
-          <span class="format-label">Excel</span>
-          <AnimatedButton @click="downloadExcel" variant="success" size="small">📄</AnimatedButton>
-        </div> -->
-        <!-- <div class="download-format">
-          <span class="format-label">PDF</span>
-          <AnimatedButton @click="downloadPDF" variant="danger" size="small">📄</AnimatedButton>
+      <!-- Main Content -->
+      <div class="invoices-content">
+        <!-- Invoice Summary Section -->
+        <div class="invoice-summary-section">
+          <h2 class="section-title">Invoice Summary</h2>
+          <div class="summary-grid">
+            <div class="summary-card metric-total animate-fade-in-up" style="animation-delay: 0.2s">
+              <div class="card-header">
+                <div class="summary-icon icon-total">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                </div>
+                <h3 class="summary-title">Total Invoices</h3>
+              </div>
+              <div v-if="!loading" class="summary-value">{{ totalInvoices }}</div>
+              <div v-else class="metric-loader">
+                <SkeletonLoader height="1.2rem" width="2.5rem" />
+              </div>
+            </div>
+            <div class="summary-card metric-pending animate-fade-in-up" style="animation-delay: 0.4s">
+              <div class="card-header">
+                <div class="summary-icon icon-pending">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12,6 12,12 16,14"/>
+                  </svg>
+                </div>
+                <h3 class="summary-title">Pending Deliveries</h3>
+              </div>
+              <div v-if="!loading" class="summary-value">{{ pendingDeliveries }}</div>
+              <div v-else class="metric-loader">
+                <SkeletonLoader height="1.2rem" width="2.5rem" />
+              </div>
+            </div>
+            <div class="summary-card metric-volume animate-fade-in-up" style="animation-delay: 0.6s">
+              <div class="card-header">
+                <div class="summary-icon icon-volume">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </div>
+                <h3 class="summary-title">Total Fuel (Ltr)</h3>
+              </div>
+              <div v-if="!loading" class="summary-value">{{ totalFuelVolume }}</div>
+              <div v-else class="metric-loader">
+                <SkeletonLoader height="1.2rem" width="3rem" />
+              </div>
+            </div>
+            <div class="summary-card metric-efficiency animate-fade-in-up" style="animation-delay: 0.8s">
+              <div class="card-header">
+                <div class="summary-icon icon-efficiency">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12l2 2 4-4"/>
+                    <circle cx="12" cy="12" r="10"/>
+                  </svg>
+                </div>
+                <h3 class="summary-title">Delivery Rate</h3>
+              </div>
+              <div v-if="!loading" class="summary-value">{{ deliveryEfficiency }}%</div>
+              <div v-else class="metric-loader">
+                <SkeletonLoader height="1.2rem" width="3rem" />
+              </div>
+            </div>
+          </div>
         </div>
-      </div> -->
 
-      <!-- Invoices Table -->
-      <div class="table-container" :class="{ 'animate-fade-in-up': isLoaded }">
-        <table class="invoices-table">
-          <thead>
-            <tr class="table-header">
-              <th class="header-cell checkbox-column">
-                <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="header-checkbox" />
-              </th>
-              <!-- <th class="header-cell"></th> -->
-              <th class="header-cell">Asp Order Code</th>
-              <th class="header-cell">Sales Invoice Number</th>
-              <th class="header-cell">Sales Order Code</th>
-              <th class="header-cell">Order Date</th>
-              <th class="header-cell">Delivery Date</th>
-              <th class="header-cell">Order Quantity</th>
-              <th class="header-cell">Delivery Quantity</th>
-              <th class="header-cell">Amount</th>
-              <th class="header-cell">Delivery Location</th>
-              <th class="header-cell">POC Name</th>
-              <th class="header-cell">POC Contact</th>
-              <th class="header-cell">Download Invoice</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Skeleton loading rows -->
-            <tr v-if="loading" v-for="i in 5" :key="i" class="table-row skeleton-row">
-              <td class="table-cell checkbox-column">
-                <SkeletonLoader width="16px" height="16px" />
-              </td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell amount"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell"><SkeletonLoader width="80%" height="16px" /></td>
-              <td class="table-cell download-col">
-                <SkeletonLoader width="24px" height="24px" />
-              </td>
-            </tr>
+        <!-- Invoices Table Section -->
+        <div class="table-section">
+          <h2 class="section-title">Invoice Management</h2>
+          <div class="card">
+            <DataTable
+              :value="loading ? skeletonData : filteredInvoices"
+              :frozenValue="lockedInvoices"
+              paginator
+              showGridlines
+              :rows="rowsPerPage"
+              dataKey="id"
+              @page="onPageChange"
+              :pt="{
+                table: { style: 'min-width: 50rem' },
+                bodyrow: ({ props }) => ({
+                  class: [{ 'font-bold': props.frozenRow }]
+                })
+              }"
+            >
+              <template #empty>
+                <div style="text-align: center; font-weight: bold; padding: 2rem; color: var(--text-primary);">
+                  No invoices found.
+                </div>
+              </template>
+              
+              <Column style="min-width: 60px; width: auto">
+                <template #header>
+                  <input 
+                    type="checkbox" 
+                    :checked="selectAll" 
+                    @change="toggleSelectAll"
+                    class="invoice-checkbox"
+                    title="Select/Deselect All for Download"
+                  />
+                </template>
+                <template #body="{ data, frozenRow }">
+                  <SkeletonLoader v-if="loading" width="18px" height="18px" border-radius="4px" />
+                  <input 
+                    v-else
+                    type="checkbox" 
+                    :checked="selectedInvoices.has(data.id)"
+                    @change="toggleInvoiceSelection(data.id)"
+                    class="invoice-checkbox"
+                    title="Select for Download"
+                  />
+                </template>
+              </Column>
+              
+              <Column field="aspOrderCode" header="Order Code" style="min-width: 100px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="80px" height="16px" />
+                  <span v-else>{{ data.aspOrderCode }}</span>
+                </template>
+              </Column>
+              
+              <Column field="salesInvoiceNumber" header="Sales Invoice No." style="min-width: 180px; width: auto; white-space: nowrap">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="90px" height="16px" />
+                  <span v-else>{{ data.salesInvoiceNumber }}</span>
+                </template>
+              </Column>
+              
+              <Column header="Download" style="min-width: 80px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="40px" height="32px" border-radius="6px" />
+                  <div v-else style="display: flex; justify-content: center;">
+                    <ModernDownloadButton 
+                      @click="downloadInvoice(data.id)" 
+                      :loading="downloadingInvoice === data.id"
+                    />
+                  </div>
+                </template>
+              </Column>
+              
+              <Column field="salesOrderCode" header="Sales Order Code" style="min-width: 250px; width: auto; white-space: nowrap">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="90px" height="16px" />
+                  <span v-else>{{ data.salesOrderCode }}</span>
+                </template>
+              </Column>
+              
+              <Column field="orderedDate" header="Order Date" style="min-width: 140px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="70px" height="16px" />
+                  <span v-else>{{ data.orderedDate }}</span>
+                </template>
+              </Column>
+              
+              <Column field="deliveredDate" header="Delivery Date" style="min-width: 140px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="70px" height="16px" />
+                  <span v-else>{{ data.deliveredDate }}</span>
+                </template>
+              </Column>
+              
+              <Column field="orderedQuantity" header="Order Qty" style="min-width: 120px; width: auto; text-align: center">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="50px" height="16px" />
+                  <span v-else style="display: block; text-align: center">{{ data.orderedQuantity }}</span>
+                </template>
+              </Column>
+              
+              <Column field="deliveredQuantity" header="Delivery Qty" style="min-width: 130px; width: auto; text-align: center">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="50px" height="16px" />
+                  <span v-else style="display: block; text-align: center">{{ data.deliveredQuantity }}</span>
+                </template>
+              </Column>
+              
+              <Column field="amount" header="Amount" style="min-width: 120px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="60px" height="16px" />
+                  <span v-else>{{ data.amount }}</span>
+                </template>
+              </Column>
+              
+              <Column field="deliveryLocation" header="City" style="min-width: 100px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="80px" height="16px" />
+                  <span v-else>{{ data.deliveryLocation }}</span>
+                </template>
+              </Column>
+              
+              <Column field="pocName" header="POC Name" style="min-width: 150px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="100px" height="16px" />
+                  <span v-else>{{ data.pocName }}</span>
+                </template>
+              </Column>
+              
+              <Column field="pocContact" header="POC Contact" style="min-width: 150px; width: auto">
+                <template #body="{ data }">
+                  <SkeletonLoader v-if="loading" width="90px" height="16px" />
+                  <span v-else>{{ data.pocContact }}</span>
+                </template>
+              </Column>
+            </DataTable>
+          </div>
+        </div>
+
+        <!-- Quick Actions Panel -->
+        <div class="quick-actions-section">
+          <h2 class="section-title">Quick Actions</h2>
+          <div class="actions-grid">
+            <button class="action-card" @click="navigateToPointOfContact">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Point of Contact</div>
+                <div class="action-subtitle">View contact details</div>
+              </div>
+            </button>
             
-            <!-- Actual data rows -->
-            <tr v-for="invoice in filteredInvoices" :key="invoice.id" class="table-row">
-              <td class="table-cell checkbox-column">
-                <input type="checkbox" v-model="invoice.selected" class="row-checkbox" />
-              </td>
-              <td class="table-cell">{{ invoice.aspOrderCode }}</td>
-              <td class="table-cell">{{ invoice.salesInvoiceNumber }}</td>
-              <td class="table-cell">{{ invoice.salesOrderCode }}</td>
-              <td class="table-cell">{{ invoice.orderedDate }}</td>
-              <td class="table-cell">{{ invoice.deliveredDate }}</td>
-              <td class="table-cell">{{ invoice.orderedQuantity }}</td>
-              <td class="table-cell">{{ invoice.deliveredQuantity }}</td>
-              <td class="table-cell amount">{{ invoice.amount }}</td>
-              <td class="table-cell delivery-location">{{ invoice.deliveryLocation }}</td>
-              <td class="table-cell">{{ invoice.pocName }}</td>
-              <td class="table-cell">{{ invoice.pocContact }}</td>
-              <td class="table-cell download-col">
-                <AnimatedButton @click="downloadInvoice(invoice.id)" variant="primary" size="small" :loading="downloadingInvoice === invoice.id">
-                  ⬇️
-                </AnimatedButton>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <!-- No data message -->
-        <div v-if="!loading && filteredInvoices.length === 0" class="no-data-message">
-          No data found
+            <button class="action-card" @click="navigateToOrders">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">View All Orders</div>
+                <div class="action-subtitle">Manage and track orders</div>
+              </div>
+            </button>
+            
+            <button class="action-card" @click="navigateToPayments">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Payment Status</div>
+                <div class="action-subtitle">Track payment history</div>
+              </div>
+            </button>
+            
+            <button class="action-card" @click="navigateToDashboard">
+              <div class="action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+              </div>
+              <div class="action-content">
+                <div class="action-title">Dashboard</div>
+                <div class="action-subtitle">View analytics overview</div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -146,89 +310,359 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import FilterBar from '@/components/ui/FilterBar.vue'
 import AnimatedButton from '@/components/layout/AnimatedButton.vue'
+import ModernDownloadButton from '@/components/layout/ModernDownloadButton.vue'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
-import DatePicker from '@/components/layout/DatePicker.vue'
 import { fetchPointOfContactInvoiceReport } from '@/api/pointOfContactInvoiceReport'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
 import { useFilters } from '@/composables/useFilters'
-import { generateInvoicesPDF } from '@/utils/pdfGenerator'
+import { useOrganization } from '@/composables/useOrganization'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
+import { downloadInvoices as downloadInvoicesPdf } from '@/api/salesInvoicePdf'
+import { usePOCFilters } from '@/composables/usePOCFilters'
+import { useRouter } from 'vue-router'
 
 // Animation state
 const isLoaded = ref(false)
 const loading = ref(true)
+const filterLoading = ref(false)
 const showNoDataPopup = ref(false)
 const errorMessage = ref('')
 const downloadingInvoice = ref(null)
 const downloadingBulk = ref(false)
 
+const currentPage = ref(0)
+const rowsPerPage = 10
+
 // Filter states using composable
 const { filters, clearFilters, buildFilterPayload } = useFilters()
-const orderedDate = ref('')
-const deliveredDate = ref('')
-const selectedCity = ref('')
-const selectedPOC = ref('')
-const selectAll = ref(false)
+const { cityOptions, pocOptions, loadPOCFilterData, clearPOCData } = usePOCFilters()
+const { showError, showDataLoadError, showNetworkError } = useGlobalErrorHandler()
+const router = useRouter()
+
+// Navigation functions
+const navigateToPointOfContact = () => {
+  router.push('/point-of-contact')
+}
+
+const navigateToOrders = () => {
+  router.push('/my-orders')
+}
+
+const navigateToPayments = () => {
+  router.push('/payments')
+}
+
+const navigateToDashboard = () => {
+  router.push('/dashboard')
+}
+
+// Get current date in YYYY-MM-DD format
+const getCurrentDate = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+// Get current date range (today only)
+const getCurrentDateRange = () => {
+  const today = new Date()
+  const currentDate = today.toISOString().split('T')[0]
+  
+  return {
+    from: currentDate,
+    to: currentDate
+  }
+}
+
+const currentDateRange = getCurrentDateRange()
+
+const filterValues = ref({
+  orderDateFrom: '',
+  orderDateTo: '',
+  deliveryDateFrom: '',
+  deliveryDateTo: '',
+  orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+  deliveryDateRange: { from: '', to: '' },
+  city: '',
+  poc: '',
+  search: ''
+})
+
+// Applied filter states
+const appliedFilters = ref({
+  orderDateFrom: '',
+  orderDateTo: '',
+  deliveryDateFrom: '',
+  deliveryDateTo: '',
+  city: '',
+  poc: '',
+  search: ''
+})
+
+// Get current page invoices
+const getCurrentPageInvoices = () => {
+  const start = currentPage.value * rowsPerPage
+  const end = start + rowsPerPage
+  return filteredInvoices.value.slice(start, end)
+}
+
+// Optimized select all state for current page
+const selectAll = computed(() => {
+  const currentPageInvoices = getCurrentPageInvoices()
+  const allCurrentPageInvoices = [...currentPageInvoices, ...lockedInvoices.value]
+  
+  if (allCurrentPageInvoices.length === 0) return false
+  
+  const selectedCount = allCurrentPageInvoices.filter(invoice => 
+    selectedInvoices.value.has(invoice.id)
+  ).length
+  
+  return selectedCount === allCurrentPageInvoices.length
+})
+
+// Cached summary statistics to avoid recalculation
+const summaryStats = ref({
+  totalInvoices: 0,
+  totalAmount: '0.00',
+  pendingDeliveries: 0,
+  totalFuelVolume: '0',
+  deliveryEfficiency: '0'
+})
+
+// Optimized summary stats calculation
+const calculateSummaryStats = () => {
+  const allInvoices = [...invoices.value, ...lockedInvoices.value]
+  
+  if (allInvoices.length === 0) {
+    summaryStats.value = {
+      totalInvoices: 0,
+      totalAmount: '0.00',
+      pendingDeliveries: 0,
+      totalFuelVolume: '0',
+      deliveryEfficiency: '0'
+    }
+    return
+  }
+  
+  // Use reduce for better performance
+  const stats = allInvoices.reduce((acc, invoice) => {
+    // Amount calculation
+    const amount = parseFloat(invoice.amount?.replace('₹ ', '') || '0')
+    acc.totalAmount += amount
+    
+    // Pending deliveries
+    if (!invoice.deliveredDate?.trim()) {
+      acc.pendingCount++
+    } else {
+      acc.deliveredCount++
+    }
+    
+    // Fuel volume
+    const qty = parseInt(invoice.orderedQuantity?.replace(' Ltr', '') || '0')
+    acc.totalFuel += qty
+    
+    return acc
+  }, { totalAmount: 0, pendingCount: 0, totalFuel: 0, deliveredCount: 0 })
+  
+  summaryStats.value = {
+    totalInvoices: allInvoices.length,
+    totalAmount: stats.totalAmount.toFixed(2),
+    pendingDeliveries: stats.pendingCount,
+    totalFuelVolume: stats.totalFuel.toLocaleString(),
+    deliveryEfficiency: Math.round((stats.deliveredCount / allInvoices.length) * 100).toString()
+  }
+}
+
+// Computed properties that return cached values
+const totalInvoices = computed(() => summaryStats.value.totalInvoices)
+const totalAmount = computed(() => summaryStats.value.totalAmount)
+const pendingDeliveries = computed(() => summaryStats.value.pendingDeliveries)
+const totalFuelVolume = computed(() => summaryStats.value.totalFuelVolume)
+const deliveryEfficiency = computed(() => summaryStats.value.deliveryEfficiency)
 
 // Invoices data
 const invoices = ref([])
-const availableCities = ref([])
-const availablePOCs = ref([])
+const lockedInvoices = ref([])
+const selectedInvoices = ref(new Set())
 
-// Computed property for filtered invoices
+// Skeleton data for loading state
+const skeletonData = ref(Array.from({ length: 10 }, (_, i) => ({
+  id: i + 1,
+  aspOrderCode: '',
+  salesInvoiceNumber: '',
+  salesOrderCode: '',
+  orderedDate: '',
+  deliveredDate: '',
+  orderedQuantity: '',
+  deliveredQuantity: '',
+  amount: '',
+  deliveryLocation: '',
+  pocName: '',
+  pocContact: ''
+})))
+
+
+
+
+
+// Optimized filtered invoices
 const filteredInvoices = computed(() => {
-  return invoices.value.filter(invoice => {
-    const cityMatch = !selectedCity.value || invoice.city === selectedCity.value
-    const pocMatch = !selectedPOC.value || `${invoice.pocName}`.includes(selectedPOC.value)
-    // Add date filtering logic here when implementing actual date filtering
-    return cityMatch && pocMatch
-  })
+  const searchQuery = appliedFilters.value.search?.trim()
+  
+  if (!searchQuery) {
+    return invoices.value
+  }
+  
+  const searchLower = searchQuery.toLowerCase()
+  return invoices.value.filter(invoice => 
+    invoice.aspOrderCode?.toLowerCase().includes(searchLower) ||
+    invoice.salesInvoiceNumber?.toLowerCase().includes(searchLower) ||
+    invoice.salesOrderCode?.toLowerCase().includes(searchLower) ||
+    invoice.pocName?.toLowerCase().includes(searchLower) ||
+    invoice.deliveryLocation?.toLowerCase().includes(searchLower)
+  )
 })
 
-const applyFilters = () => {
-  // Update filters object with current values
-  filters.value.orderedDate = orderedDate.value
-  filters.value.deliveredDate = deliveredDate.value
-  filters.value.selectedCity = selectedCity.value
-  filters.value.selectedPOC = selectedPOC.value
-  // Apply current filter values
-  loadData()
+const handleApplyFilters = (newFilters) => {
+  // Immediate UI update
+  Object.assign(appliedFilters.value, newFilters)
+  
+  // Check if backend call is needed
+  const hasBackendFilters = newFilters.orderDateFrom || newFilters.deliveryDateFrom || 
+    newFilters.city || newFilters.poc
+  
+  if (!hasBackendFilters) {
+    return // Only search filter, handled by computed property
+  }
+  
+  // Async backend call without blocking UI
+  nextTick(async () => {
+    loading.value = true
+    
+    // Update filters for backend call
+    if (newFilters.orderDateFrom) {
+      filters.value.orderedDateFrom = newFilters.orderDateFrom
+      filters.value.orderedDateTo = newFilters.orderDateTo || newFilters.orderDateFrom
+      filters.value.deliveredDateFrom = ''
+      filters.value.deliveredDateTo = ''
+    } else if (newFilters.deliveryDateFrom) {
+      filters.value.deliveredDateFrom = newFilters.deliveryDateFrom
+      filters.value.deliveredDateTo = newFilters.deliveryDateTo || newFilters.deliveryDateFrom
+      filters.value.orderedDateFrom = ''
+      filters.value.orderedDateTo = ''
+    }
+    
+    filters.value.selectedCity = newFilters.city
+    filters.value.selectedPOC = newFilters.poc
+    
+    await loadData()
+  })
 }
 
-const clearAllFilters = () => {
-  orderedDate.value = ''
-  deliveredDate.value = ''
-  selectedCity.value = ''
-  selectedPOC.value = ''
+const handleClearFilters = () => {
+  const hadBackendFilters = appliedFilters.value.orderDateFrom || appliedFilters.value.deliveryDateFrom || 
+    appliedFilters.value.city || appliedFilters.value.poc
+  
+  // Immediate UI update
+  const emptyFilters = {
+    orderDateFrom: '',
+    orderDateTo: '',
+    deliveryDateFrom: '',
+    deliveryDateTo: '',
+    city: '',
+    poc: '',
+    search: ''
+  }
+  
+  Object.assign(filterValues.value, emptyFilters)
+  Object.assign(appliedFilters.value, emptyFilters)
   clearFilters()
-  loadData()
+  
+  if (hadBackendFilters) {
+    nextTick(async () => {
+      loading.value = true
+      await loadData()
+    })
+  }
+}
+
+const handleSelectionChange = (selectedItems) => {
+  // Handle selection change if needed
+  console.log('Selected items:', selectedItems)
+}
+
+const toggleLockByCheckbox = (data, frozen) => {
+  if (frozen) {
+    // Unlock: move from locked to regular
+    lockedInvoices.value = lockedInvoices.value.filter(invoice => invoice.id !== data.id)
+    if (!invoices.value.find(invoice => invoice.id === data.id)) {
+      invoices.value.push(data)
+    }
+  } else {
+    // Lock: move from regular to locked (max 3)
+    if (lockedInvoices.value.length < 3) {
+      invoices.value = invoices.value.filter(invoice => invoice.id !== data.id)
+      lockedInvoices.value.push(data)
+    }
+  }
+
+  // Sort invoices by ID
+  invoices.value.sort((val1, val2) => val1.id - val2.id)
+  lockedInvoices.value.sort((val1, val2) => val1.id - val2.id)
+}
+
+const onPageChange = (event) => {
+  currentPage.value = event.page
 }
 
 const toggleSelectAll = () => {
-  invoices.value.forEach(invoice => {
-    invoice.selected = selectAll.value
-  })
+  const currentPageInvoices = getCurrentPageInvoices()
+  const allCurrentPageInvoices = [...currentPageInvoices, ...lockedInvoices.value]
+  
+  if (selectAll.value) {
+    // Deselect current page invoices
+    allCurrentPageInvoices.forEach(invoice => {
+      selectedInvoices.value.delete(invoice.id)
+    })
+  } else {
+    // Select current page invoices
+    allCurrentPageInvoices.forEach(invoice => {
+      selectedInvoices.value.add(invoice.id)
+    })
+  }
+}
+
+const toggleInvoiceSelection = (invoiceId) => {
+  if (selectedInvoices.value.has(invoiceId)) {
+    selectedInvoices.value.delete(invoiceId)
+  } else {
+    selectedInvoices.value.add(invoiceId)
+  }
 }
 
 const downloadInvoice = async (invoiceId) => {
   try {
-    console.log('Starting PDF download for invoice ID:', invoiceId)
     downloadingInvoice.value = invoiceId
-    const invoice = invoices.value.find(inv => inv.id === invoiceId)
-    if (!invoice) {
-      console.error('Invoice not found for ID:', invoiceId)
+    const allInvoices = [...invoices.value, ...lockedInvoices.value]
+    const invoice = allInvoices.find(inv => inv.id === invoiceId)
+    if (!invoice || !invoice.salesInvoiceNumber) {
       errorMessage.value = 'Invoice not found'
       showNoDataPopup.value = true
       return
     }
-    console.log('Invoice data:', invoice)
-    // Generate PDF for single invoice
-    const filename = await generateInvoicesPDF([invoice], false)
-    console.log('PDF generated successfully:', filename)
+    
+    await downloadInvoicesPdf([{
+      sales_invoice_erp_code: invoice.salesInvoiceNumber,
+      isPickup: false
+    }], undefined)
   } catch (error) {
     console.error('Error downloading invoice:', error)
-    errorMessage.value = `Failed to generate PDF: ${error.message}`
+    errorMessage.value = error.message || 'Unable to download invoice. Please try again.'
     showNoDataPopup.value = true
   } finally {
     downloadingInvoice.value = null
@@ -237,33 +671,46 @@ const downloadInvoice = async (invoiceId) => {
 
 const downloadInvoices = async () => {
   try {
-    console.log('Starting bulk PDF download')
     downloadingBulk.value = true
-    if (filteredInvoices.value.length === 0) {
-      console.log('No filtered invoices available')
-      errorMessage.value = 'No data available to download'
-      showNoDataPopup.value = true
-      return
-    }
-    const selectedInvoices = invoices.value.filter(invoice => invoice.selected)
-    const hasSelection = selectedInvoices.length > 0
     
-    // Use selected invoices if any are selected, otherwise use all filtered invoices
-    const invoicesToDownload = hasSelection ? selectedInvoices : filteredInvoices.value
-    
-    console.log('Invoices to download:', invoicesToDownload.length, 'invoices')
-    
-    if (invoicesToDownload.length === 0) {
-      errorMessage.value = 'No invoices selected for download'
+    if (selectedInvoices.value.size === 0) {
+      errorMessage.value = 'Please select at least one invoice to download'
       showNoDataPopup.value = true
       return
     }
     
-    const filename = await generateInvoicesPDF(invoicesToDownload, false)
-    console.log('Bulk PDF generated successfully:', filename)
+    // Get selected invoices without array spreading
+    const invoicesWithErpCodes = []
+    
+    invoices.value.forEach(invoice => {
+      if (selectedInvoices.value.has(invoice.id) && invoice.salesInvoiceNumber) {
+        invoicesWithErpCodes.push({
+          sales_invoice_erp_code: invoice.salesInvoiceNumber,
+          isPickup: false
+        })
+      }
+    })
+    
+    lockedInvoices.value.forEach(invoice => {
+      if (selectedInvoices.value.has(invoice.id) && invoice.salesInvoiceNumber) {
+        invoicesWithErpCodes.push({
+          sales_invoice_erp_code: invoice.salesInvoiceNumber,
+          isPickup: false
+        })
+      }
+    })
+    
+    if (invoicesWithErpCodes.length === 0) {
+      errorMessage.value = 'No valid invoice codes found'
+      showNoDataPopup.value = true
+      return
+    }
+    
+    await downloadInvoicesPdf(invoicesWithErpCodes)
   } catch (error) {
     console.error('Error downloading invoices:', error)
-    errorMessage.value = `Failed to generate PDF: ${error.message}`
+    // Show user-friendly error message
+    errorMessage.value = error.message || 'Unable to download invoices. Please try again.'
     showNoDataPopup.value = true
   } finally {
     downloadingBulk.value = false
@@ -271,84 +718,118 @@ const downloadInvoices = async () => {
 }
 
 const downloadExcel = () => {
-  console.log('Downloading Excel format')
+
   // Implement Excel download logic
 }
 
 const downloadPDF = () => {
-  console.log('Downloading PDF format')
+
   // Implement PDF download logic
 }
 
 const pointOfContactStore = usePointOfContactStore()
+const { getOrganizationId, watchOrganizationChange } = useOrganization()
+
+// Watch for organization changes
+let unwatchOrganization = null
+
+const formatDate = (value) => {
+  if (!value) return ''
+  const date = typeof value === 'string' ? new Date(value) : value
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
 
 const loadData = async () => {
   try {
-    let userId = pointOfContactStore.selectedUserId
+    const organizationId = getOrganizationId()
     
-    // If store is empty, try to refresh from localStorage
-    if (!userId) {
-      pointOfContactStore.refreshFromStorage()
-      userId = pointOfContactStore.selectedUserId
+    if (!organizationId) {
+      return
     }
     
-    if (!userId) return
+    // Use current date if no filters are applied
+    if (!filters.value.orderedDateFrom && !filters.value.deliveredDateFrom) {
+      const currentDate = getCurrentDate()
+      filters.value.orderedDateFrom = currentDate
+      filters.value.orderedDateTo = currentDate
+    }
     
-    // Build filter payload
-    const filterPayload = buildFilterPayload(userId)
+    // Build filter payload with organization ID
+    const filterPayload = buildFilterPayload(organizationId)
+
     
-    const reportData = await fetchPointOfContactInvoiceReport(userId, filterPayload)
-    invoices.value = reportData.map((item, index) => {
-      // Extract order date value if it exists
-      let orderDate = ''
-      if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
-        orderDate = item.order_date.value
-      } else if (typeof item.order_date === 'string') {
-        orderDate = item.order_date
+    const reportData = await fetchPointOfContactInvoiceReport(organizationId, filterPayload)
+
+    // Sort by latest date first (order date or delivery date)
+    const sortedData = reportData.sort((a, b) => {
+      const getDate = (item) => {
+        let orderDate = ''
+        if (item.order_date && typeof item.order_date === 'object' && item.order_date.value) {
+          orderDate = item.order_date.value
+        } else if (typeof item.order_date === 'string') {
+          orderDate = item.order_date
+        }
+        
+        let deliveredDate = ''
+        if (item.delivered_date && typeof item.delivered_date === 'object' && item.delivered_date.value) {
+          deliveredDate = item.delivered_date.value
+        } else if (typeof item.delivered_date === 'string') {
+          deliveredDate = item.delivered_date
+        }
+        
+        // Use delivery date if available, otherwise order date
+        const dateToUse = deliveredDate || orderDate
+        return dateToUse ? new Date(dateToUse) : new Date(0)
       }
       
-      // Extract delivered date value if it exists
-      let deliveredDate = ''
-      if (item.delivered_date && typeof item.delivered_date === 'object' && item.delivered_date.value) {
-        deliveredDate = item.delivered_date.value
-      } else if (typeof item.delivered_date === 'string') {
-        deliveredDate = item.delivered_date
-      }
-      
-      // Handle order amount (can be number or string)
-      let orderAmount = 0
-      if (typeof item.order_amount === 'number') {
-        orderAmount = item.order_amount
-      } else if (typeof item.order_amount === 'string') {
-        orderAmount = parseFloat(item.order_amount) || 0
-      }
-      
-      return {
-        id: index + 1,
-        aspOrderCode: item.app_order_code || '',
-        salesInvoiceNumber: item.invoice || '',
-        salesOrderCode: item.erp_order_code || '',
-        orderedDate: orderDate,
-        deliveredDate: deliveredDate,
-        orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
-        deliveredQuantity: item.order_delivered_qty ? `${item.order_delivered_qty} Ltr` : '0 Ltr',
-        amount: `₹ ${orderAmount.toFixed(2)}`,
-        deliveryLocation: item.city || '',
-        pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
-        pocContact: item.phone_number || '',
-        city: item.city || '',
-        selected: false
-      }
+      return getDate(b) - getDate(a) // Latest first
     })
     
-    // Extract unique cities and POCs from the data
-    const cities = [...new Set(reportData.map(item => item.city).filter(Boolean))]
-    const pocs = [...new Set(reportData.map(item => `${item.first_name || ''} ${item.last_name || ''}`.trim()).filter(Boolean))]
+    invoices.value = sortedData.map((item, index) => ({
+      id: index + 1,
+      aspOrderCode: item.app_order_code || '',
+      salesInvoiceNumber: item.invoice || '',
+      salesOrderCode: item.erp_order_code || '',
+      orderedDate: formatDate(item.order_date?.value || item.order_date || ''),
+      deliveredDate: formatDate(item.delivered_date?.value || item.delivered_date || ''),
+      orderedQuantity: item.order_qty ? `${item.order_qty} Ltr` : '0 Ltr',
+      deliveredQuantity: item.order_delivered_qty ? `${item.order_delivered_qty} Ltr` : '0 Ltr',
+      amount: `₹ ${(parseFloat(item.order_amount) || 0).toFixed(2)}`,
+      deliveryLocation: item.city || '',
+      pocName: `${item.first_name || ''} ${item.last_name || ''}`.trim(),
+      pocContact: item.phone_number || '',
+      city: item.city || '',
+      selected: false
+    }))
     
-    availableCities.value = cities.sort()
-    availablePOCs.value = pocs.sort()
+
+    
+    // Calculate summary stats asynchronously
+    nextTick(() => calculateSummaryStats())
+    
   } catch (error) {
-    console.error('Error loading invoices:', error)
+    console.error('Error loading invoices data:', error)
+    
+    // Clear data on error
+    invoices.value = []
+    summaryStats.value = {
+      totalInvoices: 0,
+      totalAmount: '0.00',
+      pendingDeliveries: 0,
+      totalFuelVolume: '0',
+      deliveryEfficiency: '0'
+    }
+    
+    // Show appropriate error based on error type
+    if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+      showNetworkError(() => loadData())
+    } else {
+      showDataLoadError(() => loadData())
+    }
   } finally {
     loading.value = false
   }
@@ -360,13 +841,64 @@ const closeErrorPopup = () => {
 }
 
 // Initialize animations on component mount
-onMounted(() => {
+onMounted(async () => {
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
   
-  // Simulate data loading
-  loadData()
+  // Load data and POC filters in parallel
+  await Promise.all([
+    loadData(),
+    loadPOCFilterData()
+  ])
+  
+  // Watch for organization changes and reload data
+  unwatchOrganization = watchOrganizationChange(async (newOrgId, oldOrgId) => {
+    if (newOrgId && newOrgId !== oldOrgId) {
+      loading.value = true
+      
+      // Reset all filters when organization changes
+      filterValues.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        orderDateRange: { from: currentDateRange.from, to: currentDateRange.to },
+        deliveryDateRange: { from: '', to: '' },
+        city: '',
+        poc: '',
+        search: ''
+      }
+      appliedFilters.value = {
+        orderDateFrom: '',
+        orderDateTo: '',
+        deliveryDateFrom: '',
+        deliveryDateTo: '',
+        city: '',
+        poc: '',
+        search: ''
+      }
+      
+      // Reset selection states
+      selectedInvoices.value.clear()
+      
+      clearFilters()
+      clearPOCData()
+      
+      // Load data and POC filters in parallel
+      await Promise.all([
+        loadData(),
+        loadPOCFilterData()
+      ])
+    }
+  })
+})
+
+// Cleanup watcher on unmount
+onUnmounted(() => {
+  if (unwatchOrganization) {
+    unwatchOrganization()
+  }
 })
 </script>
 
@@ -403,5 +935,19 @@ onMounted(() => {
   .popup-content p {
     margin: 0 0 20px 0;
     color: #666;
+  }
+
+  .download-actions {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .download-actions.animate-fade-in-up {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>

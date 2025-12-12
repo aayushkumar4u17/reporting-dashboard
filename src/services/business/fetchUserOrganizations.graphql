@@ -1,10 +1,16 @@
 query fetchUserOrganizations($user_id: uuid!) {
   organization_user(
     where: {
-      user_id: { _eq: $user_id }
-      is_active: { _eq: true }
-      is_owner: { _eq: true }
-      organization_user_type: { _eq: "DELIVERY" }
+      user_id: {_eq: $user_id}, 
+      is_active: {_eq: true}, 
+      organization_user_type: {_eq: "DELIVERY"},
+      _or: [
+        {is_owner: {_eq: true}},
+        {_and: [
+          {is_owner: {_eq: false}},
+          {role: {role: {_in: ["owner", "manager"]}}}
+        ]}
+      ]
     }
   ) {
     id
@@ -13,11 +19,17 @@ query fetchUserOrganizations($user_id: uuid!) {
     is_owner
     organization_id
     organization_user_type
+    role_id
+    role {
+      id
+      role
+    }
     organization {
       id
       name
       is_active
       created_at
+      brand_logo
     }
     user {
       id

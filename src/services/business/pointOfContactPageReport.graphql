@@ -1,0 +1,13 @@
+query PointOfContactPageQuery($organization_id: uuid!, $city: String, $state: String) {
+  pointOfContactPageReport(object: {organization_id: $organization_id, city: $city, state: $state}) {
+    data {
+      address_line1
+      city_name
+      email
+      first_name
+      last_name
+      phone_number
+      state_name
+    }
+  }
+}

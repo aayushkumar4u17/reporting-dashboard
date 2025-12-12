@@ -1,79 +1,152 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { useErrorHandler } from "@/composables/useErrorHandler";
-import Navbar from "@/components/layout/Navbar.vue";
-import ErrorNotification from "@/components/ErrorNotification.vue";
-import AuthGuard from "@/components/AuthGuard.vue";
+import { onMounted, onErrorCaptured } from 'vue'
+import { useRouter } from "vue-router"
+import { useErrorHandler } from "@/composables/useErrorHandler"
+import { useGlobalErrorHandler } from "@/composables/useGlobalErrorHandler"
+import { useThemeStore } from "@/stores/theme"
+import { useSidebar } from "@/composables/useSidebar"
+import Navbar from "@/components/layout/Navbar.vue"
+import ErrorNotification from "@/components/ErrorNotification.vue"
+import UserFriendlyError from "@/components/UserFriendlyError.vue"
+import AuthGuard from "@/components/AuthGuard.vue"
+import ErrorHandler from "@/utils/errorHandler"
 
-const router = useRouter();
-const { errorState, hideError, handleRetry } = useErrorHandler();
+const router = useRouter()
+const { errorState, hideError, handleRetry } = useErrorHandler()
+const { globalErrorState, hideError: hideGlobalError, handleRetry: handleGlobalRetry, handleRefresh } = useGlobalErrorHandler()
+const themeStore = useThemeStore()
+const { isSidebarCollapsed } = useSidebar()
 
-const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"];
+const getSuggestions = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return ['Refresh the page', 'Clear browser cache', 'Contact support immediately']
+    case 'high':
+      return ['Try refreshing the page', 'Check your internet connection', 'Contact support if issue persists']
+    case 'medium':
+      return ['Refresh the page', 'Try again in a few moments', 'Check your connection']
+    case 'low':
+      return ['Try again', 'Refresh if needed']
+    default:
+      return ['Try refreshing the page', 'Contact support if needed']
+  }
+}
+
+const routesWithoutXPadding = ["/dashboard", "/point-of-contact", "/my-orders", "/my-invoices", "/payments"]
+
+// Global error capture to prevent cross-page contamination
+onErrorCaptured((error, instance, info) => {
+  const safeError = ErrorHandler.handleError(error, {
+    component: 'App',
+    action: `Vue Error: ${info}`
+  })
+  
+  console.error('Global Vue Error Captured:', {
+    message: safeError.message,
+    component: instance?.type?.name || 'Unknown',
+    info,
+    timestamp: new Date().toISOString()
+  })
+  
+  // Prevent error from propagating further
+  return false
+})
+
+// Initialize theme on app mount
+onMounted(() => {
+  try {
+    themeStore.initializeTheme()
+  } catch (error) {
+    ErrorHandler.handleError(error, {
+      component: 'App',
+      action: 'initializeTheme'
+    })
+  }
+})
 </script>
 
 <template>
-	<main>
-		<template v-if="router.currentRoute.value.fullPath === '/login'">
-			<router-view></router-view>
-		</template>
-		<AuthGuard v-else>
-			<Navbar
-				v-if="
-					router.currentRoute.value.fullPath !== '/login' &&
-					router.currentRoute.value.fullPath !== '/' &&
-					router.currentRoute.value.fullPath !== '/select-user'
-				" />
-			<div
-				v-if="router.currentRoute.value.fullPath === '/select-user'"
-				class="fullscreen-content">
-				<router-view></router-view>
-			</div>
-			<div
-				v-else
-				class="content-wrapper"
-				:class="
-					routesWithoutXPadding.includes(
-						router.currentRoute.value.fullPath,
-					)
-						? 'with-sidebar'
-						: 'without-sidebar'
-				">
-				<router-view></router-view>
-			</div>
-		</AuthGuard>
-		
-		<ErrorNotification
-			:show="errorState.show"
-			:title="errorState.title"
-			:message="errorState.message"
-			:details="errorState.details"
-			:show-retry="errorState.showRetry"
-			@close="hideError"
-			@retry="handleRetry"
-		/>
-	</main>
+  <main>
+    <template v-if="router.currentRoute.value.fullPath === '/login'">
+      <router-view />
+    </template>
+    <AuthGuard v-else>
+      <Navbar
+        v-if="
+          router.currentRoute.value.fullPath !== '/login' &&
+          router.currentRoute.value.fullPath !== '/' &&
+          router.currentRoute.value.fullPath !== '/select-user'
+        " />
+      <div
+        v-if="router.currentRoute.value.fullPath === '/select-user'"
+        class="fullscreen-content">
+        <router-view />
+      </div>
+      <div
+        v-else
+        class="content-wrapper"
+        :class="[
+          routesWithoutXPadding.includes(router.currentRoute.value.fullPath)
+            ? 'with-sidebar'
+            : 'without-sidebar',
+          { 'sidebar-collapsed': isSidebarCollapsed }
+        ]">
+        <router-view />
+      </div>
+    </AuthGuard>
+    
+    <ErrorNotification
+      :show="errorState.show"
+      :title="errorState.title"
+      :message="errorState.message"
+      :details="errorState.details"
+      :show-retry="errorState.showRetry"
+      @close="hideError"
+      @retry="handleRetry"
+    />
+    
+    <UserFriendlyError
+      :show="globalErrorState.show"
+      :title="globalErrorState.title"
+      :message="globalErrorState.message"
+      :details="globalErrorState.details"
+      :severity="globalErrorState.severity"
+      :show-retry="globalErrorState.showRetry"
+      :suggestions="getSuggestions(globalErrorState.severity)"
+      @close="hideGlobalError"
+      @retry="handleGlobalRetry"
+      @refresh="handleRefresh"
+    />
+  </main>
 </template>
 
 <style scoped>
 main {
-  height: 100vh;
-  background-color: #f5f5f5;
+  min-height: 100vh;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Mobile scrolling fixes */
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  position: relative;
 }
-.content-wrapper {
-  height: 100vh;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: #00C851 #f1f1f1;
-}
+
 
 .content-wrapper.with-sidebar {
   margin-left: 200px;
   padding-top: 64px;
   padding-left: 0;
   padding-right: 0;
+  width: calc(100vw - 200px);
+  max-width: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-wrapper.with-sidebar.sidebar-collapsed {
+  margin-left: 60px;
+  width: calc(100vw - 60px);
 }
 
 .content-wrapper.without-sidebar {
@@ -82,6 +155,8 @@ main {
   padding-right: 3rem;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
+  max-width: none;
 }
 
 .fullscreen-content {
@@ -97,11 +172,32 @@ main {
   .content-wrapper.with-sidebar {
     margin-left: 0;
     padding-top: 64px;
+    width: 100vw;
+    max-width: none;
+    /* Mobile scrolling fixes */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
   }
   
   .content-wrapper.without-sidebar {
     padding-left: 1rem;
     padding-right: 1rem;
+    width: 100vw;
+    max-width: none;
+    /* Mobile scrolling fixes */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Fix for mobile viewport height issues */
+  main {
+    min-height: 100dvh; /* Use dynamic viewport height on supported browsers */
+  }
+  
+  .content-wrapper {
+    min-height: 100dvh;
   }
 }
 </style>

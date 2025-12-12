@@ -18,12 +18,13 @@ export interface OrganizationUser {
   is_active: boolean;
   is_owner: boolean;
   organization_id: string;
-  organization_user_type?: string;
+  organization_user_type?: string | null;
   organization: {
     id: string;
     name?: string | null;
     is_active: boolean;
     created_at?: string;
+    brand_logo?: string | null;
   };
   user: {
     id: string;
@@ -126,13 +127,13 @@ const refreshTokenWithRetry = async (uid: string, maxAttempts: number = 3): Prom
       if (attempt < maxAttempts) {
         // Exponential backoff: 2s, 4s, 6s
         const delay = 2000 * attempt;
-        console.log(`Retrying token refresh in ${delay}ms...`);
+
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
   
-  console.warn('All token refresh attempts failed');
+  console.warn('Token refresh failed after all attempts', { uid, maxAttempts });
   return false;
 };
 
@@ -209,7 +210,7 @@ const waitForHasuraClaims = async (userId: string, maxAttempts: number = 5): Pro
     }
   }
   
-  console.warn('Failed to get Hasura claims after all attempts');
+  console.warn('Failed to obtain Hasura claims after all attempts', { userId, maxAttempts });
   return null;
 };
 

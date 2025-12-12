@@ -57,12 +57,31 @@
           v-for="org in filteredOrganizations" 
           :key="org.uniqueKey || `${org.id}-${org.name}`"
           class="user-card"
+          :class="{ 'selected': isSelectedOrganization(org.id) }"
           @click="selectOrganization(org)"
         >
-          <div class="user-avatar" :style="{ background: org.color }">
-            <span class="user-initial">{{ getInitials(org.name) }}</span>
+          <div class="user-avatar">
+            <img 
+              v-if="org.brand_logo" 
+              :src="org.brand_logo" 
+              :alt="org.name"
+              class="brand-logo"
+              @error="(e) => handleImageError(e, org)"
+            />
+            <div 
+              v-if="!org.brand_logo || org.showFallback" 
+              class="fallback-avatar" 
+              :style="{ background: org.color }"
+            >
+              <span class="user-initial">{{ getInitials(org.name) }}</span>
+            </div>
           </div>
           <p class="user-name">{{ org.name }}</p>
+          <div v-if="isSelectedOrganization(org.id)" class="selected-tick">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
         </div>
       </div>
       
@@ -79,18 +98,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSdk } from '@/sdk'
 import client from '@/api/APIClient'
 import { canAccessIndusDashboard } from '@/utils/auth'
 import { useUserStore } from '@/stores'
+import { useThemeStore } from '@/stores/theme'
 import { usePointOfContactStore } from '@/stores/pointOfContact'
+import { useOrganizationStore } from '@/stores/organization'
+import { useGlobalErrorHandler } from '@/composables/useGlobalErrorHandler'
 import SkeletonLoader from '@/components/layout/SkeletonLoader.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 const pointOfContactStore = usePointOfContactStore()
+const organizationStore = useOrganizationStore()
+const { showError, showNetworkError, showAuthError, showDataLoadError } = useGlobalErrorHandler()
 const organizations = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -130,6 +155,15 @@ const getInitials = (name) => {
   return name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()
 }
 
+// Check if organization is currently selected
+const isSelectedOrganization = (orgId) => {
+  // Initialize organization store if needed
+  organizationStore.initialize()
+  const selectedOrg = organizationStore.selectedOrganization || JSON.parse(localStorage.getItem('selectedOrganization') || 'null')
+
+  return selectedOrg?.id === orgId
+}
+
 // Clear search query
 const clearSearch = () => {
   searchQuery.value = ''
@@ -140,6 +174,11 @@ const clearSearch = () => {
 const performSearch = () => {
   searchQuery.value = searchInput.value
 }
+
+// Watch searchInput for automatic search
+watch(searchInput, (newValue) => {
+  searchQuery.value = newValue
+})
 
 // Computed property for filtered and sorted organizations
 const filteredOrganizations = computed(() => {
@@ -166,7 +205,7 @@ const selectOrganization = (org) => {
   // Store selected organization with avatar info
   const orgWithAvatar = {
     ...org,
-    avatar: org.color,
+    avatar: org.brand_logo || org.color,
     initials: getInitials(org.name)
   }
   localStorage.setItem('selectedOrganization', JSON.stringify(orgWithAvatar))
@@ -271,6 +310,8 @@ const fetchOrganizations = async () => {
         is_owner: orgUser.is_owner,
         organization_user_type: orgUser.organization_user_type, // Should be 'DELIVERY'
         created_at: orgUser.organization.created_at || orgUser.created_at, // Use organization creation date first
+        brand_logo: orgUser.organization.brand_logo,
+        showFallback: false,
         color: getColorForOrg(orgUser.organization.name || 'Unnamed Organization'),
         uniqueKey: `${orgUser.organization.id}-${index}-${Date.now()}` // Ensure uniqueness
       }))
@@ -301,6 +342,15 @@ const fetchOrganizations = async () => {
       error.value = 'Development Mode: Unable to load organizations. This may be due to backend services not running locally.'
     } else {
       error.value = 'Failed to load organizations. Please try again.'
+      
+      // Show global error for better UX
+      if (err.message?.includes('network') || err.message?.includes('fetch')) {
+        showNetworkError(() => retryFetch())
+      } else if (err.message?.includes('auth') || err.message?.includes('Authentication')) {
+        showAuthError()
+      } else {
+        showDataLoadError(() => retryFetch())
+      }
     }
     
     organizations.value = []
@@ -308,6 +358,13 @@ const fetchOrganizations = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Handle image loading errors
+const handleImageError = (event, org) => {
+  // Mark this organization to show fallback
+  org.showFallback = true
+  event.target.style.display = 'none'
 }
 
 // Retry fetching organizations
@@ -321,7 +378,7 @@ const checkAuthAndFetch = async () => {
   try {
     // Check if user has proper access
     if (!canAccessIndusDashboard()) {
-      console.warn('User does not have Indus Dashboard access')
+  
       router.replace('/login')
       return
     }
@@ -333,16 +390,19 @@ const checkAuthAndFetch = async () => {
         organizations.value = JSON.parse(cached)
         loading.value = false
       } catch (e) {
-        console.error('Error parsing cached organizations:', e)
+
       }
     }
     
     // Fetch fresh data
     await fetchOrganizations()
   } catch (err) {
-    console.error('Error during auth check:', err)
+    console.error('Authentication check error:', err)
     error.value = 'Authentication error. Please try logging in again.'
     loading.value = false
+    
+    // Show auth error for better UX
+    showAuthError()
   }
 }
 
@@ -363,7 +423,7 @@ const waitForAuthState = () => {
           return
         }
       } catch (error) {
-        console.log('Firebase not initialized yet, waiting...')
+
       }
       
       // Check localStorage flags as fallback
@@ -387,6 +447,9 @@ const waitForAuthState = () => {
 }
 
 onMounted(async () => {
+  // Force light mode for user selection page
+  themeStore.setTheme('light')
+  
   // Show initial loader for 1 second for smooth transition
   setTimeout(() => {
     showInitialLoader.value = false
@@ -395,7 +458,7 @@ onMounted(async () => {
   // Wait for Firebase auth state to be ready
   const authReady = await waitForAuthState()
   if (!authReady) {
-    console.warn('Firebase auth not ready and no valid localStorage flags found')
+
     // Still proceed with checkAuthAndFetch which will handle redirect if needed
   }
   
@@ -405,7 +468,7 @@ onMounted(async () => {
   // Set up interval to periodically check auth state
   authStateCheckInterval = setInterval(async () => {
     if (!canAccessIndusDashboard()) {
-      console.warn('User lost authentication, redirecting to login')
+
       clearInterval(authStateCheckInterval)
       router.replace('/login')
     }

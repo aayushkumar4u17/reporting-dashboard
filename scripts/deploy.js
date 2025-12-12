@@ -73,10 +73,19 @@ function checkForSecrets() {
   ];
 
   function scanDirectory(dir) {
-    const files = fs.readdirSync(dir);
+    // Validate directory path to prevent traversal
+    const resolvedDir = path.resolve(dir);
+    const srcDirResolved = path.resolve(srcDir);
+    
+    if (!resolvedDir.startsWith(srcDirResolved)) {
+      console.warn('⚠️  Directory traversal attempt blocked');
+      return;
+    }
+    
+    const files = fs.readdirSync(resolvedDir);
     
     for (const file of files) {
-      const filePath = path.join(dir, file);
+      const filePath = path.join(resolvedDir, file);
       const stat = fs.statSync(filePath);
       
       if (stat.isDirectory() && !file.startsWith('.')) {
@@ -86,7 +95,7 @@ function checkForSecrets() {
         
         for (const pattern of secretPatterns) {
           if (pattern.test(content)) {
-            console.warn(`⚠️  Potential secret found in ${filePath}`);
+            console.warn(`⚠️  Potential secret found in ${path.relative(srcDirResolved, filePath)}`);
           }
         }
       }

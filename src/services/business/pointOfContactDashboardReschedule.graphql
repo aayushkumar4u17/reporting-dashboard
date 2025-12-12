@@ -1,0 +1,8 @@
+query PointOfContactDashboardReschedule($org_id: String!, $city: String, $delivery_date_to: String, $delivery_date_from: String, $order_date_from: String, $order_date_to: String, $point_of_contact: String) {
+  pointOfContactDashboardReschedule(object: {org_id: $org_id, city: $city, delivery_date_from: $delivery_date_from, delivery_date_to: $delivery_date_to, order_date_from: $order_date_from, order_date_to: $order_date_to, point_of_contact: $point_of_contact}) {
+    data {
+      rescheduled_count
+      rescheduled_qty
+    }
+  }
+}

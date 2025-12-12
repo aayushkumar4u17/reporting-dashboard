@@ -30,14 +30,22 @@ const isChecking = ref(true)
 const isAuthenticated = ref(false)
 
 let isCheckingAuth = false
+let authCheckPromise: Promise<void> | null = null
 
 // Enhanced authentication check with better handling for page refreshes
 const checkAuthentication = async () => {
-  if (isCheckingAuth) {
-    return
+  if (isCheckingAuth || authCheckPromise) {
+    return authCheckPromise
   }
   
   isCheckingAuth = true
+  isChecking.value = true
+  
+  authCheckPromise = performAuthCheck()
+  return authCheckPromise
+}
+
+const performAuthCheck = async () => {
   
   try {
     // First check sessionStorage flags as a quick validation
@@ -78,7 +86,9 @@ const checkAuthentication = async () => {
       return
     }
 
-    isAuthenticated.value = true
+    if (!isAuthenticated.value) {
+      isAuthenticated.value = true
+    }
     
   } catch (error) {
     console.error('AuthGuard: Error during authentication check:', error)
@@ -86,10 +96,14 @@ const checkAuthentication = async () => {
   } finally {
     isChecking.value = false
     isCheckingAuth = false
+    authCheckPromise = null
   }
 }
 
 const redirectToLogin = () => {
+  if (isAuthenticated.value !== false) {
+    isAuthenticated.value = false
+  }
   clearLoginState()
   router.push('/login')
 }

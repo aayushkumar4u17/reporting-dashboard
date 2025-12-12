@@ -90,7 +90,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       }
       
     } catch (containerError) {
-      console.error('Failed to create reCAPTCHA container:', containerError);
+      console.error('Failed to create reCAPTCHA container:', { hasError: true });
       throw new Error("Unable to initialize reCAPTCHA. Please refresh the page and try again.");
     }
 
@@ -102,9 +102,9 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
         {
           size: "invisible",
           callback: (response: any) => {
-            console.log('reCAPTCHA solved:', !!response);
+    
           },
-          "error-callback": (error: any) => {
+          "error-callback": (_error: any) => {
             console.error('reCAPTCHA error callback:', { hasError: true });
           },
         }
@@ -121,7 +121,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
       confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
       
     } catch (otpError) {
-      console.error('Failed to send OTP:', { code: otpError?.code, message: 'OTP sending failed' });
+      console.error('Failed to send OTP:', { code: (otpError as any)?.code, hasError: true });
       
       // Clean up verifier on error
       try {
@@ -140,7 +140,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     try {
       recaptchaVerifier.clear();
     } catch (clearError) {
-      console.warn('Error clearing reCAPTCHA verifier after success:', clearError);
+      console.warn('Error clearing reCAPTCHA verifier after success:', { hasError: true });
     }
 
     setTimeout(() => {
@@ -148,7 +148,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     }, 2000);
 
   } catch (err: any) {
-    console.error('sendOTP error:', { code: err?.code, message: 'OTP process failed' });
+    console.error('sendOTP error:', { code: err?.code, hasError: true });
     
     authStore.toggleOTPVerificationModal && authStore.toggleOTPVerificationModal(false);
 
@@ -210,7 +210,7 @@ export const sendOTP = async (phoneNumber: string, setConfirmationResult: (resul
     } else {
       authStore.showErrorPopup({
         title: "Error Sending OTP",
-        message: `Unable to send OTP: ${err.message || 'Unknown error'}. Please try again.`,
+        message: "Unable to send OTP. Please try again.",
         showRetry: true,
       });
     }
@@ -237,12 +237,12 @@ export const verifyOTP = async ({ otp, confirmationResult }: { otp: string; conf
           // Provide clean, environment-appropriate error messages
           const isDev = import.meta.env.MODE === 'development';
           let title = "Account Setup in Progress";
-          let message = validation.error || "Account permissions are being configured.";
+          let message = "Account permissions are being configured.";
           
           if (isDev) {
             title = "Development Environment";
             // Use the error message as-is from the validation service
-            message = validation.error || "Backend services are starting up. Please wait a moment and try again.";
+            message = "Backend services are starting up. Please wait a moment and try again.";
           }
           
           authStore.showErrorPopup({
@@ -259,7 +259,7 @@ export const verifyOTP = async ({ otp, confirmationResult }: { otp: string; conf
         } else {
           authStore.showErrorPopup({
             title: "Access Denied",
-            message: validation.error || "Access denied",
+            message: "Access denied",
             showRetry: false,
           });
           
@@ -295,7 +295,7 @@ export const verifyOTP = async ({ otp, confirmationResult }: { otp: string; conf
     return { success: false, error: "No user found" };
   } catch (error: any) {
     // Don't show error popup here - let the component handle it
-    return { success: false, error: error.message, errorCode: error.code };
+    return { success: false, error: "Verification failed", errorCode: error.code };
   }
 };
 

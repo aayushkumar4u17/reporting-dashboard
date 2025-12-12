@@ -192,63 +192,62 @@ watch(() => props.modelValue, (newValue) => {
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid var(--border-medium);
   border-radius: 10px;
   font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-glass);
   backdrop-filter: blur(5px);
-  color: #333;
+  color: var(--text-primary);
   min-width: 120px;
+  width: 130px;
+  height: 40px;
+  box-sizing: border-box;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
-.date-input:hover {
-  border-color: rgba(0, 200, 81, 0.6);
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
-}
+
 
 .date-input:focus-within {
   outline: none;
-  border-color: #00C851;
-  box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-light);
   transform: translateY(-2px);
 }
 
 .date-value {
   flex: 1;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .date-value:empty::before {
   content: attr(data-placeholder);
-  color: #999;
+  color: var(--text-tertiary);
   font-weight: normal;
 }
 
 .calendar-icon {
-  color: #00C851;
+  color: var(--text-primary);
   margin-left: 8px;
   transition: all 0.3s ease;
 }
 
-.date-input:hover .calendar-icon {
-  color: #00A844;
-  transform: scale(1.1);
-}
+
 
 .calendar-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 200, 81, 0.2);
+  border: 2px solid var(--border-medium);
   border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px var(--shadow-medium), 0 0 0 1px var(--border-light);
   z-index: 99999;
   overflow: hidden;
   opacity: 0;
@@ -269,14 +268,14 @@ watch(() => props.modelValue, (newValue) => {
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background: linear-gradient(135deg, rgba(0, 200, 81, 0.05), rgba(0, 200, 81, 0.02));
-  border-bottom: 1px solid rgba(0, 200, 81, 0.1);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .nav-button {
-  background: rgba(0, 200, 81, 0.1);
-  border: 1px solid rgba(0, 200, 81, 0.2);
-  color: #00C851;
+  background: var(--accent-light);
+  border: 1px solid var(--border-light);
+  color: var(--accent-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -291,10 +290,10 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .nav-button:hover {
-  background: rgba(0, 200, 81, 0.2);
-  border-color: rgba(0, 200, 81, 0.4);
+  background: var(--bg-hover);
+  border-color: var(--border-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.2);
+  box-shadow: 0 4px 12px var(--accent-light);
 }
 
 .nav-button:active {
@@ -303,7 +302,7 @@ watch(() => props.modelValue, (newValue) => {
 
 .month-year {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.95rem;
   text-align: center;
   min-width: 140px;
@@ -314,14 +313,14 @@ watch(() => props.modelValue, (newValue) => {
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
   padding: 0.75rem;
-  background: rgba(0, 200, 81, 0.02);
+  background: var(--bg-primary);
 }
 
 .day-header {
   text-align: center;
   font-size: 0.7rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
   padding: 8px 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -343,13 +342,13 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .calendar-date:hover {
-  background: rgba(0, 200, 81, 0.1);
+  background: var(--accent-light);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 200, 81, 0.15);
+  box-shadow: 0 2px 8px var(--shadow-light);
 }
 
 .calendar-date.other-month {
-  color: #ccc;
+  color: var(--text-tertiary);
   cursor: default;
 }
 
@@ -360,76 +359,76 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .calendar-date.selected {
-  background: linear-gradient(135deg, #00C851, #00A844);
-  color: white;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: var(--text-inverse);
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.3);
+  box-shadow: 0 4px 12px var(--accent-light);
 }
 
 .calendar-date.selected:hover {
-  background: linear-gradient(135deg, #00A844, #008A37);
+  background: linear-gradient(135deg, var(--accent-secondary), #008A37);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 200, 81, 0.4);
+  box-shadow: 0 6px 16px var(--accent-light);
 }
 
 .calendar-date.today {
-  background: rgba(0, 200, 81, 0.15);
-  color: #00C851;
+  background: var(--accent-light);
+  color: var(--accent-primary);
   font-weight: 600;
-  border: 2px solid rgba(0, 200, 81, 0.3);
+  border: 2px solid var(--border-color);
 }
 
 .calendar-date.today:hover {
-  background: rgba(0, 200, 81, 0.25);
-  border-color: rgba(0, 200, 81, 0.5);
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
 }
 
 .calendar-date.selected.today {
-  background: linear-gradient(135deg, #00C851, #00A844);
-  color: white;
-  border: 2px solid #00A844;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: var(--text-inverse);
+  border: 2px solid var(--accent-secondary);
 }
 
 .calendar-footer {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: rgba(0, 200, 81, 0.02);
-  border-top: 1px solid rgba(0, 200, 81, 0.1);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
   gap: 0.5rem;
 }
 
 .clear-button, .today-button {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 200, 81, 0.3);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.75rem;
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #333;
+  color: var(--text-primary);
 }
 
 .clear-button:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  background: var(--status-error);
+  border-color: var(--status-error-text);
+  color: var(--status-error-text);
   transform: translateY(-1px);
 }
 
 .today-button {
-  background: rgba(0, 200, 81, 0.1);
-  color: #00C851;
-  border-color: rgba(0, 200, 81, 0.3);
+  background: var(--accent-light);
+  color: var(--accent-primary);
+  border-color: var(--border-color);
 }
 
 .today-button:hover {
-  background: #00C851;
-  color: white;
-  border-color: #00A844;
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border-color: var(--accent-secondary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.3);
+  box-shadow: 0 4px 12px var(--accent-light);
 }
 
 /* Responsive Design */
